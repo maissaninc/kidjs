@@ -6,14 +6,14 @@ and provides helper functions that simplify many of the browser APIs.
 
 ## Usage
 
-Load the framework into your HTML file. Any code written inside of
+Use the following HTML template to get started. Any code written inside of
 `<script type="kidjs">` tags will be executed by the framework.
 
 ```
 <html>
   <head>
     <title>Kid.js Example</title>
-    <script src="kid.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@maissaninc/kidjs/dist/kid.min.js"></script>
   </head>
   <body>
     <script type="kidjs">

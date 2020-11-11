@@ -1,5 +1,15 @@
 {
   "presets": [
-    "@babel/env"
+    [
+      '@babel/preset-env',
+      {
+        targets: {
+          esmodules: true
+        }
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-async-to-generator"
   ]
 }

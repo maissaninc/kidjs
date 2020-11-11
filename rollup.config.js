@@ -1,6 +1,6 @@
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from "rollup-plugin-terser";
 
 export default {
   input: 'src/kid.js',
@@ -15,7 +15,11 @@ export default {
       name: 'KID',
       file: 'dist/kid.min.js',
       plugins: [
-        uglify()
+        terser({
+          format: {
+            ascii_only: true
+          }
+        })
       ]
     }
   ],

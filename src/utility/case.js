@@ -1,4 +1,25 @@
-function normalizeCase(code) {
+function normalizeNode(node) {
+  switch (node.type) {
+    case 'Identifier':
+      node.name = normalizeIdentifier(node.name);
+      break;
+    case 'AssignmentExpression':
+    case 'BinaryExpression':
+      normalizeNode(node.left);
+      normalizeNode(node.right);
+      break;
+    case 'MemberExpression':
+      normalizeNode(node.property);
+      break;
+    case 'ForStatement':
+      normalizeNode(node.init);
+      normalizeNode(node.test);
+      normalizeNode(node.update);
+      break;
+  }
+}
+
+function normalizeIdentifier(identifier) {
 
   // Dictionary of cased functions and keywords
   var dictionary = [
@@ -21,45 +42,37 @@ function normalizeCase(code) {
     'lineStyle',
     'lineTo',
     'Math',
-    'Math\.PI',
     'moveTo',
     'Number',
     'Object',
     'parseFloat',
     'parseInt',
+    'PI',
     'removeEventListener',
     'requestAnimationFrame',
+    'shadowBlur',
+    'shadowColor',
+    'shadowOffsetX',
+    'shadowOffsetY',
     'String',
+    'strokeStyle',
+    'textAlign',
+    'textBaseline',
     'toLowerCase',
     'toUpperCase'
   ];
 
-  // Split along string literals
-  var tokens = code.split(
-    /("(?:[^"\\]*(?:\\.[^"\\]*)*)"|\'(?:[^\'\\]*(?:\\.[^\'\\]*)*)\')/
-  );
+  // Lowercase all identifiers
+  identifier = identifier.toLowerCase();
 
-  var result = '';
-  for (var i = 0; i < tokens.length; i++) {
-
-    // If string literal, leave it alone
-    if (tokens[i][0] == '\"' || tokens[i][0] == '\'') {
-      result += tokens[i];
-
-    // Otherwise correct casing
-    } else {
-      var token = tokens[i].toLowerCase();
-      for (var j = 0; j < dictionary.length; j++) {
-        token = token.replace(
-          new RegExp('\\b' + dictionary[j].toLowerCase() + '\\b', 'g'),
-          dictionary[j]
-        );
-      }
-      result += token;
+  // Correct case for specific identifiers
+  for (var j = 0; j < dictionary.length; j++) {
+    if (identifier == dictionary[j].toLowerCase()) {
+      identifier = dictionary[j];
     }
   }
 
-  return result;
+  return identifier;
 };
 
-export { normalizeCase }
+export { normalizeNode }

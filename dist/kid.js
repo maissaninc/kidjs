@@ -9038,29 +9038,43 @@
     }
   };
 
-  function normalizeCase(code) {
+  function normalizeNode(node) {
+    switch (node.type) {
+      case 'Identifier':
+        node.name = normalizeIdentifier(node.name);
+        break;
+
+      case 'AssignmentExpression':
+      case 'BinaryExpression':
+        normalizeNode(node.left);
+        normalizeNode(node.right);
+        break;
+
+      case 'MemberExpression':
+        normalizeNode(node.property);
+        break;
+
+      case 'ForStatement':
+        normalizeNode(node.init);
+        normalizeNode(node.test);
+        normalizeNode(node.update);
+        break;
+    }
+  }
+
+  function normalizeIdentifier(identifier) {
     // Dictionary of cased functions and keywords
-    var dictionary = ['addEventListener', 'appendChild', 'bezierCurveTo', 'clearRect', 'decodeURI', 'decodeURIComponent', 'drawImage', 'encodeURI', 'encodeURIComponent', 'fillCircle', 'fillRect', 'fillStyle', 'JSON', 'indexOf', 'isFinite', 'isNaN', 'lineStyle', 'lineTo', 'Math', 'Math\.PI', 'moveTo', 'Number', 'Object', 'parseFloat', 'parseInt', 'removeEventListener', 'requestAnimationFrame', 'String', 'toLowerCase', 'toUpperCase']; // Split along string literals
+    var dictionary = ['addEventListener', 'appendChild', 'bezierCurveTo', 'clearRect', 'decodeURI', 'decodeURIComponent', 'drawImage', 'encodeURI', 'encodeURIComponent', 'fillCircle', 'fillRect', 'fillStyle', 'JSON', 'indexOf', 'isFinite', 'isNaN', 'lineStyle', 'lineTo', 'Math', 'moveTo', 'Number', 'Object', 'parseFloat', 'parseInt', 'PI', 'removeEventListener', 'requestAnimationFrame', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY', 'String', 'strokeStyle', 'textAlign', 'textBaseline', 'toLowerCase', 'toUpperCase']; // Lowercase all identifiers
 
-    var tokens = code.split(/("(?:[^"\\]*(?:\\.[^"\\]*)*)"|\'(?:[^\'\\]*(?:\\.[^\'\\]*)*)\')/);
-    var result = '';
+    identifier = identifier.toLowerCase(); // Correct case for specific identifiers
 
-    for (var i = 0; i < tokens.length; i++) {
-      // If string literal, leave it alone
-      if (tokens[i][0] == '\"' || tokens[i][0] == '\'') {
-        result += tokens[i]; // Otherwise correct casing
-      } else {
-        var token = tokens[i].toLowerCase();
-
-        for (var j = 0; j < dictionary.length; j++) {
-          token = token.replace(new RegExp('\\b' + dictionary[j].toLowerCase() + '\\b', 'g'), dictionary[j]);
-        }
-
-        result += token;
+    for (var j = 0; j < dictionary.length; j++) {
+      if (identifier == dictionary[j].toLowerCase()) {
+        identifier = dictionary[j];
       }
     }
 
-    return result;
+    return identifier;
   }
 
   function Grid() {
@@ -9108,7 +9122,13 @@
 
   KID._listeners = []; // Track animation requests added after initialization
 
-  KID._animationRequests = []; // Initialize framework
+  KID._animationRequests = []; // Default settings
+
+  KID.settings = {
+    caseInsensitive: false,
+    slowMotion: false,
+    pixelSize: 1
+  }; // Initialize framework
 
   window.addEventListener('DOMContentLoaded', function () {
     new KID.Animation();
@@ -9148,15 +9168,13 @@
     var scripts = document.querySelectorAll('script[type="kidjs"]');
 
     for (var i = 0; i < scripts.length; i = i + 1) {
+      if (scripts[i].getAttribute('caseInsensitive') == 'true') {
+        KID.settings.caseInsensitive = true;
+      }
+
       KID.run(scripts[i].innerHTML);
     }
-  }); // Default settings
-
-  KID.settings = {
-    caseInsensitive: false,
-    slowMotion: false,
-    pixelSize: 1
-  }; // Reset framework
+  }); // Reset framework
 
   window.reset = function () {
     KID._canvas.reset();
@@ -9183,11 +9201,7 @@
 
   KID.run = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator(function* (code) {
-      if (KID.settings.caseInsensitive) {
-        code = KID.normalizeCase(code);
-      } // Parse code
-
-
+      // Parse code
       var ast = parse('(async function() {' + code + '})()', {
         locations: true
       }); // Preload images
@@ -9211,10 +9225,16 @@
 
       for (var i = 0; i < images.length; i = i + 1) {
         yield KID._canvas.loadImage(images[i]);
-      } // Insert step code
+      } // Walk entire source tree
 
 
       full(ast.body[0], function (node) {
+        // Case insensitive
+        if (KID.settings.caseInsensitive) {
+          KID.normalizeNode(node);
+        } // Insert step code
+
+
         if (node.body) {
           for (var i = node.body.length - 1; i >= 0; i = i - 1) {
             if (['ExpressionStatement', 'VariableDeclaration'].indexOf(node.body[i].type) > -1) {
@@ -9250,7 +9270,7 @@
   exports.Scene = Scene;
   exports.Speech = Speech;
   exports.Sprite = Sprite;
-  exports.normalizeCase = normalizeCase;
+  exports.normalizeNode = normalizeNode;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

@@ -11,7 +11,7 @@ export { Sprite } from './scene/sprite.js';
 export { Speech } from './speech/speech.js';
 export { Keyboard } from './keyboard/keyboard.js';
 export { Pointer } from './pointer/pointer.js';
-export { normalizeCase } from './utility/case.js';
+export { normalizeNode } from './utility/case.js';
 export { Grid } from './utility/grid.js';
 
 // Track event listeners added after initialization
@@ -19,6 +19,13 @@ KID._listeners = [];
 
 // Track animation requests added after initialization
 KID._animationRequests = [];
+
+// Default settings
+KID.settings = {
+  caseInsensitive: false,
+  slowMotion: false,
+  pixelSize: 1
+};
 
 // Initialize framework
 window.addEventListener('DOMContentLoaded', function() {
@@ -56,16 +63,12 @@ window.addEventListener('DOMContentLoaded', function() {
   // Execute script blocks
   var scripts = document.querySelectorAll('script[type="kidjs"]');
   for (var i = 0; i < scripts.length; i = i + 1) {
+    if (scripts[i].getAttribute('caseInsensitive') == 'true') {
+      KID.settings.caseInsensitive = true;
+    }
     KID.run(scripts[i].innerHTML);
   }
 });
-
-// Default settings
-KID.settings = {
-  caseInsensitive: false,
-  slowMotion: false,
-  pixelSize: 1
-};
 
 // Reset framework
 window.reset = function() {
@@ -86,9 +89,6 @@ window.reset = function() {
 
 // Run script
 KID.run = async function(code) {
-  if (KID.settings.caseInsensitive) {
-    code = KID.normalizeCase(code);
-  }
 
   // Parse code
   var ast = acorn.parse('(async function() {' + code + '})()', {
@@ -108,8 +108,15 @@ KID.run = async function(code) {
     await KID._canvas.loadImage(images[i]);
   }
 
-  // Insert step code
+  // Walk entire source tree
   walk.full(ast.body[0], function(node) {
+
+    // Case insensitive
+    if (KID.settings.caseInsensitive) {
+      KID.normalizeNode(node);
+    }
+
+    // Insert step code
     if (node.body) {
       for (var i = node.body.length - 1; i >= 0; i = i - 1) {
         if (['ExpressionStatement', 'VariableDeclaration'].indexOf(node.body[i].type) > -1) {

@@ -9341,14 +9341,16 @@
         KID._permissions.checkRequiredPermissions(node); // Insert step code
 
 
-        if (node.body) {
-          for (var i = node.body.length - 1; i >= 0; i = i - 1) {
-            if (['ExpressionStatement', 'VariableDeclaration'].indexOf(node.body[i].type) > -1) {
-              node.body.splice(i + 1, 0, KID.debug._createStepStatement(node.body[i].loc));
-            }
+        if (KID.settings.slowMotion !== false) {
+          if (node.body) {
+            for (var i = node.body.length - 1; i >= 0; i = i - 1) {
+              if (['ExpressionStatement', 'VariableDeclaration'].indexOf(node.body[i].type) > -1) {
+                node.body.splice(i + 1, 0, KID.debug._createStepStatement(node.body[i].loc));
+              }
 
-            if (node.body[i].type == 'FunctionDeclaration') {
-              node.body[i].async = true;
+              if (node.body[i].type == 'FunctionDeclaration') {
+                node.body[i].async = true;
+              }
             }
           }
         }

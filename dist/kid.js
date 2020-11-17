@@ -9120,6 +9120,38 @@
     }
   };
 
+  function Permissions() {
+    this.granted = [];
+    this.requested = []; // Permission not required for device orientation
+
+    if (typeof DeviceMotionEvent.requestPermission != "function") {
+      this.granted.push('deviceorientation');
+    }
+  }
+
+  Permissions.prototype = {
+    constructor: Permissions,
+    checkRequiredPermissions: function checkRequiredPermissions(node) {
+      if (node.type == 'CallExpression') {
+        if (node.callee.name == 'addEventListener') {
+          if (node.arguments.length) {
+            switch (node.arguments[0].raw) {
+              case 'deviceorientation':
+              case 'devicemotion':
+                this.addPermission(node.arguments[0].raw);
+                break;
+            }
+          }
+        }
+      }
+    },
+    addPermission: function addPermission(permission) {
+      if (this.granted.indexOf(permission) < 0) {
+        this.requested.push(permission);
+      }
+    }
+  };
+
   KID._listeners = []; // Track animation requests added after initialization
 
   KID._animationRequests = []; // Default settings
@@ -9143,6 +9175,7 @@
     new KID.Keyboard();
     new KID.Pointer();
     KID._grid = new KID.Grid();
+    KID._permissions = new KID.Permissions();
     window.dispatchEvent(new Event('KID.ready'));
     window['Sprite'] = KID.Sprite; // Override addEventListener
 
@@ -9232,7 +9265,10 @@
         // Case insensitive
         if (KID.settings.caseInsensitive) {
           KID.normalizeNode(node);
-        } // Insert step code
+        } // Check for required permissions
+
+
+        KID._permissions.checkRequiredPermissions(node); // Insert step code
 
 
         if (node.body) {
@@ -9249,6 +9285,7 @@
       });
       ast.body[0].expression.callee.body.body.push(KID.debug._createEndStatement()); // Run code
 
+      console.log(KID._permissions.granted);
       code = generate(ast);
       eval(code); // Code finished
 
@@ -9266,6 +9303,7 @@
   exports.DeviceOrientation = DeviceOrientation;
   exports.Grid = Grid;
   exports.Keyboard = Keyboard;
+  exports.Permissions = Permissions;
   exports.Pointer = Pointer;
   exports.Scene = Scene;
   exports.Speech = Speech;

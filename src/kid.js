@@ -13,6 +13,7 @@ export { Keyboard } from './keyboard/keyboard.js';
 export { Pointer } from './pointer/pointer.js';
 export { normalizeNode } from './utility/case.js';
 export { Grid } from './utility/grid.js';
+export { Permissions } from './utility/permissions.js';
 
 // Track event listeners added after initialization
 KID._listeners = [];
@@ -39,6 +40,7 @@ window.addEventListener('DOMContentLoaded', function() {
   new KID.Keyboard();
   new KID.Pointer();
   KID._grid = new KID.Grid();
+  KID._permissions = new KID.Permissions();
   window.dispatchEvent(new Event('KID.ready'));
   window['Sprite'] = KID.Sprite;
 
@@ -115,6 +117,9 @@ KID.run = async function(code) {
     if (KID.settings.caseInsensitive) {
       KID.normalizeNode(node);
     }
+
+    // Check for required permissions
+    KID._permissions.checkRequiredPermissions(node);
 
     // Insert step code
     if (node.body) {

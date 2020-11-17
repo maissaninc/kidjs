@@ -9038,43 +9038,29 @@
     }
   };
 
-  function normalizeNode(node) {
-    switch (node.type) {
-      case 'Identifier':
-        node.name = normalizeIdentifier(node.name);
-        break;
-
-      case 'AssignmentExpression':
-      case 'BinaryExpression':
-        normalizeNode(node.left);
-        normalizeNode(node.right);
-        break;
-
-      case 'MemberExpression':
-        normalizeNode(node.property);
-        break;
-
-      case 'ForStatement':
-        normalizeNode(node.init);
-        normalizeNode(node.test);
-        normalizeNode(node.update);
-        break;
-    }
-  }
-
-  function normalizeIdentifier(identifier) {
+  function normalizeCase(code) {
     // Dictionary of cased functions and keywords
-    var dictionary = ['addEventListener', 'appendChild', 'bezierCurveTo', 'clearRect', 'decodeURI', 'decodeURIComponent', 'drawImage', 'encodeURI', 'encodeURIComponent', 'fillCircle', 'fillRect', 'fillStyle', 'JSON', 'indexOf', 'isFinite', 'isNaN', 'lineStyle', 'lineTo', 'Math', 'moveTo', 'Number', 'Object', 'parseFloat', 'parseInt', 'PI', 'removeEventListener', 'requestAnimationFrame', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY', 'String', 'strokeStyle', 'textAlign', 'textBaseline', 'toLowerCase', 'toUpperCase']; // Lowercase all identifiers
+    var dictionary = ['addEventListener', 'appendChild', 'bezierCurveTo', 'clearRect', 'decodeURI', 'decodeURIComponent', 'drawImage', 'encodeURI', 'encodeURIComponent', 'fillCircle', 'fillRect', 'fillStyle', 'JSON', 'indexOf', 'isFinite', 'isNaN', 'lineStyle', 'lineTo', 'Math.PI', 'moveTo', 'Number', 'Object', 'parseFloat', 'parseInt', 'removeEventListener', 'requestAnimationFrame', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY', 'String', 'strokeStyle', 'textAlign', 'textBaseline', 'toLowerCase', 'toUpperCase']; // Split code along string literals
 
-    identifier = identifier.toLowerCase(); // Correct case for specific identifiers
+    var tokens = code.split(/("(?:[^"\\]*(?:\\.[^"\\]*)*)"|\'(?:[^\'\\]*(?:\\.[^\'\\]*)*)\')/);
+    var result = ''; // Iterate over each token
 
-    for (var j = 0; j < dictionary.length; j++) {
-      if (identifier == dictionary[j].toLowerCase()) {
-        identifier = dictionary[j];
+    for (var i = 0; i < tokens.length; i++) {
+      // If string literal, leave it alone
+      if (tokens[i][0] == '\"' || tokens[i][0] == '\'') {
+        result += tokens[i]; // Otherwise correct casing
+      } else {
+        var token = tokens[i].toLowerCase();
+
+        for (var j = 0; j < dictionary.length; j++) {
+          token = token.replace(new RegExp('\\b' + dictionary[j].toLowerCase() + '\\b', 'g'), dictionary[j]);
+        }
+
+        result += token;
       }
     }
 
-    return identifier;
+    return result;
   }
 
   function Grid() {
@@ -9304,7 +9290,12 @@
 
   KID.run = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator(function* (code) {
-      // Parse code
+      // Case insensitive
+      if (KID.settings.caseInsensitive) {
+        code = KID.normalizeCase(code);
+      } // Parse code
+
+
       var ast = parse('(async function() {' + code + '})()', {
         locations: true
       }); // Preload images
@@ -9332,12 +9323,7 @@
 
 
       full(ast.body[0], function (node) {
-        // Case insensitive
-        if (KID.settings.caseInsensitive) {
-          KID.normalizeNode(node);
-        } // Check for required permissions
-
-
+        // Check for required permissions
         KID._permissions.checkRequiredPermissions(node); // Insert step code
 
 
@@ -9387,7 +9373,7 @@
   exports.Scene = Scene;
   exports.Speech = Speech;
   exports.Sprite = Sprite;
-  exports.normalizeNode = normalizeNode;
+  exports.normalizeCase = normalizeCase;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

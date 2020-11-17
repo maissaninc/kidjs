@@ -11,7 +11,7 @@ export { Sprite } from './scene/sprite.js';
 export { Speech } from './speech/speech.js';
 export { Keyboard } from './keyboard/keyboard.js';
 export { Pointer } from './pointer/pointer.js';
-export { normalizeNode } from './utility/case.js';
+export { normalizeCase } from './utility/case.js';
 export { Grid } from './utility/grid.js';
 export { Permissions } from './utility/permissions.js';
 
@@ -92,6 +92,11 @@ window.reset = function() {
 // Run script
 KID.run = async function(code) {
 
+  // Case insensitive
+  if (KID.settings.caseInsensitive) {
+    code = KID.normalizeCase(code);
+  }
+
   // Parse code
   var ast = acorn.parse('(async function() {' + code + '})()', {
     locations: true
@@ -112,11 +117,6 @@ KID.run = async function(code) {
 
   // Walk entire source tree
   walk.full(ast.body[0], function(node) {
-
-    // Case insensitive
-    if (KID.settings.caseInsensitive) {
-      KID.normalizeNode(node);
-    }
 
     // Check for required permissions
     KID._permissions.checkRequiredPermissions(node);

@@ -9040,7 +9040,7 @@
 
   function normalizeCase(code) {
     // Dictionary of cased functions and keywords
-    var dictionary = ['addEventListener', 'appendChild', 'bezierCurveTo', 'clearRect', 'decodeURI', 'decodeURIComponent', 'drawImage', 'encodeURI', 'encodeURIComponent', 'fillCircle', 'fillRect', 'fillStyle', 'JSON', 'indexOf', 'isFinite', 'isNaN', 'lineStyle', 'lineTo', 'Math.PI', 'moveTo', 'Number', 'Object', 'parseFloat', 'parseInt', 'removeEventListener', 'requestAnimationFrame', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY', 'String', 'strokeStyle', 'textAlign', 'textBaseline', 'toLowerCase', 'toUpperCase']; // Split code along string literals
+    var dictionary = ['addEventListener', 'appendChild', 'bezierCurveTo', 'clearRect', 'decodeURI', 'decodeURIComponent', 'drawImage', 'encodeURI', 'encodeURIComponent', 'fillCircle', 'fillRect', 'fillStyle', 'JSON', 'indexOf', 'isFinite', 'isNaN', 'lineStyle', 'lineTo', 'lineWidth', 'moveTo', 'Number', 'Object', 'parseFloat', 'parseInt', 'PI', 'removeEventListener', 'requestAnimationFrame', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY', 'String', 'strokeStyle', 'textAlign', 'textBaseline', 'toLowerCase', 'toUpperCase']; // Split code along string literals
 
     var tokens = code.split(/("(?:[^"\\]*(?:\\.[^"\\]*)*)"|\'(?:[^\'\\]*(?:\\.[^\'\\]*)*)\')/);
     var result = ''; // Iterate over each token

@@ -9124,12 +9124,12 @@
     this.granted = [];
     this.requested = []; // Permission not required for device orientation
 
-    if (typeof DeviceOrientationEvent.requestPermission != "function") {
+    if (typeof DeviceOrientationEvent == 'undefined' || typeof DeviceOrientationEvent.requestPermission != "function") {
       this.granted.push('deviceorientation');
     } // Permission not required for device motion
 
 
-    if (typeof DeviceMotionEvent.requestPermission != "function") {
+    if (typeof DeviceMotionEvent == 'undefined' || typeof DeviceMotionEvent.requestPermission != "function") {
       this.granted.push('devicemotion');
     }
   }

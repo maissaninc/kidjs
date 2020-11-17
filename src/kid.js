@@ -137,9 +137,17 @@ KID.run = async function(code) {
     KID.debug._createEndStatement()
   );
 
-  // Run code
+  // Generate code
   code = astring.generate(ast);
-  eval(code);
+
+  // Permissions required
+  if (KID._permissions.requested.length > 0) {
+    KID._permissions.clickToStart(function() {
+      eval(code);
+    });
+  } else {
+    eval(code);
+  }
 
   // Code finished
   window.dispatchEvent(new Event('KID.parsed'));

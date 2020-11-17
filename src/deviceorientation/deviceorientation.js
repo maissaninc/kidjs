@@ -38,7 +38,7 @@ DeviceOrientation.prototype = {
     if (window.matchMedia('(orientation: portrait)').matches) {
       return e.gamma;
     } else {
-      return e.beta;
+      return -e.beta;
     }
   },
 

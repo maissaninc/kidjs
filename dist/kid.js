@@ -9140,12 +9140,17 @@
       if (node.type == 'CallExpression') {
         if (node.callee.name == 'addEventListener') {
           if (node.arguments.length) {
-            console.log(node.arguments[0].value);
-
             switch (node.arguments[0].value) {
               case 'deviceorientation':
+              case 'tiltleft':
+              case 'tiltright':
+              case 'tiltup':
+              case 'tiltdown':
+                this.addPermission('deviceorientation');
+                break;
+
               case 'devicemotion':
-                this.addPermission(node.arguments[0].value);
+                this.addPermission('devicemotion');
                 break;
             }
           }
@@ -9355,7 +9360,7 @@
       if (KID._permissions.requested.length > 0) {
         KID._permissions.clickToStart(function () {
           eval(code);
-        });
+        }.bind(this));
       } else {
         eval(code);
       } // Code finished

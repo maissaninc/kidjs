@@ -144,7 +144,7 @@ KID.run = async function(code) {
   if (KID._permissions.requested.length > 0) {
     KID._permissions.clickToStart(function() {
       eval(code);
-    });
+    }.bind(this));
   } else {
     eval(code);
   }

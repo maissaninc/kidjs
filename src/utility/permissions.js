@@ -3,12 +3,12 @@ function Permissions() {
   this.requested = [];
 
   // Permission not required for device orientation
-  if (typeof( DeviceOrientationEvent.requestPermission ) != "function") {
+  if (typeof(DeviceOrientationEvent.requestPermission) != "function") {
     this.granted.push('deviceorientation');
   }
 
   // Permission not required for device motion
-  if (typeof( DeviceMotionEvent.requestPermission ) != "function") {
+  if (typeof(DeviceMotionEvent.requestPermission) != "function") {
     this.granted.push('devicemotion');
   }
 }
@@ -21,11 +21,17 @@ Permissions.prototype = {
     if (node.type == 'CallExpression') {
       if (node.callee.name == 'addEventListener') {
         if (node.arguments.length) {
-          console.log(node.arguments[0].value);
           switch (node.arguments[0].value) {
             case 'deviceorientation':
+            case 'tiltleft':
+            case 'tiltright':
+            case 'tiltup':
+            case 'tiltdown':
+              this.addPermission('deviceorientation');
+              break;
+
             case 'devicemotion':
-              this.addPermission(node.arguments[0].value);
+              this.addPermission('devicemotion');
               break;
           }
         }

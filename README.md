@@ -25,4 +25,7 @@ Use the following HTML template to get started. Any code written inside of
 </html>
 ```
 
-Supported by Maissan Inc.
+See the [Wiki](https://github.com/maissaninc/kidjs/wiki) for a comprehensive
+list of available commands and events.
+
+Supported by [Maissan Inc.](https://maissan.net)

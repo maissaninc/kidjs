@@ -8898,7 +8898,7 @@
     constructor: Sprite,
     _draw: function _draw() {
       if (typeof this.draw === 'function') {
-        this.draw.bind(KID._scene.canvas);
+        this.draw.apply(KID._scene.canvas, [this.x, this.y]);
       } else {
         if (this.image) {
           // Draw image

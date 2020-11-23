@@ -8883,8 +8883,8 @@
   };
 
   function Sprite(image) {
-    this.x = 0;
-    this.y = 0;
+    this._x = 0;
+    this._y = 0;
     this.width = false;
     this.height = false;
     this.image = image;
@@ -8897,6 +8897,27 @@
 
   Sprite.prototype = {
     constructor: Sprite,
+
+    set x(val) {
+      this._x = val;
+
+      this._updateBoundingPath();
+    },
+
+    get x() {
+      return this._x;
+    },
+
+    set y(val) {
+      this._y = val;
+
+      this._updateBoundingPath();
+    },
+
+    get y() {
+      return this._y;
+    },
+
     _draw: function _draw() {
       if (typeof this.draw === 'function') {
         this.draw.apply(KID._scene.canvas, [this.x, this.y]);
@@ -8922,10 +8943,26 @@
         }
       }
     },
+    _updateBoundingPath: function _updateBoundingPath() {
+      this._boundingPath = new Path2D();
+
+      this._boundingPath.moveTo(this.x, this.y);
+
+      this._boundingPath.lineTo(this.x + this.width, this.y);
+
+      this._boundingPath.lineTo(this.x + this.width, this.y + this.height);
+
+      this._boundingPath.lineTo(this.x, this.y + this.height);
+
+      this._boundingPath.closePath();
+    },
     updatePosition: function updatePosition() {
       this.speed = this.speed + this.acceleration;
-      this.x = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
-      this.y = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+
+      if (this.speed > 0) {
+        this.x = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
+        this.y = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+      }
     },
     degreesToRadians: function degreesToRadians(degrees) {
       return degrees * Math.PI / 180;

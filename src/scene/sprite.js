@@ -1,18 +1,37 @@
 function Sprite(image) {
-  this.x = 0;
-  this.y = 0;
+  this._x = 0;
+  this._y = 0;
   this.width = false;
   this.height = false;
   this.image = image;
   this.direction = 0;
   this.speed = 0;
   this.acceleration = 0;
+
   KID._scene.addSprite(this);
 }
 
 Sprite.prototype = {
 
   constructor: Sprite,
+
+  set x(val) {
+    this._x = val;
+    this._updateBoundingPath();
+  },
+
+  get x() {
+    return this._x;
+  },
+
+  set y(val) {
+    this._y = val;
+    this._updateBoundingPath();
+  },
+
+  get y() {
+    return this._y;
+  },
 
   _draw: function() {
     if (typeof this.draw === 'function') {
@@ -40,10 +59,21 @@ Sprite.prototype = {
     }
   },
 
+  _updateBoundingPath: function() {
+    this._boundingPath = new Path2D();
+    this._boundingPath.moveTo(this.x, this.y);
+    this._boundingPath.lineTo(this.x + this.width, this.y);
+    this._boundingPath.lineTo(this.x + this.width, this.y + this.height);
+    this._boundingPath.lineTo(this.x, this.y + this.height);
+    this._boundingPath.closePath();
+  },
+
   updatePosition: function() {
     this.speed = this.speed + this.acceleration;
-    this.x = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
-    this.y = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+    if (this.speed > 0) {
+      this.x = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
+      this.y = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+    }
   },
 
   degreesToRadians: function(degrees) {

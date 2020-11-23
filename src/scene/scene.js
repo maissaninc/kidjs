@@ -23,21 +23,22 @@ Scene.prototype = {
     }
 
     // Check for collisions
-    if (typeof window.onCollision == 'function') {
-      for (var i = 0; i < this.sprites.length; i = i + 1) {
-        for (var j = i + 1; j < this.sprites.length; j = j + 1) {
+    for (var i = 0; i < this.sprites.length; i = i + 1) {
+      for (var j = i + 1; j < this.sprites.length; j = j + 1) {
 
-          // Check for box collision
-          if (
-            this.sprites[i].width && this.sprites[i].height &&
-            this.sprites[j].width && this.sprites[j].height &&
-            this.sprites[i].x + this.sprites[i].width > this.sprites[j].x &&
-            this.sprites[i].x < this.sprites[j].x + this.sprites[j].width &&
-            this.sprites[i].y + this.sprites[i].height > this.sprites[j].y &&
-            this.sprites[i].y < this.sprites[j].y + this.sprites[j].height
-          ) {
-            window.onCollision(this.sprites[i], this.sprites[j]);
-          }
+        // Check for box collision
+        if (
+          this.sprites[i].width && this.sprites[i].height &&
+          this.sprites[j].width && this.sprites[j].height &&
+          this.sprites[i].x + this.sprites[i].width > this.sprites[j].x &&
+          this.sprites[i].x < this.sprites[j].x + this.sprites[j].width &&
+          this.sprites[i].y + this.sprites[i].height > this.sprites[j].y &&
+          this.sprites[i].y < this.sprites[j].y + this.sprites[j].height
+        ) {
+          var event = new Event('collision');
+          event.a = this.sprites[i];
+          event.b = this.sprites[j];
+          window.dispatchEvent(event);
         }
       }
     }

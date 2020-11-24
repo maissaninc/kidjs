@@ -1,6 +1,7 @@
 function Scene() {
   this.sprites = [];
   this.canvas = new KID.Canvas('kidjs-scene');
+  window.addEventListener('click', this.onClick.bind(this));
 }
 
 Scene.prototype = {
@@ -40,6 +41,19 @@ Scene.prototype = {
           event.b = this.sprites[j];
           window.dispatchEvent(event);
         }
+      }
+    }
+  },
+
+  onClick: function(e) {
+    for (var i = 0; i < this.sprites.length; i = i + 1) {
+      if (this.canvas.context.isPointInPath(
+        this.sprites[i]._boundingPath,
+        e.clientX,
+        e.clientY
+      )) {
+        var event = new Event('click');
+        this.sprites[i].dispatchEvent(event);
       }
     }
   }

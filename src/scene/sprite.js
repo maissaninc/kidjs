@@ -7,6 +7,7 @@ function Sprite(image) {
   this.direction = 0;
   this.speed = 0;
   this.acceleration = 0;
+  this._listeners = {};
 
   KID._scene.addSprite(this);
 }
@@ -78,6 +79,31 @@ Sprite.prototype = {
 
   degreesToRadians: function(degrees) {
     return degrees * Math.PI / 180;
+  },
+
+  addEventListener(event, listener) {
+    if (!Array.isArray(this._listeners[event])) {
+      this._listeners[event] = [];
+    }
+    this._listeners[event].push(listener);
+  },
+
+  removeEventListener(event, listener) {
+    if (Array.isArray(this._listeners[event])) {
+      for (var i = this._listeners[event].length; i >= 0; i = i - 1) {
+        if (this._listeners[event][i] == listener) {
+          this._listeners[event].splice(i, 1);
+        }
+      }
+    }
+  },
+
+  dispatchEvent(event) {
+    if (Array.isArray(this._listeners[event.type])) {
+      for (var i = 0; i < this._listeners[event.type].length; i = i + 1) {
+        this._listeners[event.type][i].call(this);
+      }
+    }
   }
 };
 

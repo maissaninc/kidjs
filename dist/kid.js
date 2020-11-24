@@ -8849,6 +8849,7 @@
 
   function Scene() {
     this.sprites = [];
+    this.walls = [];
     this.canvas = new KID.Canvas('kidjs-scene');
     window.addEventListener('click', this.onClick.bind(this));
   }
@@ -8858,9 +8859,17 @@
     addSprite: function addSprite(sprite) {
       this.sprites.push(sprite);
     },
+    addWall: function addWall(wall) {
+      this.walls.push(wall);
+    },
     drawFrame: function drawFrame() {
       // Clear frame
-      this.canvas.clear(); // Update and draw sprites
+      this.canvas.clear(); // Draw walls
+
+      for (var i = 0; i < this.walls.length; i = i + 1) {
+        this.walls[i]._draw();
+      } // Update and draw sprites
+
 
       for (var i = 0; i < this.sprites.length; i = i + 1) {
         this.sprites[i]._draw();
@@ -9004,6 +9013,28 @@
       }
     }
 
+  };
+
+  function Wall(x1, y1, x2, y2) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+
+    KID._scene.addWall(this);
+  }
+
+  Wall.prototype = {
+    constructor: Wall,
+    _draw: function _draw() {
+      if (typeof this.draw === 'function') {
+        this.draw.apply(KID._scene.canvas, [this.x1, this.y1, this.x2, this.y2]);
+      } else {
+        KID._scene.canvas.moveTo(this.x1, this.y1);
+
+        KID._scene.canvas.lineTo(this.x2, this.y2);
+      }
+    }
   };
 
   function Speech() {
@@ -9448,6 +9479,7 @@
   exports.Scene = Scene;
   exports.Speech = Speech;
   exports.Sprite = Sprite;
+  exports.Wall = Wall;
   exports.normalizeCase = normalizeCase;
 
   Object.defineProperty(exports, '__esModule', { value: true });

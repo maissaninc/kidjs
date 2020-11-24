@@ -8,6 +8,7 @@ export { Debug } from './debug/debug.js';
 export { DeviceOrientation } from './deviceorientation/deviceorientation.js';
 export { Scene } from './scene/scene.js';
 export { Sprite } from './scene/sprite.js';
+export { Wall } from './scene/wall.js';
 export { Speech } from './speech/speech.js';
 export { Keyboard } from './keyboard/keyboard.js';
 export { Pointer } from './pointer/pointer.js';

@@ -9420,6 +9420,19 @@
           }
 
           return CallExpression;
+        }(),
+        NewExpression: function () {
+          var _NewExpression = _asyncToGenerator(function* (node) {
+            if (node.callee.name == 'Sprite') {
+              images.push(node.arguments[0].value);
+            }
+          });
+
+          function NewExpression(_x3) {
+            return _NewExpression.apply(this, arguments);
+          }
+
+          return NewExpression;
         }()
       });
 

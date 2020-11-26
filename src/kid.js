@@ -110,6 +110,11 @@ KID.run = async function(code) {
       if (node.callee.name == 'drawImage') {
         images.push(node.arguments[0].value);
       }
+    },
+    NewExpression: async function(node) {
+      if (node.callee.name == 'Sprite') {
+        images.push(node.arguments[0].value);
+      }
     }
   });
   for (var i = 0; i < images.length; i = i + 1) {

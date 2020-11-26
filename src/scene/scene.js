@@ -17,6 +17,12 @@ Scene.prototype = {
     this.walls.push(wall);
   },
 
+  reset: function() {
+    this.sprites.splice(0, this.sprites.length);
+    this.walls.splice(0, this.walls.length);
+    this.canvas.clear();
+  },
+
   drawFrame: function() {
 
     // Clear frame

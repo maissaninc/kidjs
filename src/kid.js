@@ -77,6 +77,7 @@ window.addEventListener('DOMContentLoaded', function() {
 window.reset = function() {
   KID._canvas.reset();
   KID._canvas.clear();
+  KID._scene.reset();
   KID._grid.draw();
   var listener = KID._listeners.pop();
   while (listener) {

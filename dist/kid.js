@@ -8862,6 +8862,11 @@
     addWall: function addWall(wall) {
       this.walls.push(wall);
     },
+    reset: function reset() {
+      this.sprites.splice(0, this.sprites.length);
+      this.walls.splice(0, this.walls.length);
+      this.canvas.clear();
+    },
     drawFrame: function drawFrame() {
       // Clear frame
       this.canvas.clear(); // Draw walls
@@ -9375,6 +9380,8 @@
     KID._canvas.reset();
 
     KID._canvas.clear();
+
+    KID._scene.reset();
 
     KID._grid.draw();
 

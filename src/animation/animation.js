@@ -10,9 +10,6 @@ Animation.prototype = {
     if (typeof window.onAnimationFrame === 'function') {
       window.onAnimationFrame();
     }
-    if (typeof KID._scene.drawFrame === 'function') {
-      KID._scene.drawFrame();
-    }
     window.requestAnimationFrame(this.onRequestAnimationFrame.bind(this));
   }
 };

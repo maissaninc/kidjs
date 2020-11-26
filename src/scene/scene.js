@@ -3,6 +3,7 @@ function Scene() {
   this.walls = [];
   this.canvas = new KID.Canvas('kidjs-scene');
   window.addEventListener('click', this.onClick.bind(this));
+  requestAnimationFrame(this.drawFrame.bind(this));
 }
 
 Scene.prototype = {
@@ -59,6 +60,8 @@ Scene.prototype = {
         }
       }
     }
+
+    requestAnimationFrame(this.drawFrame.bind(this));
   },
 
   onClick: function(e) {

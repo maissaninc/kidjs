@@ -8450,10 +8450,6 @@
         window.onAnimationFrame();
       }
 
-      if (typeof KID._scene.drawFrame === 'function') {
-        KID._scene.drawFrame();
-      }
-
       window.requestAnimationFrame(this.onRequestAnimationFrame.bind(this));
     }
   };
@@ -8852,6 +8848,7 @@
     this.walls = [];
     this.canvas = new KID.Canvas('kidjs-scene');
     window.addEventListener('click', this.onClick.bind(this));
+    requestAnimationFrame(this.drawFrame.bind(this));
   }
 
   Scene.prototype = {
@@ -8894,6 +8891,8 @@
           }
         }
       }
+
+      requestAnimationFrame(this.drawFrame.bind(this));
     },
     onClick: function onClick(e) {
       for (var i = 0; i < this.sprites.length; i = i + 1) {

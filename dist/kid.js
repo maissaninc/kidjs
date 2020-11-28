@@ -8848,7 +8848,7 @@
     this.walls = [];
     this.canvas = new KID.Canvas('kidjs-scene');
     window.addEventListener('click', this.onClick.bind(this));
-    requestAnimationFrame(this.drawFrame.bind(this));
+    requestAnimationFrame(this.drawFrame.bind(this), true);
   }
 
   Scene.prototype = {
@@ -8892,7 +8892,7 @@
         }
       }
 
-      requestAnimationFrame(this.drawFrame.bind(this));
+      requestAnimationFrame(this.drawFrame.bind(this), true);
     },
     onClick: function onClick(e) {
       for (var i = 0; i < this.sprites.length; i = i + 1) {
@@ -9359,8 +9359,14 @@
 
     window.parentRequestAnimationFrame = window.requestAnimationFrame;
 
-    window.requestAnimationFrame = function (callback) {
-      KID._animationRequests.push(window.parentRequestAnimationFrame(callback));
+    window.requestAnimationFrame = function (callback, system) {
+      if (typeof system == undefined) {
+        if (KID_.animationRequests.indexOf(callback) < 0) {
+          KID._animationRequests.push(window.parentRequestAnimationFrame(callback));
+        }
+      } else {
+        window.parentRequestAnimationFrame(callback);
+      }
     }; // Execute script blocks
 
 

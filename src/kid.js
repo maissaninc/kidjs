@@ -57,10 +57,16 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // Override requestAnimationFrame
   window.parentRequestAnimationFrame = window.requestAnimationFrame;
-  window.requestAnimationFrame = function(callback) {
-    KID._animationRequests.push(
-      window.parentRequestAnimationFrame(callback)
-    );
+  window.requestAnimationFrame = function(callback, system) {
+    if (typeof system == undefined) {
+      if (KID_.animationRequests.indexOf(callback) < 0) {
+        KID._animationRequests.push(
+          window.parentRequestAnimationFrame(callback)
+        );
+      }
+    } else {
+      window.parentRequestAnimationFrame(callback);
+    }
   }
 
   // Execute script blocks

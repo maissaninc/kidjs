@@ -2,6 +2,7 @@ function Scene() {
   this.sprites = [];
   this.walls = [];
   this.canvas = new KID.Canvas('kidjs-scene');
+  this._lastFrame = 0;
   window.addEventListener('click', this.onClick.bind(this));
   requestAnimationFrame(this.drawFrame.bind(this), true);
 }
@@ -24,7 +25,9 @@ Scene.prototype = {
     this.canvas.clear();
   },
 
-  drawFrame: function() {
+  drawFrame: function(timestamp) {
+    var elapsed = timestamp - this._lastFrame;
+    this._lastFrame = timestamp;
 
     // Clear frame
     this.canvas.clear();
@@ -37,7 +40,7 @@ Scene.prototype = {
     // Update and draw sprites
     for (var i = 0; i < this.sprites.length; i = i + 1) {
       this.sprites[i]._draw();
-      this.sprites[i].updatePosition();
+      this.sprites[i].updatePosition(elapsed);
     }
 
     // Check for collisions

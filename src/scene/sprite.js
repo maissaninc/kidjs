@@ -71,11 +71,11 @@ Sprite.prototype = {
     this._boundingPath.addPoint(this.x, this.y + this.height);
   },
 
-  updatePosition: function() {
-    this.speed = this.speed + this.acceleration;
+  updatePosition: function(elapsed) {
+    this.speed = this.speed + this.acceleration * (elapsed / 1000) ;
     if (this.speed > 0) {
-      var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
-      var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+      var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
+      var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
       if (this._checkPosition(xprime, yprime)) {
         this.x = xprime;
         this.y = yprime;

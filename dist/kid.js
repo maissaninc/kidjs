@@ -8847,6 +8847,7 @@
     this.sprites = [];
     this.walls = [];
     this.canvas = new KID.Canvas('kidjs-scene');
+    this._lastFrame = 0;
     window.addEventListener('click', this.onClick.bind(this));
     requestAnimationFrame(this.drawFrame.bind(this), true);
   }
@@ -8864,8 +8865,10 @@
       this.walls.splice(0, this.walls.length);
       this.canvas.clear();
     },
-    drawFrame: function drawFrame() {
-      // Clear frame
+    drawFrame: function drawFrame(timestamp) {
+      var elapsed = timestamp - this._lastFrame;
+      this._lastFrame = timestamp; // Clear frame
+
       this.canvas.clear(); // Draw walls
 
       for (var i = 0; i < this.walls.length; i = i + 1) {
@@ -8876,7 +8879,7 @@
       for (var i = 0; i < this.sprites.length; i = i + 1) {
         this.sprites[i]._draw();
 
-        this.sprites[i].updatePosition();
+        this.sprites[i].updatePosition(elapsed);
       } // Check for collisions
 
 
@@ -9060,12 +9063,12 @@
 
       this._boundingPath.addPoint(this.x, this.y + this.height);
     },
-    updatePosition: function updatePosition() {
-      this.speed = this.speed + this.acceleration;
+    updatePosition: function updatePosition(elapsed) {
+      this.speed = this.speed + this.acceleration * (elapsed / 1000);
 
       if (this.speed > 0) {
-        var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
-        var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+        var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
+        var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
 
         if (this._checkPosition(xprime, yprime)) {
           this.x = xprime;

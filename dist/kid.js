@@ -8896,11 +8896,93 @@
     },
     onClick: function onClick(e) {
       for (var i = 0; i < this.sprites.length; i = i + 1) {
-        if (this.canvas.context.isPointInPath(this.sprites[i]._boundingPath, e.clientX, e.clientY)) {
+        if (this.sprites[i].containsPoint(e.clientX, e.clientY)) {
           var event = new Event('click');
           this.sprites[i].dispatchEvent(event);
         }
       }
+    }
+  };
+
+  function Path() {
+    this.x = 0;
+    this.y = 0;
+    this.points = [];
+    this._path = new Path2D();
+  }
+
+  Path.prototype = {
+    constructor: Path,
+    addPoint: function addPoint(x, y) {
+      this.points.push({
+        x: x,
+        y: y
+      });
+
+      this._updateInternalPath();
+    },
+    clearPoints: function clearPoints() {
+      this.points = [];
+    },
+    _updateInternalPath: function _updateInternalPath() {
+      this._path = new Path2D();
+
+      if (this.points.length) {
+        this._path.moveTo(this.points[0].x, this.points[0].y);
+      }
+
+      for (var i = 1; i < this.points.length; i = i + 1) {
+        this._path.lineTo(this.points[i].x, this.points[i].y);
+      }
+
+      this._path.closePath();
+    },
+    containsPoint: function containsPoint(x, y) {
+      return KID._scene.canvas.context.isPointInPath(this._path, x, y);
+    },
+    lineIntersects: function lineIntersects(x1, y1, x2, y2) {
+      for (var i = 0; i < this.points.length; i = i + 1) {
+        var j = (i + 1) % this.points.length;
+
+        if (this.lineSegmentsIntersect(this.points[i].x, this.points[i].y, this.points[j].x, this.points[j].y, x1, y1, x2, y2)) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+    lineSegmentsIntersect: function lineSegmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+      var a1 = y2 - y1;
+      var b1 = x1 - x2;
+      var c1 = x2 * y1 - x1 * y2;
+      var r3 = a1 * x3 + b1 * y3 + c1;
+      var r4 = a1 * x4 + b1 * y4 + c1;
+
+      if (r3 !== 0 && r4 !== 0 && Math.sign(r3) == Math.sign(r4)) {
+        return false;
+      }
+
+      var a2 = y4 - y3;
+      var b2 = x3 - x4;
+      var c2 = x4 * y3 - x3 * y4;
+      var r1 = a2 * x1 + b2 * y1 + c2;
+      var r2 = a2 * x2 + b2 * y2 + c2;
+
+      if (r1 !== 0 && r2 !== 0 && Math.sign(r1) == Math.sign(r2)) {
+        return false;
+      }
+
+      var denominator = a1 * b2 - a2 * b1;
+
+      if (denominator === 0) {
+        if ((x1 >= x3 && x1 <= x4 || x2 >= x3 && x2 <= x4 || x3 <= x1 && x3 >= x2) && (y1 >= y3 && y1 <= y4 || y2 >= y3 && y2 <= y4 || y3 <= y1 && y3 >= y2)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      return true;
     }
   };
 
@@ -8914,6 +8996,7 @@
     this.speed = 0;
     this.acceleration = 0;
     this._listeners = {};
+    this._boundingPath = new Path();
 
     KID._scene.addSprite(this);
   }
@@ -8967,25 +9050,40 @@
       }
     },
     _updateBoundingPath: function _updateBoundingPath() {
-      this._boundingPath = new Path2D();
+      this._boundingPath.clearPoints();
 
-      this._boundingPath.moveTo(this.x, this.y);
+      this._boundingPath.addPoint(this.x, this.y);
 
-      this._boundingPath.lineTo(this.x + this.width, this.y);
+      this._boundingPath.addPoint(this.x + this.width, this.y);
 
-      this._boundingPath.lineTo(this.x + this.width, this.y + this.height);
+      this._boundingPath.addPoint(this.x + this.width, this.y + this.height);
 
-      this._boundingPath.lineTo(this.x, this.y + this.height);
-
-      this._boundingPath.closePath();
+      this._boundingPath.addPoint(this.x, this.y + this.height);
     },
     updatePosition: function updatePosition() {
       this.speed = this.speed + this.acceleration;
 
       if (this.speed > 0) {
-        this.x = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
-        this.y = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+        var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
+        var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+
+        if (this._checkPosition(xprime, yprime)) {
+          this.x = xprime;
+          this.y = yprime;
+        }
       }
+    },
+    _checkPosition: function _checkPosition(x, y) {
+      if (this._boundingPath) {
+        for (var i = 0; i < KID._scene.walls.length; i = i + 1) {
+          if (this._boundingPath.lineIntersects(KID._scene.walls[i].x1, KID._scene.walls[i].y1, KID._scene.walls[i].x2, KID._scene.walls[i].y2)) return false;
+        }
+      }
+
+      return true;
+    },
+    containsPoint: function containsPoint(x, y) {
+      return this._boundingPath.containsPoint(x, y);
     },
     degreesToRadians: function degreesToRadians(degrees) {
       return degrees * Math.PI / 180;

@@ -66,11 +66,7 @@ Scene.prototype = {
 
   onClick: function(e) {
     for (var i = 0; i < this.sprites.length; i = i + 1) {
-      if (this.canvas.context.isPointInPath(
-        this.sprites[i]._boundingPath,
-        e.clientX,
-        e.clientY
-      )) {
+      if (this.sprites[i].containsPoint(e.clientX, e.clientY)) {
         var event = new Event('click');
         this.sprites[i].dispatchEvent(event);
       }

@@ -1,3 +1,5 @@
+import { Path } from './path.js';
+
 function Sprite(image) {
   this._x = 0;
   this._y = 0;
@@ -8,6 +10,7 @@ function Sprite(image) {
   this.speed = 0;
   this.acceleration = 0;
   this._listeners = {};
+  this._boundingPath = new Path();
 
   KID._scene.addSprite(this);
 }
@@ -61,20 +64,41 @@ Sprite.prototype = {
   },
 
   _updateBoundingPath: function() {
-    this._boundingPath = new Path2D();
-    this._boundingPath.moveTo(this.x, this.y);
-    this._boundingPath.lineTo(this.x + this.width, this.y);
-    this._boundingPath.lineTo(this.x + this.width, this.y + this.height);
-    this._boundingPath.lineTo(this.x, this.y + this.height);
-    this._boundingPath.closePath();
+    this._boundingPath.clearPoints();
+    this._boundingPath.addPoint(this.x, this.y);
+    this._boundingPath.addPoint(this.x + this.width, this.y);
+    this._boundingPath.addPoint(this.x + this.width, this.y + this.height);
+    this._boundingPath.addPoint(this.x, this.y + this.height);
   },
 
   updatePosition: function() {
     this.speed = this.speed + this.acceleration;
     if (this.speed > 0) {
-      this.x = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
-      this.y = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+      var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed;
+      var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+      if (this._checkPosition(xprime, yprime)) {
+        this.x = xprime;
+        this.y = yprime;
+      }
     }
+  },
+
+  _checkPosition: function(x, y) {
+    if (this._boundingPath) {
+      for (var i = 0; i < KID._scene.walls.length; i = i + 1) {
+        if (this._boundingPath.lineIntersects(
+          KID._scene.walls[i].x1,
+          KID._scene.walls[i].y1,
+          KID._scene.walls[i].x2,
+          KID._scene.walls[i].y2
+        )) return false;
+      }
+    }
+    return true;
+  },
+
+  containsPoint: function(x, y) {
+    return this._boundingPath.containsPoint(x, y);
   },
 
   degreesToRadians: function(degrees) {

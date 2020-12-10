@@ -9,6 +9,7 @@ function Sprite(image) {
   this.direction = 0;
   this.speed = 0;
   this.acceleration = 0;
+  this.mass = 0;
   this._listeners = {};
   this._boundingPath = new Path();
 
@@ -71,11 +72,25 @@ Sprite.prototype = {
     this._boundingPath.addPoint(this.x, this.y + this.height);
   },
 
-  updatePosition: function(elapsed) {
+  updatePosition: function(elapsed, gravity) {
+
+    // Update speed
     this.speed = this.speed + this.acceleration * (elapsed / 1000) ;
-    if (this.speed > 0) {
-      var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
-      var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
+
+    // Break speed into x and y vectors
+    var velocityX = Math.cos(this.degreesToRadians(this.direction)) * this.speed;
+    var velocityY = Math.sin(this.degreesToRadians(this.direction)) * this.speed;
+
+    // Apply gravity
+    if (this.mass && gravity) {
+      velocityY = velocityY + gravity * (elapsed / 1000);
+      this.speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+      this.direction = Math.atan2(velocityY, velocityX) * 180 / Math.PI;
+    }
+
+    if (velocityX || velocityY) {
+      var xprime = this.x + velocityX;
+      var yprime = this.y + velocityY;
       if (this._checkPosition(xprime, yprime)) {
         this.x = xprime;
         this.y = yprime;

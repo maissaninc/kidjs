@@ -8847,6 +8847,7 @@
     this.sprites = [];
     this.walls = [];
     this.canvas = new KID.Canvas('kidjs-scene');
+    this.gravity = 9.8;
     this._lastFrame = 0;
     window.addEventListener('click', this.onClick.bind(this));
     requestAnimationFrame(this.drawFrame.bind(this), true);
@@ -8879,7 +8880,7 @@
       for (var i = 0; i < this.sprites.length; i = i + 1) {
         this.sprites[i]._draw();
 
-        this.sprites[i].updatePosition(elapsed);
+        this.sprites[i].updatePosition(elapsed, this.gravity);
       } // Check for collisions
 
 
@@ -8998,6 +8999,7 @@
     this.direction = 0;
     this.speed = 0;
     this.acceleration = 0;
+    this.mass = 0;
     this._listeners = {};
     this._boundingPath = new Path();
 
@@ -9063,12 +9065,22 @@
 
       this._boundingPath.addPoint(this.x, this.y + this.height);
     },
-    updatePosition: function updatePosition(elapsed) {
-      this.speed = this.speed + this.acceleration * (elapsed / 1000);
+    updatePosition: function updatePosition(elapsed, gravity) {
+      // Update speed
+      this.speed = this.speed + this.acceleration * (elapsed / 1000); // Break speed into x and y vectors
 
-      if (this.speed > 0) {
-        var xprime = this.x + Math.cos(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
-        var yprime = this.y + Math.sin(this.degreesToRadians(this.direction)) * this.speed * (elapsed / 1000);
+      var velocityX = Math.cos(this.degreesToRadians(this.direction)) * this.speed;
+      var velocityY = Math.sin(this.degreesToRadians(this.direction)) * this.speed; // Apply gravity
+
+      if (this.mass && gravity) {
+        velocityY = velocityY + gravity * (elapsed / 1000);
+        this.speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+        this.direction = Math.atan2(velocityY, velocityX) * 180 / Math.PI;
+      }
+
+      if (velocityX || velocityY) {
+        var xprime = this.x + velocityX;
+        var yprime = this.y + velocityY;
 
         if (this._checkPosition(xprime, yprime)) {
           this.x = xprime;

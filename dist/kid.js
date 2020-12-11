@@ -8843,13 +8843,42 @@
     }
   };
 
+  function Wall(x1, y1, x2, y2, visible, exclude) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.visible = visible == undefined ? true : visible;
+
+    if (!exclude) {
+      KID._scene.addWall(this);
+    }
+  }
+
+  Wall.prototype = {
+    constructor: Wall,
+    _draw: function _draw() {
+      if (this.visible) {
+        if (typeof this.draw === 'function') {
+          this.draw.apply(KID._scene.canvas, [this.x1, this.y1, this.x2, this.y2]);
+        } else {
+          KID._scene.canvas.moveTo(this.x1, this.y1);
+
+          KID._scene.canvas.lineTo(this.x2, this.y2);
+        }
+      }
+    }
+  };
+
   function Scene() {
     this.sprites = [];
     this.walls = [];
     this.canvas = new KID.Canvas('kidjs-scene');
     this.gravity = 9.8;
     this._lastFrame = 0;
-    this._activeCollisions = [];
+    this._activeCollisions = []; // Add floor
+
+    this.walls[0] = new Wall(0, this.canvas.container.offsetHeight, this.canvas.container.offsetWidth, this.canvas.container.offsetHeight, false, true);
     window.addEventListener('click', this.onClick.bind(this));
     requestAnimationFrame(this.drawFrame.bind(this), true);
   }
@@ -9139,28 +9168,6 @@
       }
     }
 
-  };
-
-  function Wall(x1, y1, x2, y2) {
-    this.x1 = x1;
-    this.y1 = y1;
-    this.x2 = x2;
-    this.y2 = y2;
-
-    KID._scene.addWall(this);
-  }
-
-  Wall.prototype = {
-    constructor: Wall,
-    _draw: function _draw() {
-      if (typeof this.draw === 'function') {
-        this.draw.apply(KID._scene.canvas, [this.x1, this.y1, this.x2, this.y2]);
-      } else {
-        KID._scene.canvas.moveTo(this.x1, this.y1);
-
-        KID._scene.canvas.lineTo(this.x2, this.y2);
-      }
-    }
   };
 
   function Speech() {

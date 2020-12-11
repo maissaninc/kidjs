@@ -1,3 +1,5 @@
+import { Wall } from './wall.js';
+
 function Scene() {
   this.sprites = [];
   this.walls = [];
@@ -5,6 +7,17 @@ function Scene() {
   this.gravity = 9.8;
   this._lastFrame = 0;
   this._activeCollisions = [];
+
+  // Add floor
+  this.walls[0] = new Wall(
+    0,
+    this.canvas.container.offsetHeight,
+    this.canvas.container.offsetWidth,
+    this.canvas.container.offsetHeight,
+    false,
+    true
+  );
+
   window.addEventListener('click', this.onClick.bind(this));
   requestAnimationFrame(this.drawFrame.bind(this), true);
 }

@@ -4,6 +4,7 @@ function Scene() {
   this.canvas = new KID.Canvas('kidjs-scene');
   this.gravity = 9.8;
   this._lastFrame = 0;
+  this._activeCollisions = [];
   window.addEventListener('click', this.onClick.bind(this));
   requestAnimationFrame(this.drawFrame.bind(this), true);
 }
@@ -45,6 +46,7 @@ Scene.prototype = {
     }
 
     // Check for collisions
+    var collisions = [];
     for (var i = 0; i < this.sprites.length; i = i + 1) {
       for (var j = i + 1; j < this.sprites.length; j = j + 1) {
 
@@ -57,13 +59,21 @@ Scene.prototype = {
           this.sprites[i].y + this.sprites[i].height > this.sprites[j].y &&
           this.sprites[i].y < this.sprites[j].y + this.sprites[j].height
         ) {
-          var event = new Event('collision');
-          event.a = this.sprites[i];
-          event.b = this.sprites[j];
-          window.dispatchEvent(event);
+
+          // Collision found
+          collisions.push(i + '-' + j);
+
+          // Check if new collision
+          if (this._activeCollisions.indexOf(i + '-' + j) < 0) {
+            var event = new Event('collision');
+            event.a = this.sprites[i];
+            event.b = this.sprites[j];
+            window.dispatchEvent(event);
+          }
         }
       }
     }
+    this._activeCollisions = collisions;
 
     requestAnimationFrame(this.drawFrame.bind(this), true);
   },

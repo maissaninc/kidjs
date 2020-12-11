@@ -8849,6 +8849,7 @@
     this.canvas = new KID.Canvas('kidjs-scene');
     this.gravity = 9.8;
     this._lastFrame = 0;
+    this._activeCollisions = [];
     window.addEventListener('click', this.onClick.bind(this));
     requestAnimationFrame(this.drawFrame.bind(this), true);
   }
@@ -8884,18 +8885,26 @@
       } // Check for collisions
 
 
+      var collisions = [];
+
       for (var i = 0; i < this.sprites.length; i = i + 1) {
         for (var j = i + 1; j < this.sprites.length; j = j + 1) {
           // Check for box collision
           if (this.sprites[i].width && this.sprites[i].height && this.sprites[j].width && this.sprites[j].height && this.sprites[i].x + this.sprites[i].width > this.sprites[j].x && this.sprites[i].x < this.sprites[j].x + this.sprites[j].width && this.sprites[i].y + this.sprites[i].height > this.sprites[j].y && this.sprites[i].y < this.sprites[j].y + this.sprites[j].height) {
-            var event = new Event('collision');
-            event.a = this.sprites[i];
-            event.b = this.sprites[j];
-            window.dispatchEvent(event);
+            // Collision found
+            collisions.push(i + '-' + j); // Check if new collision
+
+            if (this._activeCollisions.indexOf(i + '-' + j) < 0) {
+              var event = new Event('collision');
+              event.a = this.sprites[i];
+              event.b = this.sprites[j];
+              window.dispatchEvent(event);
+            }
           }
         }
       }
 
+      this._activeCollisions = collisions;
       requestAnimationFrame(this.drawFrame.bind(this), true);
     },
     onClick: function onClick(e) {

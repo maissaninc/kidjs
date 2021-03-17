@@ -3,17 +3,17 @@ import resolve from '@rollup/plugin-node-resolve';
 import { terser } from "rollup-plugin-terser";
 
 export default {
-  input: 'src/kid.js',
+  input: 'src/index.js',
   output: [
     {
       format: 'umd',
       name: 'KID',
-      file: 'dist/kid.js'
+      file: 'dist/index.js'
     },
     {
       format: 'umd',
       name: 'KID',
-      file: 'dist/kid.min.js',
+      file: 'dist/index.min.js',
       plugins: [
         terser({
           format: {

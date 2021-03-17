@@ -57,6 +57,7 @@ export default class Stage {
   render() {
     this.context.clearRect(0, 0, this.width, this.height);
     for (let obj of this.children) {
+      obj.updatePosition();
       obj.render(this.context);
     }
     requestAnimationFrame(this.render.bind(this));

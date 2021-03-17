@@ -6707,12 +6707,13 @@ function generate(node, options) {
 
 
 
-function preprocess(code) {
+async function preprocess(code) {
 
   // Parse code into source tree
   let ast = acorn__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .Qc('(async function() {' + code + '})()', {
     locations: true
   });
+  console.log(ast);
 
   // Walk entire source tree
   acorn_walk__WEBPACK_IMPORTED_MODULE_1__/* .full */ .rp(ast.body[0], function(node) {
@@ -6742,7 +6743,9 @@ function preprocess(code) {
 }
 
 async function run(code) {
-  eval(preprocess(code));
+  let processed = await preprocess(code);
+  console.log(processed);
+  eval(processed);
 }
 
 async function wait(seconds) {
@@ -6865,6 +6868,7 @@ class Stage {
   render() {
     this.context.clearRect(0, 0, this.width, this.height);
     for (let obj of this.children) {
+      obj.updatePosition();
       obj.render(this.context);
     }
     requestAnimationFrame(this.render.bind(this));
@@ -6877,6 +6881,14 @@ class Shape {
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
+    this.speed = {
+      x: 0,
+      y: 0
+    };
+    this.acceleration = {
+      x: 0,
+      y: 0
+    };
     return this;
   }
 
@@ -6891,6 +6903,13 @@ class Shape {
     context.closePath();
     context.fill();
     context.stroke();
+  }
+
+  updatePosition() {
+    this.x = this.x + this.speed.x;
+    this.y = this.y + this.speed.y;
+    this.speed.x = this.speed.x + this.acceleration.x;
+    this.speed.y = this.speed.y + this.acceleration.y;
   }
 }
 

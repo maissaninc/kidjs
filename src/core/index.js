@@ -2,12 +2,13 @@ import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 
-function preprocess(code) {
+async function preprocess(code) {
 
   // Parse code into source tree
   let ast = acorn.parse('(async function() {' + code + '})()', {
     locations: true
   });
+  console.log(ast);
 
   // Walk entire source tree
   walk.full(ast.body[0], function(node) {
@@ -37,7 +38,9 @@ function preprocess(code) {
 }
 
 export async function run(code) {
-  eval(preprocess(code));
+  let processed = await preprocess(code);
+  console.log(processed);
+  eval(processed);
 }
 
 export async function wait(seconds) {

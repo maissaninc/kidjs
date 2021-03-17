@@ -60,6 +60,6 @@ export default class Stage {
       obj.updatePosition();
       obj.render(this.context);
     }
-    requestAnimationFrame(this.render.bind(this));
+    requestAnimationFrame(() => this.render());
   }
 }

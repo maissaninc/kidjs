@@ -9,6 +9,19 @@
 
       let c = circle(100, 100, 10);
 
+      on('keypress', function(key) {
+        if (key == 'a') {
+          c.speed.x = 1;
+        }
+        if (key == 'b') {
+          reset();
+        }
+      });
+
+      on('keyup', function() {
+        c.speed.x = 0;
+      })
+
     </script>
   </body>
 </html>

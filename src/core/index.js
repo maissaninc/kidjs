@@ -1,6 +1,7 @@
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import * as astring from 'astring';
+import { removeAllEventListeners } from './events';
 
 async function preprocess(code) {
 
@@ -8,7 +9,6 @@ async function preprocess(code) {
   let ast = acorn.parse('(async function() {' + code + '})()', {
     locations: true
   });
-  console.log(ast);
 
   // Walk entire source tree
   walk.full(ast.body[0], function(node) {
@@ -37,9 +37,13 @@ async function preprocess(code) {
   return astring.generate(ast);
 }
 
+export function reset() {
+  removeAllEventListeners();
+}
+
 export async function run(code) {
+  reset();
   let processed = await preprocess(code);
-  console.log(processed);
   eval(processed);
 }
 

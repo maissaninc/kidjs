@@ -1,4 +1,5 @@
-import { run, wait } from './core';
+import { run, reset, wait } from './core';
+import { on } from './core/events';
 import Stage from './stage';
 import { circle } from './shape/circle';
 import { rect } from './shape/rect';
@@ -6,6 +7,8 @@ import { rect } from './shape/rect';
 // Set globals
 window.stage = new Stage();
 window.circle = circle;
+window.on = on;
+window.reset = reset;
 window.wait = wait;
 
 window.addEventListener('DOMContentLoaded', function() {

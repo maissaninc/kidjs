@@ -6735,7 +6735,6 @@ function addEventListener(type, listener) {
     listener: listener
   });
   window.addEventListener(type, listener);
-  console.log(listeners);
 }
 
 function removeAllEventListeners() {
@@ -6943,6 +6942,7 @@ class Shape {
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
+
     this.speed = {
       x: 0,
       y: 0
@@ -6951,6 +6951,10 @@ class Shape {
       x: 0,
       y: 0
     };
+
+    this.state = 'default';
+    this.frame = 0;
+
     return this;
   }
 
@@ -6965,6 +6969,7 @@ class Shape {
     context.closePath();
     context.fill();
     context.stroke();
+    this.frame++;
   }
 
   updatePosition() {
@@ -6996,7 +7001,49 @@ function circle(x, y, radius) {
   return shape;
 }
 
+;// CONCATENATED MODULE: ./src/shape/line.js
+
+
+function line(x1, y1, x2, y2) {
+  const shape = new Shape();
+
+  shape.x1 = x1;
+  shape.y1 = y1;
+  shape.x2 = x2;
+  shape.y2 = y2;
+
+  shape.render = function(context) {
+    this.prerender(context);
+
+    switch (this.state) {
+      case 'wiggle':
+        context.strokeStyle = 'red';
+        context.moveTo(this.x1, this.y1);
+        context.lineTo(this.x2, this.y2);
+        if (this.frame > 300) {
+          this.frame = 0;
+          this.state = 'default';
+        }
+        break;
+
+      default:
+        context.moveTo(this.x1, this.y1);
+        context.lineTo(this.x2, this.y2);
+    }
+    this.postrender(context);
+  }
+
+  shape.wiggle = function() {
+    this.state = 'wiggle';
+  }
+
+  window.stage.addChild(shape);
+
+  return shape;
+}
+
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 
@@ -7006,6 +7053,7 @@ function circle(x, y, radius) {
 // Set globals
 window.stage = new Stage();
 window.circle = circle;
+window.line = line;
 window.on = events.on;
 window.reset = core/* reset */.mc;
 window.wait = core/* wait */.Dc;

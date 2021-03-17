@@ -33,7 +33,6 @@ function addEventListener(type, listener) {
     listener: listener
   });
   window.addEventListener(type, listener);
-  console.log(listeners);
 }
 
 export function removeAllEventListeners() {

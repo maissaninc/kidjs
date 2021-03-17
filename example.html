@@ -9,6 +9,8 @@
 
       let c = circle(100, 100, 10);
 
+      line(10, 10, 400, 400).wiggle();
+
       on('keypress', function(key) {
         if (key == 'a') {
           c.speed.x = 1;

@@ -3,6 +3,7 @@ export default class Shape {
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
+
     this.speed = {
       x: 0,
       y: 0
@@ -11,6 +12,10 @@ export default class Shape {
       x: 0,
       y: 0
     };
+
+    this.state = 'default';
+    this.frame = 0;
+
     return this;
   }
 
@@ -25,6 +30,7 @@ export default class Shape {
     context.closePath();
     context.fill();
     context.stroke();
+    this.frame++;
   }
 
   updatePosition() {

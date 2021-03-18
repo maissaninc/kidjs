@@ -7001,7 +7001,43 @@ function circle(x, y, radius) {
   return shape;
 }
 
+;// CONCATENATED MODULE: ./src/shape/vector.js
+class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  get length() {
+    return Math.sqrt(
+      Math.pow(this.x, 2) + Math.pow(this.y, 2)
+    );
+  }
+
+  rotate(degrees) {
+    let angle = degress * (Math.PI / 180);
+    let vector = {
+      x: this.x * Math.cos(angle) - this.y * Math.sin(angle),
+      y: this.x * Math.sin(angle) + this.y * Math.cos(angle)
+    };
+    this.x = vector.x;
+    this.y = vector.y;
+  }
+
+  normalize() {
+    return new Vector(
+      this.x / this.length,
+      this.y / this.length
+    );
+  }
+
+  dotProduct(v) {
+    return (this.x * v.x + this.y * v.y);
+  }
+}
+
 ;// CONCATENATED MODULE: ./src/shape/line.js
+
 
 
 /**
@@ -7023,9 +7059,18 @@ function line(x1, y1, x2, y2) {
 
     switch (this.state) {
       case 'wiggle':
-        context.strokeStyle = 'red';
         context.moveTo(this.x1, this.y1);
-        context.lineTo(this.x2, this.y2);
+        for (let i = 0; i < this.vectors.length - 1; i = i + 2) {
+          let magnitude = Math.sin(this.frame / 5) * 10
+          context.bezierCurveTo(
+            this.x1 + this.vectors[i].x - this.u.y * magnitude,
+            this.y1 + this.vectors[i].y + this.u.x * magnitude,
+            this.x1 + this.vectors[i].x + this.u.y * magnitude,
+            this.y1 + this.vectors[i].y - this.u.x * magnitude,
+            this.x1 + this.vectors[i + 1].x,
+            this.y1 + this.vectors[i + 1].y
+          );
+        }
         if (this.frame > 300) {
           this.frame = 0;
           this.state = 'default';
@@ -7039,34 +7084,29 @@ function line(x1, y1, x2, y2) {
     this.postrender(context);
   }
 
+  shape.postrender = function(context) {
+    context.stroke();
+    this.frame++;
+  }
+
   /**
    * Make the line wiggle
    */
   shape.wiggle = function() {
     this.state = 'wiggle';
+    this.v = new Vector(x2 - x1, y2 - y1);
+    this.u = this.v.normalize();
+    this.vectors = [];
+    let segment = this.v.length / 10;
+    for (let i = 1; i <= 10; i++) {
+      this.vectors.push(
+        new Vector(this.u.x * segment * i, this.u.y * segment * i)
+      );
+    }
   }
 
   window.stage.addChild(shape);
   return shape;
-}
-
-;// CONCATENATED MODULE: ./src/shape/vector.js
-class Vector {
-  constructor(x, y, length = 1) {
-    this.x = x;
-    this.y = y;
-    this.length = length;
-  }
-
-  rotate(degrees) {
-    let angle = degress * (Math.PI / 180);
-    let vector = {
-      x: this.x * Math.cos(angle) - this.y * Math.sin(angle),
-      y: this.x * Math.sin(angle) + this.y * Math.cos(angle)
-    };
-    this.x = vector.x;
-    this.y = vector.y;
-  }
 }
 
 ;// CONCATENATED MODULE: ./src/shape/polygon.js

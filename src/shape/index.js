@@ -15,8 +15,6 @@ export default class Shape {
 
     this.state = 'default';
     this.frame = 0;
-
-    return this;
   }
 
   prerender(context) {

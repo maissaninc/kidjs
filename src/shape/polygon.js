@@ -5,7 +5,6 @@ export default class Polygon extends Shape {
   constructor() {
     super();
     this.points = [];
-    return this;
   }
 
   addPoint(x, y) {

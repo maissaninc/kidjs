@@ -8,7 +8,6 @@ export default class Line extends Shape {
     this.y = y1;
     this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
-    return this;
   }
 
   render(context) {

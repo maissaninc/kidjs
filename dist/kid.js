@@ -6954,8 +6954,6 @@ class Shape {
 
     this.state = 'default';
     this.frame = 0;
-
-    return this;
   }
 
   prerender(context) {
@@ -7047,7 +7045,6 @@ class Line extends Shape {
     this.y = y1;
     this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
-    return this;
   }
 
   render(context) {
@@ -7111,7 +7108,6 @@ class Polygon extends Shape {
   constructor() {
     super();
     this.points = [];
-    return this;
   }
 
   addPoint(x, y) {

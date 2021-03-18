@@ -10,6 +10,7 @@ window.stage = new Stage();
 window.circle = circle;
 window.line = line;
 window.on = on;
+window.rect = rect;
 window.reset = reset;
 window.wait = wait;
 

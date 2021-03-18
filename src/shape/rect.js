@@ -1,21 +1,14 @@
-import Shape from './';
+import Polygon from './polygon';
 
 export function rect(x, y, width, height) {
-  const shape = new Shape();
+  const shape = new Polygon();
 
   shape.x = x;
   shape.y = y;
-  shape.width = width;
-  shape.height = height;
-
-  shape.render = function(context) {
-    this.prerender(context);
-    context.moveTo(this.x - (this.width / 2), this.y - (this.height / 2));
-    context.lineTo(this.x + (this.width / 2), this.y - (this.height / 2));
-    context.lineTo(this.x + (this.width / 2), this.y + (this.height / 2));
-    context.lineTo(this.x - (this.width / 2), this.y + (this.height / 2));
-    this.postrender(context);
-  }
+  shape.addPoint(-width / 2, -height / 2);
+  shape.addPoint(width / 2, -height / 2);
+  shape.addPoint(width / 2, height / 2);
+  shape.addPoint(-width / 2, height / 2);
 
   window.stage.addChild(shape);
 

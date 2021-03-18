@@ -7004,6 +7004,9 @@ function circle(x, y, radius) {
 ;// CONCATENATED MODULE: ./src/shape/line.js
 
 
+/**
+ * Adds a line to the stage
+ */
 function line(x1, y1, x2, y2) {
   const shape = new Shape();
 
@@ -7012,6 +7015,9 @@ function line(x1, y1, x2, y2) {
   shape.x2 = x2;
   shape.y2 = y2;
 
+  /**
+   * Render shape based on current frame and state
+   */
   shape.render = function(context) {
     this.prerender(context);
 
@@ -7033,9 +7039,76 @@ function line(x1, y1, x2, y2) {
     this.postrender(context);
   }
 
+  /**
+   * Make the line wiggle
+   */
   shape.wiggle = function() {
     this.state = 'wiggle';
   }
+
+  window.stage.addChild(shape);
+  return shape;
+}
+
+;// CONCATENATED MODULE: ./src/shape/vector.js
+class Vector {
+  constructor(x, y, length = 1) {
+    this.x = x;
+    this.y = y;
+    this.length = length;
+  }
+
+  rotate(degrees) {
+    let angle = degress * (Math.PI / 180);
+    let vector = {
+      x: this.x * Math.cos(angle) - this.y * Math.sin(angle),
+      y: this.x * Math.sin(angle) + this.y * Math.cos(angle)
+    };
+    this.x = vector.x;
+    this.y = vector.y;
+  }
+}
+
+;// CONCATENATED MODULE: ./src/shape/polygon.js
+
+
+
+class Polygon extends Shape {
+  constructor() {
+    super();
+    this.points = [];
+    return this;
+  }
+
+  addPoint(x, y) {
+    this.points.push(new Vector(x, y));
+  }
+
+  render(context) {
+    if (this.points.length < 2) {
+      return;
+    }
+    this.prerender(context);
+    context.moveTo(this.x + this.points[0].x, this.y + this.points[0].y);
+    for (let point of this.points) {
+      context.lineTo(this.x + point.x, this.y + point.y);
+    }
+    this.postrender(context);
+  }
+}
+
+;// CONCATENATED MODULE: ./src/shape/rect.js
+
+
+function rect(x, y, width, height) {
+  const shape = new Polygon();
+
+  shape.x = x;
+  shape.y = y;
+  shape.addPoint(-width / 2, -height / 2);
+  shape.addPoint(width / 2, -height / 2);
+  shape.addPoint(width / 2, height / 2);
+  shape.addPoint(-width / 2, height / 2);
 
   window.stage.addChild(shape);
 
@@ -7055,6 +7128,7 @@ window.stage = new Stage();
 window.circle = circle;
 window.line = line;
 window.on = events.on;
+window.rect = rect;
 window.reset = core/* reset */.mc;
 window.wait = core/* wait */.Dc;
 

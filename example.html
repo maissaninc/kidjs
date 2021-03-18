@@ -7,22 +7,7 @@
   <body>
     <script type="kidjs">
 
-      let c = circle(100, 100, 10);
-
-      line(10, 10, 400, 400).wiggle();
-
-      on('keypress', function(key) {
-        if (key == 'a') {
-          c.speed.x = 1;
-        }
-        if (key == 'b') {
-          reset();
-        }
-      });
-
-      on('keyup', function() {
-        c.speed.x = 0;
-      })
+      rect(150, 150, 50, 50);
 
     </script>
   </body>

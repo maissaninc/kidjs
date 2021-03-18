@@ -7040,35 +7040,31 @@ class Vector {
 
 
 
-/**
- * Adds a line to the stage
- */
-function line(x1, y1, x2, y2) {
-  const shape = new Shape();
+class Line extends Shape {
+  constructor(x1, y1, x2, y2) {
+    super();
+    this.x = x1;
+    this.y = y1;
+    this.v = new Vector(x2 - x1, y2 - y1);
+    this.u = this.v.normalize();
+    return this;
+  }
 
-  shape.x1 = x1;
-  shape.y1 = y1;
-  shape.x2 = x2;
-  shape.y2 = y2;
-
-  /**
-   * Render shape based on current frame and state
-   */
-  shape.render = function(context) {
+  render(context) {
     this.prerender(context);
 
     switch (this.state) {
       case 'wiggle':
-        context.moveTo(this.x1, this.y1);
+        context.moveTo(this.x, this.y);
         for (let i = 0; i < this.vectors.length - 1; i = i + 2) {
           let magnitude = Math.sin(this.frame / 5) * 10
           context.bezierCurveTo(
-            this.x1 + this.vectors[i].x - this.u.y * magnitude,
-            this.y1 + this.vectors[i].y + this.u.x * magnitude,
-            this.x1 + this.vectors[i].x + this.u.y * magnitude,
-            this.y1 + this.vectors[i].y - this.u.x * magnitude,
-            this.x1 + this.vectors[i + 1].x,
-            this.y1 + this.vectors[i + 1].y
+            this.x + this.vectors[i].x - this.u.y * magnitude,
+            this.y + this.vectors[i].y + this.u.x * magnitude,
+            this.x + this.vectors[i].x + this.u.y * magnitude,
+            this.y + this.vectors[i].y - this.u.x * magnitude,
+            this.x + this.vectors[i + 1].x,
+            this.y + this.vectors[i + 1].y
           );
         }
         if (this.frame > 300) {
@@ -7078,24 +7074,19 @@ function line(x1, y1, x2, y2) {
         break;
 
       default:
-        context.moveTo(this.x1, this.y1);
-        context.lineTo(this.x2, this.y2);
+        context.moveTo(this.x, this.y);
+        context.lineTo(this.x + this.v.x, this.y + this.v.y);
     }
     this.postrender(context);
   }
 
-  shape.postrender = function(context) {
+  postrender(context) {
     context.stroke();
     this.frame++;
   }
 
-  /**
-   * Make the line wiggle
-   */
-  shape.wiggle = function() {
+  wiggle() {
     this.state = 'wiggle';
-    this.v = new Vector(x2 - x1, y2 - y1);
-    this.u = this.v.normalize();
     this.vectors = [];
     let segment = this.v.length / 10;
     for (let i = 1; i <= 10; i++) {
@@ -7104,7 +7095,10 @@ function line(x1, y1, x2, y2) {
       );
     }
   }
+}
 
+function line(x1, y1, x2, y2) {
+  let shape = new Line(x1, y1, x2, y2);
   window.stage.addChild(shape);
   return shape;
 }

@@ -16,9 +16,9 @@ export default class Polygon extends Shape {
       return;
     }
     this.prerender(context);
-    context.moveTo(this.x + this.points[0].x, this.y + this.points[0].y);
+    context.moveTo(this.x + this.points[0].x, this.y - this.points[0].y);
     for (let point of this.points) {
-      context.lineTo(this.x + point.x, this.y + point.y);
+      context.lineTo(this.x + point.x, this.y - point.y);
     }
     this.postrender(context);
   }

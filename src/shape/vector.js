@@ -10,14 +10,14 @@ export default class Vector {
     );
   }
 
-  rotate(degrees) {
-    let angle = degress * (Math.PI / 180);
-    let vector = {
+  rotate(deg) {
+    let angle = deg * (Math.PI / 180);
+    let v = {
       x: this.x * Math.cos(angle) - this.y * Math.sin(angle),
       y: this.x * Math.sin(angle) + this.y * Math.cos(angle)
     };
-    this.x = vector.x;
-    this.y = vector.y;
+    this.x = v.x;
+    this.y = v.y;
   }
 
   normalize() {

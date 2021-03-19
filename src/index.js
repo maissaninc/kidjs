@@ -4,6 +4,7 @@ import Stage from './stage';
 import { circle } from './shape/circle';
 import { line } from './shape/line';
 import { rect } from './shape/rect';
+import { star } from './shape/star';
 
 // Set globals
 window.stage = new Stage();
@@ -12,6 +13,7 @@ window.line = line;
 window.on = on;
 window.rect = rect;
 window.reset = reset;
+window.star = star;
 window.wait = wait;
 
 window.addEventListener('DOMContentLoaded', function() {

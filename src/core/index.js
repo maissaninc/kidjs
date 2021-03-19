@@ -3,7 +3,7 @@ import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { removeAllEventListeners } from './events';
 
-async function preprocess(code) {
+async function compile(code) {
 
   // Parse code into source tree
   let ast = acorn.parse('(async function() {' + code + '})()', {
@@ -43,7 +43,7 @@ export function reset() {
 
 export async function run(code) {
   reset();
-  let processed = await preprocess(code);
+  let processed = await compile(code);
   eval(processed);
 }
 

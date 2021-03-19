@@ -6946,14 +6946,17 @@ class Actor {
 
     this.x = x;
     this.y = y;
+    this.rotation = 0;
 
     this.speed = {
       x: 0,
-      y: 0
+      y: 0,
+      rotation: 0
     };
     this.acceleration = {
       x: 0,
-      y: 0
+      y: 0,
+      rotation: 0
     };
 
     if (typeof stage === 'undefined') {
@@ -6967,8 +6970,10 @@ class Actor {
     this.frame++;
     this.x = this.x + this.speed.x;
     this.y = this.y + this.speed.y;
+    this.rotation = this.rotation + this.speed.rotation;
     this.speed.x = this.speed.x + this.acceleration.x;
     this.speed.y = this.speed.y + this.acceleration.y;
+    this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
   }
 
   stop() {
@@ -7038,12 +7043,10 @@ class Vector {
 
   rotate(deg) {
     let angle = deg * (Math.PI / 180);
-    let v = {
-      x: this.x * Math.cos(angle) - this.y * Math.sin(angle),
-      y: this.x * Math.sin(angle) + this.y * Math.cos(angle)
-    };
-    this.x = v.x;
-    this.y = v.y;
+    return new Vector(
+      this.x * Math.cos(angle) - this.y * Math.sin(angle),
+      this.x * Math.sin(angle) + this.y * Math.cos(angle)
+    );
   }
 
   normalize() {
@@ -7139,9 +7142,11 @@ class Polygon extends Shape {
       return;
     }
     this.prerender(context);
-    context.moveTo(this.x + this.points[0].x, this.y - this.points[0].y);
+    let v = this.points[0].rotate(this.rotation);
+    context.moveTo(this.x + v.x, this.y - v.y);
     for (let point of this.points) {
-      context.lineTo(this.x + point.x, this.y - point.y);
+      v = point.rotate(this.rotation);
+      context.lineTo(this.x +v.x, this.y - v.y);
     }
     this.postrender(context);
   }
@@ -7176,13 +7181,13 @@ class Star extends Polygon {
     let angle = 360 / points;
     let outerVector = new Vector(0, outerRadius);
     let innerVector = new Vector(0, innerRadius);
-    innerVector.rotate(angle / 2);
+    innerVector = innerVector.rotate(angle / 2);
 
     for (let i = 0; i < points; i++) {
       this.addPoint(outerVector.x, outerVector.y);
       this.addPoint(innerVector.x, innerVector.y);
-      outerVector.rotate(angle);
-      innerVector.rotate(angle);
+      outerVector = outerVector.rotate(angle);
+      innerVector = innerVector.rotate(angle);
     }
   }
 }

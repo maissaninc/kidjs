@@ -12,12 +12,10 @@ export default class Vector {
 
   rotate(deg) {
     let angle = deg * (Math.PI / 180);
-    let v = {
-      x: this.x * Math.cos(angle) - this.y * Math.sin(angle),
-      y: this.x * Math.sin(angle) + this.y * Math.cos(angle)
-    };
-    this.x = v.x;
-    this.y = v.y;
+    return new Vector(
+      this.x * Math.cos(angle) - this.y * Math.sin(angle),
+      this.x * Math.sin(angle) + this.y * Math.cos(angle)
+    );
   }
 
   normalize() {

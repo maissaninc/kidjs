@@ -8,13 +8,13 @@ export default class Star extends Polygon {
     let angle = 360 / points;
     let outerVector = new Vector(0, outerRadius);
     let innerVector = new Vector(0, innerRadius);
-    innerVector.rotate(angle / 2);
+    innerVector = innerVector.rotate(angle / 2);
 
     for (let i = 0; i < points; i++) {
       this.addPoint(outerVector.x, outerVector.y);
       this.addPoint(innerVector.x, innerVector.y);
-      outerVector.rotate(angle);
-      innerVector.rotate(angle);
+      outerVector = outerVector.rotate(angle);
+      innerVector = innerVector.rotate(angle);
     }
   }
 }

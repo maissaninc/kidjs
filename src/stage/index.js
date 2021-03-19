@@ -1,5 +1,6 @@
 export default class Stage {
   constructor(width, height) {
+    this.frame = 0;
 
     // Default width and height
     if (width === undefined || height === undefined) {
@@ -55,9 +56,10 @@ export default class Stage {
   }
 
   render() {
+    this.frame++;
     this.context.clearRect(0, 0, this.width, this.height);
     for (let obj of this.children) {
-      obj.updatePosition();
+      obj.update();
       obj.render(this.context);
     }
     requestAnimationFrame(() => this.render());

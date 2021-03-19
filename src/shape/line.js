@@ -3,9 +3,7 @@ import Vector from './vector';
 
 export default class Line extends Shape {
   constructor(x1, y1, x2, y2) {
-    super();
-    this.x = x1;
-    this.y = y1;
+    super(x1, y1);
     this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
   }
@@ -42,7 +40,6 @@ export default class Line extends Shape {
 
   postrender(context) {
     context.stroke();
-    this.frame++;
   }
 
   wiggle() {
@@ -59,6 +56,5 @@ export default class Line extends Shape {
 
 export function line(x1, y1, x2, y2) {
   let shape = new Line(x1, y1, x2, y2);
-  window.stage.addChild(shape);
   return shape;
 }

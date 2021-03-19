@@ -3,9 +3,7 @@ import Vector from './vector';
 
 export default class Star extends Polygon {
   constructor(x, y, outerRadius, innerRadius, points = 5) {
-    super();
-    this.x = x;
-    this.y = y;
+    super(x, y);
 
     let angle = 360 / points;
     let outerVector = new Vector(0, outerRadius);
@@ -28,6 +26,5 @@ export function star(x, y, outerRadius, innerRadius = false, points = 5) {
   }
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
-  window.stage.addChild(shape);
   return shape;
 }

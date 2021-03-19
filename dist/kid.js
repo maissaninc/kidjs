@@ -6763,7 +6763,7 @@ function removeAllEventListeners() {
 
 
 
-async function preprocess(code) {
+async function compile(code) {
 
   // Parse code into source tree
   let ast = acorn__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .Qc('(async function() {' + code + '})()', {
@@ -6803,7 +6803,7 @@ function reset() {
 
 async function run(code) {
   reset();
-  let processed = await preprocess(code);
+  let processed = await compile(code);
   eval(processed);
 }
 
@@ -6872,6 +6872,7 @@ var events = __webpack_require__(459);
 ;// CONCATENATED MODULE: ./src/stage/index.js
 class Stage {
   constructor(width, height) {
+    this.frame = 0;
 
     // Default width and height
     if (width === undefined || height === undefined) {
@@ -6927,21 +6928,24 @@ class Stage {
   }
 
   render() {
+    this.frame++;
     this.context.clearRect(0, 0, this.width, this.height);
     for (let obj of this.children) {
-      obj.updatePosition();
+      obj.update();
       obj.render(this.context);
     }
     requestAnimationFrame(() => this.render());
   }
 }
 
-;// CONCATENATED MODULE: ./src/shape/index.js
-class Shape {
-  constructor() {
-    this.fill = window.fill;
-    this.stroke = window.stroke;
-    this.lineWidth = window.lineWidth;
+;// CONCATENATED MODULE: ./src/stage/actor.js
+class Actor {
+  constructor(x, y, stage) {
+    this.frame = 0;
+    this.state = 'default';
+
+    this.x = x;
+    this.y = y;
 
     this.speed = {
       x: 0,
@@ -6952,8 +6956,36 @@ class Shape {
       y: 0
     };
 
-    this.state = 'default';
+    if (typeof stage === 'undefined') {
+      window.stage.addChild(this);
+    } else {
+      stage.addChild(this);
+    }
+  }
+
+  update() {
+    this.frame++;
+    this.x = this.x + this.speed.x;
+    this.y = this.y + this.speed.y;
+    this.speed.x = this.speed.x + this.acceleration.x;
+    this.speed.y = this.speed.y + this.acceleration.y;
+  }
+
+  stop() {
     this.frame = 0;
+    this.state = 'default';
+  }
+}
+
+;// CONCATENATED MODULE: ./src/shape/index.js
+
+
+class Shape extends Actor {
+  constructor(x, y) {
+    super(x, y);
+    this.fill = window.fill;
+    this.stroke = window.stroke;
+    this.lineWidth = window.lineWidth;
   }
 
   prerender(context) {
@@ -6967,14 +6999,6 @@ class Shape {
     context.closePath();
     context.fill();
     context.stroke();
-    this.frame++;
-  }
-
-  updatePosition() {
-    this.x = this.x + this.speed.x;
-    this.y = this.y + this.speed.y;
-    this.speed.x = this.speed.x + this.acceleration.x;
-    this.speed.y = this.speed.y + this.acceleration.y;
   }
 }
 
@@ -7040,9 +7064,7 @@ class Vector {
 
 class Line extends Shape {
   constructor(x1, y1, x2, y2) {
-    super();
-    this.x = x1;
-    this.y = y1;
+    super(x1, y1);
     this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
   }
@@ -7079,7 +7101,6 @@ class Line extends Shape {
 
   postrender(context) {
     context.stroke();
-    this.frame++;
   }
 
   wiggle() {
@@ -7096,7 +7117,6 @@ class Line extends Shape {
 
 function line(x1, y1, x2, y2) {
   let shape = new Line(x1, y1, x2, y2);
-  window.stage.addChild(shape);
   return shape;
 }
 
@@ -7105,8 +7125,8 @@ function line(x1, y1, x2, y2) {
 
 
 class Polygon extends Shape {
-  constructor() {
-    super();
+  constructor(x, y) {
+    super(x, y);
     this.points = [];
   }
 
@@ -7151,9 +7171,7 @@ function rect(x, y, width, height) {
 
 class Star extends Polygon {
   constructor(x, y, outerRadius, innerRadius, points = 5) {
-    super();
-    this.x = x;
-    this.y = y;
+    super(x, y);
 
     let angle = 360 / points;
     let outerVector = new Vector(0, outerRadius);
@@ -7176,7 +7194,6 @@ function star(x, y, outerRadius, innerRadius = false, points = 5) {
   }
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
-  window.stage.addChild(shape);
   return shape;
 }
 

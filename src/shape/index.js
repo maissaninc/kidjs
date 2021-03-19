@@ -1,20 +1,11 @@
-export default class Shape {
-  constructor() {
+import Actor from '../stage/actor';
+
+export default class Shape extends Actor {
+  constructor(x, y) {
+    super(x, y);
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
-
-    this.speed = {
-      x: 0,
-      y: 0
-    };
-    this.acceleration = {
-      x: 0,
-      y: 0
-    };
-
-    this.state = 'default';
-    this.frame = 0;
   }
 
   prerender(context) {
@@ -28,13 +19,5 @@ export default class Shape {
     context.closePath();
     context.fill();
     context.stroke();
-    this.frame++;
-  }
-
-  updatePosition() {
-    this.x = this.x + this.speed.x;
-    this.y = this.y + this.speed.y;
-    this.speed.x = this.speed.x + this.acceleration.x;
-    this.speed.y = this.speed.y + this.acceleration.y;
   }
 }

@@ -2,8 +2,8 @@ import Shape from './';
 import Vector from './vector';
 
 export default class Polygon extends Shape {
-  constructor() {
-    super();
+  constructor(x, y) {
+    super(x, y);
     this.points = [];
   }
 

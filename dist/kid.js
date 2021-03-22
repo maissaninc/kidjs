@@ -6766,14 +6766,36 @@ function removeAllEventListeners() {
 async function compile(code) {
 
   // Parse code into source tree
-  let ast = acorn__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .Qc('(async function() {' + code + '})()', {
+  let ast = acorn__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .Qc(code, {
     locations: true
   });
 
   // Walk entire source tree
-  acorn_walk__WEBPACK_IMPORTED_MODULE_1__/* .full */ .rp(ast.body[0], function(node) {
+  acorn_walk__WEBPACK_IMPORTED_MODULE_1__/* .full */ .rp(ast, function(node) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
+
+        // Intercept calls to "on" method
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          node.body[i].expression.callee.name == 'on' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[0].type == 'BinaryExpression') {
+
+          // Set up trigger
+          if (node.body[i].expression.arguments[1].type == 'Identifier') {
+            window._triggers.push({
+              'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
+              'function': node.body[i].expression.arguments[1].name
+            });
+          }
+          if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
+            window._triggers.push({
+              'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
+              'inline': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[1])
+            });
+          }
+        }
 
         // Convert all functions to async
         if (node.body[i].type == 'FunctionDeclaration') {
@@ -6794,10 +6816,28 @@ async function compile(code) {
     }
   });
 
-  return astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
+  let processed = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
+  return `
+    (async function() {
+      ${processed}
+      window._onframe = function() {
+        for (let i = 0; i < window._triggers.length; i++) {
+          if (eval(window._triggers[i].condition)) {
+            if (typeof window._triggers[i].function !== 'undefined') {
+              eval(window._triggers[i].function + '();');
+            }
+            if (typeof window._triggers[i].inline !== 'undefined') {
+              eval('(' + window._triggers[i].inline + ')();');
+            }
+          }
+        }
+      };
+    })();
+  `
 }
 
 function reset() {
+  window._triggers = [];
   (0,_events__WEBPACK_IMPORTED_MODULE_3__/* .removeAllEventListeners */ .R)();
 }
 
@@ -6870,6 +6910,8 @@ var core = __webpack_require__(763);
 // EXTERNAL MODULE: ./src/core/events.js
 var events = __webpack_require__(459);
 ;// CONCATENATED MODULE: ./src/stage/index.js
+
+
 class Stage {
   constructor(width, height) {
     this.frame = 0;
@@ -6933,6 +6975,9 @@ class Stage {
     for (let obj of this.children) {
       obj.update();
       obj.render(this.context);
+    }
+    if (typeof window._onframe == 'function') {
+      window._onframe();
     }
     requestAnimationFrame(() => this.render());
   }

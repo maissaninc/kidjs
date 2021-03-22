@@ -1,3 +1,5 @@
+import { evaluateTriggers } from '../core';
+
 export default class Stage {
   constructor(width, height) {
     this.frame = 0;
@@ -61,6 +63,9 @@ export default class Stage {
     for (let obj of this.children) {
       obj.update();
       obj.render(this.context);
+    }
+    if (typeof window._onframe == 'function') {
+      window._onframe();
     }
     requestAnimationFrame(() => this.render());
   }

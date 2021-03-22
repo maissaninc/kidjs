@@ -7,13 +7,28 @@
   <body>
     <script type="kidjs">
 
-      rect(150, 150, 50, 50);
+      on("click", function() {
 
-      let l = line(40, 40, 100, 100);
-      l.wiggle();
+      });
 
-      let s = star(250, 250, 100);
-      s.speed.rotation = 1;
+      let x = 1;
+      on(x == 5, function() {
+        console.log('5');
+      });
+
+      let f = function() {
+        console.log('6');
+      }
+      on(x == 6, f);
+
+      on("keypress", function(key) {
+        if (key == 'a') {
+          x = x + 1;
+          console.log(x);
+        }
+      });
+
+      star(100, 100, 50);
 
     </script>
   </body>

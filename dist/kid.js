@@ -7055,21 +7055,21 @@ class Shape extends Actor {
 ;// CONCATENATED MODULE: ./src/shape/circle.js
 
 
-function circle(x, y, radius) {
-  const shape = new Shape();
+class Circle extends Shape {
+  constructor(x, y, radius) {
+    super(x, y);
+    this.radius = radius;
+  }
 
-  shape.x = x;
-  shape.y = y;
-  shape.radius = radius;
-
-  shape.render = function(context) {
+  render(context) {
     this.prerender(context);
     context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     this.postrender(context);
   }
+}
 
-  window.stage.addChild(shape);
-
+function circle(x, y, diameter) {
+  const shape = new Circle(x, y, diameter / 2);
   return shape;
 }
 
@@ -7200,18 +7200,18 @@ class Polygon extends Shape {
 ;// CONCATENATED MODULE: ./src/shape/rect.js
 
 
+class Rect extends Polygon {
+  constructor(x, y, width, height) {
+    super(x, y);
+    this.addPoint(-width / 2, -height / 2);
+    this.addPoint(width / 2, -height / 2);
+    this.addPoint(width / 2, height / 2);
+    this.addPoint(-width / 2, height / 2)
+  }
+}
+
 function rect(x, y, width, height) {
-  const shape = new Polygon();
-
-  shape.x = x;
-  shape.y = y;
-  shape.addPoint(-width / 2, -height / 2);
-  shape.addPoint(width / 2, -height / 2);
-  shape.addPoint(width / 2, height / 2);
-  shape.addPoint(-width / 2, height / 2);
-
-  window.stage.addChild(shape);
-
+  const shape = new Rect(x, y, width, height);
   return shape;
 }
 

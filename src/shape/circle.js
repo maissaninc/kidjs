@@ -1,19 +1,19 @@
 import Shape from './';
 
-export function circle(x, y, radius) {
-  const shape = new Shape();
+export default class Circle extends Shape {
+  constructor(x, y, radius) {
+    super(x, y);
+    this.radius = radius;
+  }
 
-  shape.x = x;
-  shape.y = y;
-  shape.radius = radius;
-
-  shape.render = function(context) {
+  render(context) {
     this.prerender(context);
     context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     this.postrender(context);
   }
+}
 
-  window.stage.addChild(shape);
-
+export function circle(x, y, diameter) {
+  const shape = new Circle(x, y, diameter / 2);
   return shape;
 }

@@ -1,16 +1,16 @@
 import Polygon from './polygon';
 
+export default class Rect extends Polygon {
+  constructor(x, y, width, height) {
+    super(x, y);
+    this.addPoint(-width / 2, -height / 2);
+    this.addPoint(width / 2, -height / 2);
+    this.addPoint(width / 2, height / 2);
+    this.addPoint(-width / 2, height / 2)
+  }
+}
+
 export function rect(x, y, width, height) {
-  const shape = new Polygon();
-
-  shape.x = x;
-  shape.y = y;
-  shape.addPoint(-width / 2, -height / 2);
-  shape.addPoint(width / 2, -height / 2);
-  shape.addPoint(width / 2, height / 2);
-  shape.addPoint(-width / 2, height / 2);
-
-  window.stage.addChild(shape);
-
+  const shape = new Rect(x, y, width, height);
   return shape;
 }

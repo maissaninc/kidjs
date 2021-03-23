@@ -7179,7 +7179,7 @@ class Polygon extends Shape {
   }
 
   addPoint(x, y) {
-    this.points.push(new Vector(x, y));
+    this.points.push(new Vector(x, -y));
   }
 
   render(context) {
@@ -7224,8 +7224,8 @@ class Star extends Polygon {
     super(x, y);
 
     let angle = 360 / points;
-    let outerVector = new Vector(0, outerRadius);
-    let innerVector = new Vector(0, innerRadius);
+    let outerVector = new Vector(0, -outerRadius);
+    let innerVector = new Vector(0, -innerRadius);
     innerVector = innerVector.rotate(angle / 2);
 
     for (let i = 0; i < points; i++) {
@@ -7247,7 +7247,29 @@ function star(x, y, outerRadius, innerRadius = false, points = 5) {
   return shape;
 }
 
+;// CONCATENATED MODULE: ./src/shape/triangle.js
+
+
+class Triangle extends Polygon {
+  constructor(x, y, width, height) {
+    super(x, y);
+    this.addPoint(0, -height / 2);
+    this.addPoint(width / 2, height / 2);
+    this.addPoint(-width / 2, height / 2);
+  }
+}
+
+function triangle(x, y, width, height = false) {
+  if (height === false) {
+    height = width * Math.sqrt(3) / 2;
+  }
+
+  let shape = new Triangle(x, y, width, height);
+  return shape;
+}
+
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 
@@ -7264,6 +7286,7 @@ window.on = events.on;
 window.rect = rect;
 window.reset = core/* reset */.mc;
 window.star = star;
+window.triangle = triangle;
 window.wait = core/* wait */.Dc;
 
 window.addEventListener('DOMContentLoaded', function() {

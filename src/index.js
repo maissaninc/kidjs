@@ -5,6 +5,7 @@ import { circle } from './shape/circle';
 import { line } from './shape/line';
 import { rect } from './shape/rect';
 import { star } from './shape/star';
+import { triangle } from './shape/triangle';
 
 // Set globals
 window.stage = new Stage();
@@ -14,6 +15,7 @@ window.on = on;
 window.rect = rect;
 window.reset = reset;
 window.star = star;
+window.triangle = triangle;
 window.wait = wait;
 
 window.addEventListener('DOMContentLoaded', function() {

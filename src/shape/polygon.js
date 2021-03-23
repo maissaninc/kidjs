@@ -8,7 +8,7 @@ export default class Polygon extends Shape {
   }
 
   addPoint(x, y) {
-    this.points.push(new Vector(x, y));
+    this.points.push(new Vector(x, -y));
   }
 
   render(context) {

@@ -6693,59 +6693,6 @@ function generate(node, options) {
 
 /***/ }),
 
-/***/ 459:
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "on": function() { return /* binding */ on; },
-/* harmony export */   "R": function() { return /* binding */ removeAllEventListeners; }
-/* harmony export */ });
-let listeners = [];
-
-function on(condition, callback) {
-
-  // If condition is an event name
-  if (typeof condition === 'string') {
-    switch (condition) {
-
-      case 'keypress':
-        addEventListener('keypress', (e) => {
-          callback(e.key);
-        });
-        break;
-
-      case 'keydown':
-        addEventListener('keydown', (e) => {
-          callback(e.key);
-        });
-        break;
-
-      case 'keyup':
-        addEventListener('keyup', (e) => {
-          callback();
-        });
-        break;
-    }
-  }
-}
-
-function addEventListener(type, listener) {
-  listeners.push({
-    type: type,
-    listener: listener
-  });
-  window.addEventListener(type, listener);
-}
-
-function removeAllEventListeners() {
-  for (let obj of listeners) {
-    window.removeEventListener(obj.type, obj.listener);
-  }
-}
-
-
-/***/ }),
-
 /***/ 763:
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
@@ -6757,7 +6704,7 @@ function removeAllEventListeners() {
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(459);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(202);
 
 
 
@@ -6854,6 +6801,81 @@ async function wait(seconds) {
 }
 
 
+/***/ }),
+
+/***/ 202:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "Z": function() { return /* binding */ events; },
+  "on": function() { return /* binding */ on; },
+  "R": function() { return /* binding */ removeAllEventListeners; }
+});
+
+;// CONCATENATED MODULE: ./src/events/mouse.js
+function onMouseMove(e) {
+  window.mouseX = e.clientX;
+  window.mouseY = e.clientY;
+  console.log('mm');
+}
+
+/* harmony default export */ function mouse() {
+  window.addEventListener('mousemove', onMouseMove);
+}
+
+;// CONCATENATED MODULE: ./src/events/index.js
+
+
+let listeners = [];
+
+/* harmony default export */ function events() {
+  mouse();
+}
+
+function on(condition, callback) {
+
+  // If condition is an event name
+  if (typeof condition === 'string') {
+    switch (condition) {
+
+      case 'keypress':
+        addEventListener('keypress', (e) => {
+          callback(e.key);
+        });
+        break;
+
+      case 'keydown':
+        addEventListener('keydown', (e) => {
+          callback(e.key);
+        });
+        break;
+
+      case 'keyup':
+        addEventListener('keyup', (e) => {
+          callback();
+        });
+        break;
+    }
+  }
+}
+
+function addEventListener(type, listener) {
+  listeners.push({
+    type: type,
+    listener: listener
+  });
+  window.addEventListener(type, listener);
+}
+
+function removeAllEventListeners() {
+  for (let obj of listeners) {
+    window.removeEventListener(obj.type, obj.listener);
+  }
+}
+
+
 /***/ })
 
 /******/ 	});
@@ -6907,8 +6929,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./src/core/index.js
 var core = __webpack_require__(763);
-// EXTERNAL MODULE: ./src/core/events.js
-var events = __webpack_require__(459);
+// EXTERNAL MODULE: ./src/events/index.js + 1 modules
+var events = __webpack_require__(202);
 ;// CONCATENATED MODULE: ./src/stage/index.js
 
 
@@ -7295,6 +7317,9 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.style.margin = 0;
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
+
+  // Setup events
+  (0,events/* default */.Z)();
 
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');

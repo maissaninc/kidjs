@@ -1,5 +1,5 @@
 import { run, reset, wait } from './core';
-import { on } from './core/events';
+import initEvents, { on } from './events';
 import Stage from './stage';
 import { circle } from './shape/circle';
 import { line } from './shape/line';
@@ -24,6 +24,9 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.style.margin = 0;
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
+
+  // Setup events
+  initEvents();
 
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');

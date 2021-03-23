@@ -1,4 +1,10 @@
+import initMouseEvents from './mouse';
+
 let listeners = [];
+
+export default function() {
+  initMouseEvents();
+}
 
 export function on(condition, callback) {
 

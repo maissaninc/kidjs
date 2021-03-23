@@ -1,7 +1,7 @@
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import * as astring from 'astring';
-import { removeAllEventListeners } from './events';
+import { removeAllEventListeners } from '../events';
 
 async function compile(code) {
 

@@ -2,6 +2,11 @@ function Speech() {
   window.speak = this.speak.bind(this);
 }
 
+export function speak(text) {
+  let utterance = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utterance);
+}
+
 Speech.prototype = {
 
   constructor: Speech,

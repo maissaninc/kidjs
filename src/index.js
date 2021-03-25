@@ -1,6 +1,7 @@
 import { init, run, reset, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
+import { speak } from './audio/speech';
 import { display } from './stage/text';
 import { circle } from './shape/circle';
 import { line } from './shape/line';

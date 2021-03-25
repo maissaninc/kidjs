@@ -1,4 +1,4 @@
-import { run, reset, wait } from './core';
+import { init, run, reset, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
 import { display } from './stage/text';
@@ -8,8 +8,8 @@ import { rect } from './shape/rect';
 import { star } from './shape/star';
 import { triangle } from './shape/triangle';
 
-// Create global object
-window._kidjs_ = {};
+// Initialize framework
+init();
 
 // Set globals
 window.circle = circle;

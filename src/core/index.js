@@ -3,6 +3,44 @@ import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { removeAllEventListeners } from '../events';
 
+let triggers = [];
+
+export function init() {
+  window._kidjs_ = {
+    settings: {
+      slowMotion: false,
+    },
+
+    onframe: function() {
+      for (let i = 0; i < triggers.length; i++) {
+        try {
+          if (window._kidjs_.eval(triggers[i].condition)) {
+            window._kidjs_.eval(triggers[i].code);
+          }
+        } catch(ex) {
+          // Carry on
+        }
+      }
+    },
+
+    step: async function(line, column) {
+      window.dispatchEvent(new CustomEvent('KID.step', {
+        detail: {
+          line: line,
+          column: column
+        }
+      }));
+      if (window._kidjs_.settings.slowMotion) {
+        await wait(1);
+      }
+    },
+
+    end: function() {
+      window.dispatchEvent(new CustomEvent('KID.end'));
+    }
+  };
+}
+
 async function compile(code) {
 
   // Parse code into source tree
@@ -15,9 +53,7 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
-        //console.log(node.body[i]);
-
-        // Intercept calls to "on" method
+        // Add trigger for each call to on method with expression
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'on' &&
@@ -25,17 +61,19 @@ async function compile(code) {
           node.body[i].expression.arguments[0].type == 'BinaryExpression'
         ) {
 
-          // Set up trigger
+          // Function name
           if (node.body[i].expression.arguments[1].type == 'Identifier') {
-            window._kidjs_.triggers.push({
+            triggers.push({
               'condition': astring.generate(node.body[i].expression.arguments[0]),
-              'function': node.body[i].expression.arguments[1].name
+              'code': node.body[i].expression.arguments[1].name + '();'
             });
           }
+
+          // Inline function
           if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
-            window._kidjs_.triggers.push({
+            triggers.push({
               'condition': astring.generate(node.body[i].expression.arguments[0]),
-              'inline': astring.generate(node.body[i].expression.arguments[1])
+              'code': '(' + astring.generate(node.body[i].expression.arguments[1]) + ')();'
             });
           }
         }
@@ -77,36 +115,58 @@ async function compile(code) {
     }
   });
 
+  // Insert step statements
+  for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
+    if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
+      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc));
+    }
+  }
+
   let processed = astring.generate(ast);
   console.log(processed);
   return `
     (async function() {
-
       window._kidjs_.eval = function(key) {
         return eval(key);
       };
-
-      window._kidjs_.onframe = function() {
-        for (let i = 0; i < window._kidjs_.triggers.length; i++) {
-          if (eval(window._kidjs_.triggers[i].condition)) {
-            if (typeof window._kidjs_.triggers[i].function !== 'undefined') {
-              eval(window._kidjs_.triggers[i].function + '();');
-            }
-            if (typeof window._kidjs_.triggers[i].inline !== 'undefined') {
-              eval('(' + window._kidjs_.triggers[i].inline + ')();');
-            }
-          }
-        }
-      };
-
       ${processed}
-
+      window._kidjs_.end();
     })();
   `
 }
 
+function createStepStatement(location) {
+  return {
+    type: 'ExpressionStatement',
+    expression: {
+      type: 'AwaitExpression',
+      argument: {
+        type: 'CallExpression',
+        callee: {
+          type: 'MemberExpression',
+          object: {
+            type: 'Identifier',
+            name: 'window._kidjs_'
+          },
+          property: {
+            type: 'Identifier',
+            name: 'step'
+          }
+        },
+        arguments: [{
+          type: 'Literal',
+          value: location.start.line
+        }, {
+          type: 'Literal',
+          value: location.start.column
+        }]
+      }
+    }
+  };
+}
+
 export function reset() {
-  window._kidjs_.triggers = [];
+  triggers = [];
   removeAllEventListeners();
 }
 
@@ -120,4 +180,20 @@ export async function wait(seconds) {
   await new Promise(function(resolve) {
     setTimeout(resolve, seconds * 1000)
   })
+}
+
+async function step(location) {
+  window.dispatchEvent(new CustomEvent('KID.step', {
+    detail: {
+      line: line,
+      column: column
+    }
+  }));
+  if (window._kidjs_.settings.slowMotion) {
+    await wait(1);
+  }
+}
+
+function end() {
+  window.dispatchEvent(new Event('KID.complete'));
 }

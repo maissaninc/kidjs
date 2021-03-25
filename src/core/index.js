@@ -3,10 +3,6 @@ import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { removeAllEventListeners } from '../events';
 
-export function init() {
-  window._kidjs_ = {};
-}
-
 async function compile(code) {
 
   // Parse code into source tree
@@ -44,14 +40,22 @@ async function compile(code) {
           }
         }
 
-        // Intercept calls to "display" method
+        // Convert calls to display method with expression to "live"
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'display' &&
-          node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[0].type == 'Literal'
+          node.body[i].expression.arguments.length == 3 &&
+          node.body[i].expression.arguments[2].type != 'Literal'
         ) {
-          //console.log(node.body[i]);
+          let expression = astring.generate(node.body[i].expression.arguments[2]);
+          node.body[i].expression.arguments[2] = {
+            type: 'Literal',
+            value: expression
+          };
+          node.body[i].expression.arguments[3] = {
+            type: 'Literal',
+            value: true
+          };
         }
 
         // Convert all functions to async
@@ -74,18 +78,13 @@ async function compile(code) {
   });
 
   let processed = astring.generate(ast);
+  console.log(processed);
   return `
     (async function() {
 
-      window._kidjs_.get = function(key) {
+      window._kidjs_.eval = function(key) {
         return eval(key);
       };
-
-      window._kidjs_.set = function(key, value) {
-        eval(key + ' = ' + value);
-      }
-
-      ${processed}
 
       window._kidjs_.onframe = function() {
         for (let i = 0; i < window._kidjs_.triggers.length; i++) {
@@ -99,6 +98,8 @@ async function compile(code) {
           }
         }
       };
+
+      ${processed}
 
     })();
   `

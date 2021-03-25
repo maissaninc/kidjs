@@ -1,4 +1,4 @@
-import { init, run, reset, wait } from './core';
+import { run, reset, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
 import { display } from './stage/text';
@@ -8,10 +8,10 @@ import { rect } from './shape/rect';
 import { star } from './shape/star';
 import { triangle } from './shape/triangle';
 
-init();
+// Create global object
+window._kidjs_ = {};
 
 // Set globals
-window.stage = new Stage();
 window.circle = circle;
 window.display = display;
 window.line = line;
@@ -25,6 +25,7 @@ window.wait = wait;
 window.addEventListener('DOMContentLoaded', function() {
 
   // Create canvas
+  window.stage = new Stage();
   document.body.style.margin = 0;
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);

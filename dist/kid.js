@@ -6921,19 +6921,47 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 ;// CONCATENATED MODULE: ./src/events/mouse.js
+const SWIPE_MIN_DISTANCE = 150;
+const SWIPE_CROSS_MAX_DISTANCE = 100;
+const SWIPE_MAX_TIME = 200;
+
 let x = false;
 let y = false;
-let time = false;
+let t = false;
 
 function onMouseDown(e) {
   x = e.clientX;
   y = e.clientY;
-  time = Date.now();
+  t = Date.now();
   window.mouseButton = e.button == 2 ? 'right' : 'left'
 }
 
 function onMouseUp(e) {
   window.mouseButton = false;
+
+  // Check for swipe
+  if (x !== false && y !== false && t !== false) {
+    let deltaX = e.clientX - x;
+    let deltaY = e.clientY - y;
+    let deltaT = Date.now() - t;
+
+    if (deltaT < SWIPE_MAX_TIME) {
+      if (deltaX > SWIPE_MIN_DISTANCE && Math.abs(deltaY) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swiperight'));
+      }
+      if (deltaX < -SWIPE_MIN_DISTANCE && Math.abs(deltaY) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swipeleft'));
+      }
+      if (deltaY > SWIPE_MIN_DISTANCE && Math.abs(deltaX) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swipedown'));
+      }
+      if (deltaY < -SWIPE_MIN_DISTANCE && Math.abs(deltaX) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swipeup'));
+      }
+    }
+  }
+
+  t = false;
 }
 
 function onMouseMove(e) {
@@ -7132,6 +7160,28 @@ class Stage {
     requestAnimationFrame(() => this.render());
   }
 }
+
+;// CONCATENATED MODULE: ./src/audio/speech.js
+function Speech() {
+  window.speak = this.speak.bind(this);
+}
+
+function speak(text) {
+  let utterance = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utterance);
+}
+
+Speech.prototype = {
+
+  constructor: Speech,
+
+  speak: function(text) {
+    var utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(utterance);
+  }
+};
+
+
 
 ;// CONCATENATED MODULE: ./src/stage/actor.js
 class Actor {
@@ -7443,6 +7493,7 @@ function triangle(x, y, width, height = false) {
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 

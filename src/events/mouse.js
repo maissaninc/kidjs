@@ -17,7 +17,7 @@ function onMouseUp(e) {
   window.mouseButton = false;
 
   // Check for swipe
-  if (x !== false && y !== false && time !== false) {
+  if (x !== false && y !== false && t !== false) {
     let deltaX = e.clientX - x;
     let deltaY = e.clientY - y;
     let deltaT = Date.now() - t;

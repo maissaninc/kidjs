@@ -1,8 +1,10 @@
+import initKeyboardEvents from './keyboard';
 import initMouseEvents from './mouse';
 
 let listeners = [];
 
 export default function() {
+  initKeyboardEvents();
   initMouseEvents();
 }
 

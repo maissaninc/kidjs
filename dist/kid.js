@@ -6697,6 +6697,7 @@ function generate(node, options) {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "S1": function() { return /* binding */ init; },
 /* harmony export */   "mc": function() { return /* binding */ reset; },
 /* harmony export */   "KH": function() { return /* binding */ run; },
 /* harmony export */   "Dc": function() { return /* binding */ wait; }
@@ -6710,6 +6711,10 @@ function generate(node, options) {
 
 
 
+function init() {
+  window._kidjs_ = {};
+}
+
 async function compile(code) {
 
   // Parse code into source tree
@@ -6722,26 +6727,39 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
+        //console.log(node.body[i]);
+
         // Intercept calls to "on" method
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'on' &&
           node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[0].type == 'BinaryExpression') {
+          node.body[i].expression.arguments[0].type == 'BinaryExpression'
+        ) {
 
           // Set up trigger
           if (node.body[i].expression.arguments[1].type == 'Identifier') {
-            window._triggers.push({
+            window._kidjs_.triggers.push({
               'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
               'function': node.body[i].expression.arguments[1].name
             });
           }
           if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
-            window._triggers.push({
+            window._kidjs_.triggers.push({
               'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
               'inline': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[1])
             });
           }
+        }
+
+        // Intercept calls to "display" method
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          node.body[i].expression.callee.name == 'display' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[0].type == 'Literal'
+        ) {
+          //console.log(node.body[i]);
         }
 
         // Convert all functions to async
@@ -6766,25 +6784,36 @@ async function compile(code) {
   let processed = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
   return `
     (async function() {
+
+      window._kidjs_.get = function(key) {
+        return eval(key);
+      };
+
+      window._kidjs_.set = function(key, value) {
+        eval(key + ' = ' + value);
+      }
+
       ${processed}
-      window._onframe = function() {
-        for (let i = 0; i < window._triggers.length; i++) {
-          if (eval(window._triggers[i].condition)) {
-            if (typeof window._triggers[i].function !== 'undefined') {
-              eval(window._triggers[i].function + '();');
+
+      window._kidjs_.onframe = function() {
+        for (let i = 0; i < window._kidjs_.triggers.length; i++) {
+          if (eval(window._kidjs_.triggers[i].condition)) {
+            if (typeof window._kidjs_.triggers[i].function !== 'undefined') {
+              eval(window._kidjs_.triggers[i].function + '();');
             }
-            if (typeof window._triggers[i].inline !== 'undefined') {
-              eval('(' + window._triggers[i].inline + ')();');
+            if (typeof window._kidjs_.triggers[i].inline !== 'undefined') {
+              eval('(' + window._kidjs_.triggers[i].inline + ')();');
             }
           }
         }
       };
+
     })();
   `
 }
 
 function reset() {
-  window._triggers = [];
+  window._kidjs_.triggers = [];
   (0,_events__WEBPACK_IMPORTED_MODULE_3__/* .removeAllEventListeners */ .R)();
 }
 
@@ -6815,14 +6844,36 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 ;// CONCATENATED MODULE: ./src/events/mouse.js
+let x = false;
+let y = false;
+let time = false;
+
+function onMouseDown(e) {
+  x = e.clientX;
+  y = e.clientY;
+  time = Date.now();
+  window.mouseButton = e.button == 2 ? 'right' : 'left'
+}
+
+function onMouseUp(e) {
+  window.mouseButton = false;
+}
+
 function onMouseMove(e) {
   window.mouseX = e.clientX;
   window.mouseY = e.clientY;
-  console.log('mm');
 }
 
 /* harmony default export */ function mouse() {
-  window.addEventListener('mousemove', onMouseMove);
+  if ('ontouchstart' in window) {
+    window.addEventListener('touchstart', onMouseDown);
+    window.addEventListener('touchend', onMouseUp);
+    window.addEventListener('touchmove', onMouseMove);
+  } else {
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('mousemove', onMouseMove);
+  }
 }
 
 ;// CONCATENATED MODULE: ./src/events/index.js
@@ -6998,8 +7049,8 @@ class Stage {
       obj.update();
       obj.render(this.context);
     }
-    if (typeof window._onframe == 'function') {
-      window._onframe();
+    if (typeof window._kidjs_.onframe == 'function') {
+      window._kidjs_.onframe();
     }
     requestAnimationFrame(() => this.render());
   }
@@ -7047,6 +7098,30 @@ class Actor {
     this.frame = 0;
     this.state = 'default';
   }
+}
+
+;// CONCATENATED MODULE: ./src/stage/text.js
+
+
+class Text extends Actor {
+  constructor(x, y, text, isVariable) {
+    super(x, y);
+    this.text = text;
+    this.isVariable = isVariable;
+  }
+
+  render(context) {
+    context.fillStyle = 'black';
+    context.font = '80px Verdana';
+    context.textBaseline = 'top';
+    const st = this.isVariable ? window._kidjs_.get(this.text) : this.text;
+    context.fillText(st, this.x, this.y);
+  }
+}
+
+function display(x, y, text, isVariable = false) {
+  const actor = new Text(x, y, text, isVariable);
+  return actor;
 }
 
 ;// CONCATENATED MODULE: ./src/shape/index.js
@@ -7300,9 +7375,13 @@ function triangle(x, y, width, height = false) {
 
 
 
+
+(0,core/* init */.S1)();
+
 // Set globals
 window.stage = new Stage();
 window.circle = circle;
+window.display = display;
 window.line = line;
 window.on = events.on;
 window.rect = rect;

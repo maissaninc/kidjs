@@ -64,8 +64,8 @@ export default class Stage {
       obj.update();
       obj.render(this.context);
     }
-    if (typeof window._onframe == 'function') {
-      window._onframe();
+    if (typeof window._kidjs_.onframe == 'function') {
+      window._kidjs_.onframe();
     }
     requestAnimationFrame(() => this.render());
   }

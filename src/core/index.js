@@ -3,6 +3,10 @@ import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { removeAllEventListeners } from '../events';
 
+export function init() {
+  window._kidjs_ = {};
+}
+
 async function compile(code) {
 
   // Parse code into source tree
@@ -15,26 +19,39 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
+        //console.log(node.body[i]);
+
         // Intercept calls to "on" method
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'on' &&
           node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[0].type == 'BinaryExpression') {
+          node.body[i].expression.arguments[0].type == 'BinaryExpression'
+        ) {
 
           // Set up trigger
           if (node.body[i].expression.arguments[1].type == 'Identifier') {
-            window._triggers.push({
+            window._kidjs_.triggers.push({
               'condition': astring.generate(node.body[i].expression.arguments[0]),
               'function': node.body[i].expression.arguments[1].name
             });
           }
           if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
-            window._triggers.push({
+            window._kidjs_.triggers.push({
               'condition': astring.generate(node.body[i].expression.arguments[0]),
               'inline': astring.generate(node.body[i].expression.arguments[1])
             });
           }
+        }
+
+        // Intercept calls to "display" method
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          node.body[i].expression.callee.name == 'display' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[0].type == 'Literal'
+        ) {
+          //console.log(node.body[i]);
         }
 
         // Convert all functions to async
@@ -59,25 +76,36 @@ async function compile(code) {
   let processed = astring.generate(ast);
   return `
     (async function() {
+
+      window._kidjs_.get = function(key) {
+        return eval(key);
+      };
+
+      window._kidjs_.set = function(key, value) {
+        eval(key + ' = ' + value);
+      }
+
       ${processed}
-      window._onframe = function() {
-        for (let i = 0; i < window._triggers.length; i++) {
-          if (eval(window._triggers[i].condition)) {
-            if (typeof window._triggers[i].function !== 'undefined') {
-              eval(window._triggers[i].function + '();');
+
+      window._kidjs_.onframe = function() {
+        for (let i = 0; i < window._kidjs_.triggers.length; i++) {
+          if (eval(window._kidjs_.triggers[i].condition)) {
+            if (typeof window._kidjs_.triggers[i].function !== 'undefined') {
+              eval(window._kidjs_.triggers[i].function + '();');
             }
-            if (typeof window._triggers[i].inline !== 'undefined') {
-              eval('(' + window._triggers[i].inline + ')();');
+            if (typeof window._kidjs_.triggers[i].inline !== 'undefined') {
+              eval('(' + window._kidjs_.triggers[i].inline + ')();');
             }
           }
         }
       };
+
     })();
   `
 }
 
 export function reset() {
-  window._triggers = [];
+  window._kidjs_.triggers = [];
   removeAllEventListeners();
 }
 

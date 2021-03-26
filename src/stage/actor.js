@@ -35,6 +35,10 @@ export default class Actor {
     this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
   }
 
+  spin(speed = 5) {
+    this.speed.rotation = speed;
+  }
+
   stop() {
     this.frame = 0;
     this.state = 'default';

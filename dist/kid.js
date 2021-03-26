@@ -6705,7 +6705,7 @@ function generate(node, options) {
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(202);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(516);
 
 
 
@@ -6909,7 +6909,7 @@ function end() {
 
 /***/ }),
 
-/***/ 202:
+/***/ 516:
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -6919,6 +6919,20 @@ __webpack_require__.d(__webpack_exports__, {
   "on": function() { return /* binding */ on; },
   "R": function() { return /* binding */ removeAllEventListeners; }
 });
+
+;// CONCATENATED MODULE: ./src/events/keyboard.js
+function onKeyDown(e) {
+  window.keyPressed = e.key;
+}
+
+function onKeyUp(e) {
+  window.keyPressed = false;
+}
+
+/* harmony default export */ function keyboard() {
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('keyup', onKeyUp);
+}
 
 ;// CONCATENATED MODULE: ./src/events/mouse.js
 const SWIPE_MIN_DISTANCE = 150;
@@ -6984,9 +6998,11 @@ function onMouseMove(e) {
 ;// CONCATENATED MODULE: ./src/events/index.js
 
 
+
 let listeners = [];
 
 /* harmony default export */ function events() {
+  keyboard();
   mouse();
 }
 
@@ -7085,8 +7101,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./src/core/index.js
 var core = __webpack_require__(763);
-// EXTERNAL MODULE: ./src/events/index.js + 1 modules
-var events = __webpack_require__(202);
+// EXTERNAL MODULE: ./src/events/index.js + 2 modules
+var events = __webpack_require__(516);
 ;// CONCATENATED MODULE: ./src/stage/index.js
 
 
@@ -7161,28 +7177,6 @@ class Stage {
   }
 }
 
-;// CONCATENATED MODULE: ./src/audio/speech.js
-function Speech() {
-  window.speak = this.speak.bind(this);
-}
-
-function speak(text) {
-  let utterance = new SpeechSynthesisUtterance(text);
-  speechSynthesis.speak(utterance);
-}
-
-Speech.prototype = {
-
-  constructor: Speech,
-
-  speak: function(text) {
-    var utterance = new SpeechSynthesisUtterance(text);
-    speechSynthesis.speak(utterance);
-  }
-};
-
-
-
 ;// CONCATENATED MODULE: ./src/stage/actor.js
 class Actor {
   constructor(x, y, stage) {
@@ -7219,6 +7213,10 @@ class Actor {
     this.speed.x = this.speed.x + this.acceleration.x;
     this.speed.y = this.speed.y + this.acceleration.y;
     this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
+  }
+
+  spin(speed = 5) {
+    this.speed.rotation = speed;
   }
 
   stop() {
@@ -7439,6 +7437,52 @@ function rect(x, y, width, height) {
   return shape;
 }
 
+;// CONCATENATED MODULE: ./src/shape/regular.js
+
+
+
+class RegularPolygon extends Polygon {
+  constructor(x, y, radius, sides) {
+    super(x, y);
+
+    if (sides > 2) {
+      let angle = 360 / sides;
+      let v = new Vector(0, -radius);
+
+      for (let i = 0; i < sides; i++) {
+        this.addPoint(v.x, v.y);
+        this.addPoint(v.x, v.y);
+        v = v.rotate(angle);
+      }
+    }
+  }
+}
+
+function square(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 4);
+  return shape;
+}
+
+function pentagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 5);
+  return shape;
+}
+
+function hexagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 6);
+  return shape;
+}
+
+function heptagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 7);
+  return shape;
+}
+
+function octagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 8);
+  return shape;
+}
+
 ;// CONCATENATED MODULE: ./src/shape/star.js
 
 
@@ -7504,16 +7548,22 @@ function triangle(x, y, width, height = false) {
 
 
 
+
 // Initialize framework
 (0,core/* init */.S1)();
 
-// Set globals
+// Assign functions to global object
 window.circle = circle;
 window.display = display;
+window.heptagon = heptagon;
+window.hexagon = hexagon;
 window.line = line;
+window.octagon = octagon;
 window.on = events.on;
+window.pentagon = pentagon;
 window.rect = rect;
 window.reset = core/* reset */.mc;
+window.square = square;
 window.star = star;
 window.triangle = triangle;
 window.wait = core/* wait */.Dc;

@@ -13,6 +13,10 @@ export default class Stage {
       this.height = height;
     }
 
+    // Stage properties
+    window.gravity = 1;
+    window.floor = true;
+
     // Create canvas
     let scale = window.devicePixelRatio;
     this.canvas = document.createElement('canvas');

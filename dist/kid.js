@@ -7119,6 +7119,10 @@ class Stage {
       this.height = height;
     }
 
+    // Stage properties
+    window.gravity = 1;
+    window.floor = true;
+
     // Create canvas
     let scale = window.devicePixelRatio;
     this.canvas = document.createElement('canvas');
@@ -7180,13 +7184,15 @@ class Stage {
 ;// CONCATENATED MODULE: ./src/stage/actor.js
 class Actor {
   constructor(x, y, stage) {
+
+    // Current state
     this.frame = 0;
     this.state = 'default';
 
+    // Default properties
     this.x = x;
     this.y = y;
     this.rotation = 0;
-
     this.speed = {
       x: 0,
       y: 0,
@@ -7197,6 +7203,7 @@ class Actor {
       y: 0,
       rotation: 0
     };
+    this.weightless = true;
 
     if (typeof stage === 'undefined') {
       window.stage.addChild(this);
@@ -7207,9 +7214,21 @@ class Actor {
 
   update() {
     this.frame++;
+
+    // Update position
     this.x = this.x + this.speed.x;
     this.y = this.y + this.speed.y;
     this.rotation = this.rotation + this.speed.rotation;
+
+    // Apply gravity
+    if (!this.weightless) {
+      this.speed.y = this.speed.y + parseInt(window.gravity) / 2;
+      if (window.floor && this.y > stage.height) {
+        this.y = stage.height;
+      }
+    }
+
+    // Update velocity
     this.speed.x = this.speed.x + this.acceleration.x;
     this.speed.y = this.speed.y + this.acceleration.y;
     this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
@@ -7308,6 +7327,31 @@ class Vector {
     );
   }
 
+  add(v) {
+    return new Vector(this.x + v.x, this.y + v.y);
+  }
+
+  subtract(v) {
+    return new Vector(this.x - v.x, this.y - v.y);
+  }
+
+  scale(s) {
+    return new Vector(this.x * s, this.y * s);
+  }
+
+  normalize() {
+    let l = this.length;
+    return l > 0 ? new Vector(this.x / l, this.y / l) : new Vector(0, 0);
+  }
+
+  dot(v) {
+    return (this.x * v.x + this.y * v.y);
+  }
+
+  cross(v) {
+    return (this.x * v.y - this.y * v.x);
+  }
+
   rotate(deg) {
     let angle = deg * (Math.PI / 180);
     return new Vector(
@@ -7316,15 +7360,10 @@ class Vector {
     );
   }
 
-  normalize() {
-    return new Vector(
-      this.x / this.length,
-      this.y / this.length
+  distance(v) {
+    return Math.sqrt(
+      Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2)
     );
-  }
-
-  dotProduct(v) {
-    return (this.x * v.x + this.y * v.y);
   }
 }
 

@@ -1,5 +1,5 @@
 import Shape from './';
-import Vector from './vector';
+import Vector from '../core/vector';
 
 export default class Line extends Shape {
   constructor(x1, y1, x2, y2) {

@@ -64,9 +64,21 @@ export default class Stage {
   render() {
     this.frame++;
     this.context.clearRect(0, 0, this.width, this.height);
-    for (let obj of this.children) {
-      obj.update();
-      obj.render(this.context);
+
+    // Detect collisions
+    for (let i = 0; i < this.children.length; i++) {
+      for (let j = i + 1; j < this.children.length; j++) {
+        if (this.children[i].collidesWith(this.children[j])) {
+          this.children[i].stroke = 'red';
+          this.children[j].colliding = 'red';
+        }
+      }
+    }
+
+    // Update actors
+    for (let actor of this.children) {
+      actor.update();
+      actor.render(this.context);
     }
     if (typeof window._kidjs_.onframe == 'function') {
       window._kidjs_.onframe();

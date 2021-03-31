@@ -1,3 +1,5 @@
+import Vector from '../core/vector';
+
 export default class Actor {
   constructor(x, y, stage) {
 
@@ -5,7 +7,7 @@ export default class Actor {
     this.frame = 0;
     this.state = 'default';
 
-    // Default properties
+    // Position and movement
     this.x = x;
     this.y = y;
     this.rotation = 0;
@@ -21,6 +23,10 @@ export default class Actor {
     };
     this.weightless = true;
 
+    // Bounds
+    this.boundingRadius = 0;
+
+    // Add to stage
     if (typeof stage === 'undefined') {
       window.stage.addChild(this);
     } else {
@@ -57,5 +63,14 @@ export default class Actor {
   stop() {
     this.frame = 0;
     this.state = 'default';
+  }
+
+  collidesWith(actor) {
+    let v = new Vector(this.x - actor.x, this.y - actor.y);
+    if (v.length < this.boundingRadius + actor.boundingRadius) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

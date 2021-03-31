@@ -7170,9 +7170,21 @@ class Stage {
   render() {
     this.frame++;
     this.context.clearRect(0, 0, this.width, this.height);
-    for (let obj of this.children) {
-      obj.update();
-      obj.render(this.context);
+
+    // Detect collisions
+    for (let i = 0; i < this.children.length; i++) {
+      for (let j = i + 1; j < this.children.length; j++) {
+        if (this.children[i].collidesWith(this.children[j])) {
+          this.children[i].stroke = 'red';
+          this.children[j].colliding = 'red';
+        }
+      }
+    }
+
+    // Update actors
+    for (let actor of this.children) {
+      actor.update();
+      actor.render(this.context);
     }
     if (typeof window._kidjs_.onframe == 'function') {
       window._kidjs_.onframe();
@@ -7181,140 +7193,7 @@ class Stage {
   }
 }
 
-;// CONCATENATED MODULE: ./src/stage/actor.js
-class Actor {
-  constructor(x, y, stage) {
-
-    // Current state
-    this.frame = 0;
-    this.state = 'default';
-
-    // Default properties
-    this.x = x;
-    this.y = y;
-    this.rotation = 0;
-    this.speed = {
-      x: 0,
-      y: 0,
-      rotation: 0
-    };
-    this.acceleration = {
-      x: 0,
-      y: 0,
-      rotation: 0
-    };
-    this.weightless = true;
-
-    if (typeof stage === 'undefined') {
-      window.stage.addChild(this);
-    } else {
-      stage.addChild(this);
-    }
-  }
-
-  update() {
-    this.frame++;
-
-    // Update position
-    this.x = this.x + this.speed.x;
-    this.y = this.y + this.speed.y;
-    this.rotation = this.rotation + this.speed.rotation;
-
-    // Apply gravity
-    if (!this.weightless) {
-      this.speed.y = this.speed.y + parseInt(window.gravity) / 2;
-      if (window.floor && this.y > stage.height) {
-        this.y = stage.height;
-      }
-    }
-
-    // Update velocity
-    this.speed.x = this.speed.x + this.acceleration.x;
-    this.speed.y = this.speed.y + this.acceleration.y;
-    this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
-  }
-
-  spin(speed = 5) {
-    this.speed.rotation = speed;
-  }
-
-  stop() {
-    this.frame = 0;
-    this.state = 'default';
-  }
-}
-
-;// CONCATENATED MODULE: ./src/stage/text.js
-
-
-class Text extends Actor {
-  constructor(x, y, text, live) {
-    super(x, y);
-    this.text = text;
-    this.live = live;
-  }
-
-  render(context) {
-    context.fillStyle = 'black';
-    context.font = '80px Verdana';
-    context.textBaseline = 'top';
-    const output = this.live ? window._kidjs_.eval(this.text) : this.text;
-    context.fillText(output, this.x, this.y);
-  }
-}
-
-function display(x, y, text, live = false) {
-  const actor = new Text(x, y, text, live);
-  return actor;
-}
-
-;// CONCATENATED MODULE: ./src/shape/index.js
-
-
-class Shape extends Actor {
-  constructor(x, y) {
-    super(x, y);
-    this.fill = window.fill;
-    this.stroke = window.stroke;
-    this.lineWidth = window.lineWidth;
-  }
-
-  prerender(context) {
-    context.fillStyle = this.fill;
-    context.strokeStyle = this.stroke;
-    context.lineWidth = this.lineWidth;
-    context.beginPath();
-  }
-
-  postrender(context) {
-    context.closePath();
-    context.fill();
-    context.stroke();
-  }
-}
-
-;// CONCATENATED MODULE: ./src/shape/circle.js
-
-
-class Circle extends Shape {
-  constructor(x, y, radius) {
-    super(x, y);
-    this.radius = radius;
-  }
-
-  render(context) {
-    this.prerender(context);
-    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    this.postrender(context);
-  }
-}
-
-function circle(x, y, diameter) {
-  const shape = new Circle(x, y, diameter / 2);
-  return shape;
-}
-
-;// CONCATENATED MODULE: ./src/shape/vector.js
+;// CONCATENATED MODULE: ./src/core/vector.js
 class Vector {
   constructor(x, y) {
     this.x = x;
@@ -7365,6 +7244,161 @@ class Vector {
       Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2)
     );
   }
+}
+
+;// CONCATENATED MODULE: ./src/stage/actor.js
+
+
+class Actor {
+  constructor(x, y, stage) {
+
+    // Current state
+    this.frame = 0;
+    this.state = 'default';
+
+    // Position and movement
+    this.x = x;
+    this.y = y;
+    this.rotation = 0;
+    this.speed = {
+      x: 0,
+      y: 0,
+      rotation: 0
+    };
+    this.acceleration = {
+      x: 0,
+      y: 0,
+      rotation: 0
+    };
+    this.weightless = true;
+
+    // Bounds
+    this.boundingRadius = 0;
+
+    // Add to stage
+    if (typeof stage === 'undefined') {
+      window.stage.addChild(this);
+    } else {
+      stage.addChild(this);
+    }
+  }
+
+  update() {
+    this.frame++;
+
+    // Update position
+    this.x = this.x + this.speed.x;
+    this.y = this.y + this.speed.y;
+    this.rotation = this.rotation + this.speed.rotation;
+
+    // Apply gravity
+    if (!this.weightless) {
+      this.speed.y = this.speed.y + parseInt(window.gravity) / 2;
+      if (window.floor && this.y > stage.height) {
+        this.y = stage.height;
+      }
+    }
+
+    // Update velocity
+    this.speed.x = this.speed.x + this.acceleration.x;
+    this.speed.y = this.speed.y + this.acceleration.y;
+    this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
+  }
+
+  spin(speed = 5) {
+    this.speed.rotation = speed;
+  }
+
+  stop() {
+    this.frame = 0;
+    this.state = 'default';
+  }
+
+  collidesWith(actor) {
+    let v = new Vector(this.x - actor.x, this.y - actor.y);
+    if (v.length < this.boundingRadius + actor.boundingRadius) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+;// CONCATENATED MODULE: ./src/stage/text.js
+
+
+class Text extends Actor {
+  constructor(x, y, text, live) {
+    super(x, y);
+    this.text = text;
+    this.live = live;
+  }
+
+  render(context) {
+    context.fillStyle = 'black';
+    context.font = '80px Verdana';
+    context.textBaseline = 'top';
+    const output = this.live ? window._kidjs_.eval(this.text) : this.text;
+    context.fillText(output, this.x, this.y);
+  }
+}
+
+function display(x, y, text, live = false) {
+  const actor = new Text(x, y, text, live);
+  return actor;
+}
+
+;// CONCATENATED MODULE: ./src/shape/index.js
+
+
+class Shape extends Actor {
+  constructor(x, y) {
+    super(x, y);
+    this.fill = window.fill;
+    this.stroke = window.stroke;
+    this.lineWidth = window.lineWidth;
+  }
+
+  prerender(context) {
+
+    context.strokeStyle = 'gray';
+    context.beginPath();
+    context.arc(this.x, this.y, this.boundingRadius, 0, Math.PI * 2);
+    context.stroke();
+
+    context.fillStyle = this.fill;
+    context.strokeStyle = this.stroke;
+    context.lineWidth = this.lineWidth;
+    context.beginPath();
+  }
+
+  postrender(context) {
+    context.closePath();
+    context.fill();
+    context.stroke();
+  }
+}
+
+;// CONCATENATED MODULE: ./src/shape/circle.js
+
+
+class Circle extends Shape {
+  constructor(x, y, radius) {
+    super(x, y);
+    this.radius = radius;
+    this.boundingRadius = radius;
+  }
+
+  render(context) {
+    this.prerender(context);
+    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    this.postrender(context);
+  }
+}
+
+function circle(x, y, diameter) {
+  const shape = new Circle(x, y, diameter / 2);
+  return shape;
 }
 
 ;// CONCATENATED MODULE: ./src/shape/line.js
@@ -7440,7 +7474,11 @@ class Polygon extends Shape {
   }
 
   addPoint(x, y) {
-    this.points.push(new Vector(x, -y));
+    let v = new Vector(x, -y);
+    if (v.length > this.boundingRadius) {
+      this.boundingRadius = v.length;
+    }
+    this.points.push(v);
   }
 
   render(context) {

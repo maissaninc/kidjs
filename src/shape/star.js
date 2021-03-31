@@ -1,5 +1,5 @@
 import Polygon from './polygon';
-import Vector from './vector';
+import Vector from '../core/vector';
 
 export default class Star extends Polygon {
   constructor(x, y, outerRadius, innerRadius, points = 5) {

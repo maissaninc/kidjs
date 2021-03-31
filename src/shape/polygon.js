@@ -1,5 +1,5 @@
 import Shape from './';
-import Vector from './vector';
+import Vector from '../core/vector';
 
 export default class Polygon extends Shape {
   constructor(x, y) {
@@ -8,7 +8,11 @@ export default class Polygon extends Shape {
   }
 
   addPoint(x, y) {
-    this.points.push(new Vector(x, -y));
+    let v = new Vector(x, -y);
+    if (v.length > this.boundingRadius) {
+      this.boundingRadius = v.length;
+    }
+    this.points.push(v);
   }
 
   render(context) {

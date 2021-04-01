@@ -7288,25 +7288,14 @@ class Actor {
    * @param {Stage} [stage] - Optional stage to add actor to. Defaults to stage object on window.
    */
   constructor(x, y, stage) {
-
-    // Current state
     this.frame = 0;
     this.state = 'default';
-
-    // Position and movement
-    this.x = x;
-    this.y = y;
-    this.rotation = 0;
-    this.speed = {
-      x: 0,
-      y: 0,
-      rotation: 0
-    };
-    this.acceleration = {
-      x: 0,
-      y: 0,
-      rotation: 0
-    };
+    this.position = new Vector(x, y);
+    this.velocity = new Vector(0, 0);
+    this.acceleration = new Vector(0, 0);
+    this.angle = 0;
+    this.angularVelocity = 0;
+    this.angularAcceleration = 0;
     this.weightless = true;
 
     // Bounds
@@ -7320,6 +7309,11 @@ class Actor {
     }
   }
 
+  get x() { return this.position.x; }
+  get y() { return this.position.y; }
+  set x(value) { this.position.x = value; }
+  set y(value) { this.position.y = value; }
+
   /**
    * Update the position of Actor on stage.
    * This is called each frame.
@@ -7328,26 +7322,24 @@ class Actor {
     this.frame++;
 
     // Update position
-    this.x = this.x + this.speed.x;
-    this.y = this.y + this.speed.y;
-    this.rotation = this.rotation + this.speed.rotation;
+    this.position = this.position.add(this.velocity);
+    this.angle = this.angle + this.angularVelocity;
 
     // Apply gravity
     if (!this.weightless) {
-      this.speed.y = this.speed.y + parseInt(window.gravity) / 2;
-      if (window.floor && this.y > stage.height) {
-        this.y = stage.height;
+      this.velocity.y = this.velocity.y + parseInt(window.gravity) / 2;
+      if (window.floor && this.position.y > stage.height) {
+        this.position.y = stage.height;
       }
     }
 
     // Update velocity
-    this.speed.x = this.speed.x + this.acceleration.x;
-    this.speed.y = this.speed.y + this.acceleration.y;
-    this.speed.rotation = this.speed.rotation + this.acceleration.rotation;
+    this.velocity = this.velocity.add(this.acceleration);
+    this.angularVelocity = this.angularVelocity + this.angularAcceleration;
   }
 
   spin(speed = 5) {
-    this.speed.rotation = speed;
+    this.angularVelocity = speed;
   }
 
   stop() {
@@ -7561,11 +7553,11 @@ class Polygon extends Shape {
       return;
     }
     this.prerender(context);
-    let v = this.points[0].rotate(this.rotation);
+    let v = this.points[0].rotate(this.angle);
     context.moveTo(this.x + v.x, this.y - v.y);
     for (let point of this.points) {
-      v = point.rotate(this.rotation);
-      context.lineTo(this.x +v.x, this.y - v.y);
+      v = point.rotate(this.angle);
+      context.lineTo(this.x + v.x, this.y - v.y);
     }
     this.postrender(context);
   }

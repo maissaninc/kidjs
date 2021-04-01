@@ -20,11 +20,11 @@ export default class Polygon extends Shape {
       return;
     }
     this.prerender(context);
-    let v = this.points[0].rotate(this.rotation);
+    let v = this.points[0].rotate(this.angle);
     context.moveTo(this.x + v.x, this.y - v.y);
     for (let point of this.points) {
-      v = point.rotate(this.rotation);
-      context.lineTo(this.x +v.x, this.y - v.y);
+      v = point.rotate(this.angle);
+      context.lineTo(this.x + v.x, this.y - v.y);
     }
     this.postrender(context);
   }

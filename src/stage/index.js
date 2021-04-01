@@ -1,17 +1,18 @@
 import { evaluateTriggers } from '../core';
 
 export default class Stage {
-  constructor(width, height) {
-    this.frame = 0;
 
-    // Default width and height
-    if (width === undefined || height === undefined) {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-    } else {
-      this.width = width;
-      this.height = height;
-    }
+  /**
+   * Create a new stage.
+   *
+   * @constructor
+   * @param {int} [width] - Optional stage width. Defaults to browser width.
+   * @param {int} [height] - Optional stage height. Defaults to browser height.
+   */
+  constructor(width = window.innerWidth, height = window.innerHeight) {
+    this.frame = 0;
+    this.width = width;
+    this.height = height;
 
     // Stage properties
     window.gravity = 1;
@@ -33,18 +34,20 @@ export default class Stage {
     window.lineWidth = 2;
 
     // Initialize
-    this.children = [];
+    this.actors = [];
     this.render();
   }
 
-  resize(width, height) {
-    if (width === undefined || height === undefined) {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-    } else {
-      this.width = width;
-      this.height = height;
-    }
+  /**
+   * Resize the stage.
+   * This is often called by a resize event handler.
+   *
+   * @param {int} [width] - Optional stage width. Defaults to browser width.
+   * @param {int} [height] - Optional stage height. Defaults to browser height.
+   */
+  resize(width = window.innerWidth, height = window.innerHeight) {
+    this.width = width;
+    this.height = height;
     let scale = window.devicePixelRatio;
     this.canvas.width = Math.floor(this.width * scale);
     this.canvas.height = Math.floor(this.height * scale);
@@ -53,36 +56,47 @@ export default class Stage {
     this.context.scale(scale, scale);
   }
 
-  addChild(obj) {
-    this.children.push(obj);
+  /**
+   * Add an actor to the stage.
+   *
+   * @param {Actor} actor - Actor to add to the stage.
+   */
+  addChild(actor) {
+    this.actors.push(actor);
   }
 
+  /**
+   * Clear all actors from the stage.
+   */
   clear() {
-    this.children = [];
+    this.actors = [];
   }
 
+  /**
+   * Render a single frame.
+   */
   render() {
     this.frame++;
     this.context.clearRect(0, 0, this.width, this.height);
 
     // Detect collisions
-    for (let i = 0; i < this.children.length; i++) {
-      for (let j = i + 1; j < this.children.length; j++) {
-        if (this.children[i].collidesWith(this.children[j])) {
-          this.children[i].stroke = 'red';
-          this.children[j].stroke = 'red';
+    for (let i = 0; i < this.actors.length; i++) {
+      for (let j = i + 1; j < this.actors.length; j++) {
+        let collision = this.actors[i].collidesWith(this.actors[j]);
+        if (collision) {
+          this.actors[i].stroke = 'red';
+          this.actors[j].stroke = 'red';
         }
       }
     }
 
     // Update actors
-    for (let actor of this.children) {
+    for (let actor of this.actors) {
       actor.update();
       actor.render(this.context);
     }
-    if (typeof window._kidjs_.onframe == 'function') {
-      window._kidjs_.onframe();
-    }
+
+    window._kidjs_.onframe();
     requestAnimationFrame(() => this.render());
   }
 }

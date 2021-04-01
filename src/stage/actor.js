@@ -1,6 +1,17 @@
+import Circle from '../shape/circle';
+import Collision from './collision';
 import Vector from '../core/vector';
 
 export default class Actor {
+
+  /**
+   * Create a new actor and add it to the stage.
+   *
+   * @constructor
+   * @param {int} x - Initial x coordinate
+   * @param {int} y - Initial y coordinate
+   * @param {Stage} [stage] - Optional stage to add actor to. Defaults to stage object on window.
+   */
   constructor(x, y, stage) {
 
     // Current state
@@ -34,6 +45,10 @@ export default class Actor {
     }
   }
 
+  /**
+   * Update the position of Actor on stage.
+   * This is called each frame.
+   */
   update() {
     this.frame++;
 
@@ -65,12 +80,46 @@ export default class Actor {
     this.state = 'default';
   }
 
+  /**
+   * Detect if this actor collects with another actor.
+   *
+   * @param {Actor} actor - Second actor
+   * @returns {(object|false)} Object containing collision data, or false if no collision occured.
+   */
   collidesWith(actor) {
-    let v = new Vector(this.x - actor.x, this.y - actor.y);
-    if (v.length < this.boundingRadius + actor.boundingRadius) {
-      return true;
-    } else {
-      return false;
+
+    // Circle colliding with circle
+   if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
+      let v = new Vector(this.x - actor.x, this.y - actor.y);
+      let distance = v.length;
+      let radiusSum = this.boundingRadius + actor.boundingRadius;
+      if (distance < radiusSum) {
+
+        // Circles at exactly the same position
+        if (distance === 0) {
+          return new Collision({
+            'depth': radiusSum,
+            'normal': new Vector(0, -1),
+            'start': this.boundingRadius > actor.boundingRadius ?
+              new Vector(this.x, this.y + this.boundingRadius) :
+              new Vector(actor.x, actor.x + actor.boundingRadius)
+          });
+
+        // Circles at different positions
+        } else {
+          let u = v.normalize().scale(-actor.boundingRadius);
+          return new Collision({
+            'depth': radiusSum - distance,
+            'normal': v.normalize(),
+            'start': new Vector(actor.x + u.x, actor.y + u.y)
+          });
+        }
+      } else {
+        return false;
+      }
     }
+
+    // Unable to determine collision
+    return false;
   }
 }

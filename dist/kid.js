@@ -6761,7 +6761,7 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
-        // Add trigger for each call to on method with expression
+        // Look for calls to on() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'on' &&
@@ -6769,7 +6769,7 @@ async function compile(code) {
           node.body[i].expression.arguments[0].type == 'BinaryExpression'
         ) {
 
-          // Function name
+          // Function name passed as second parameter
           if (node.body[i].expression.arguments[1].type == 'Identifier') {
             triggers.push({
               'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
@@ -6777,7 +6777,7 @@ async function compile(code) {
             });
           }
 
-          // Inline function
+          // Inline function passed as second parameter
           if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
             triggers.push({
               'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
@@ -6786,7 +6786,7 @@ async function compile(code) {
           }
         }
 
-        // Convert calls to display method with expression to "live"
+        // Look for calls to display() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'display' &&
@@ -7107,17 +7107,18 @@ var events = __webpack_require__(516);
 
 
 class Stage {
-  constructor(width, height) {
-    this.frame = 0;
 
-    // Default width and height
-    if (width === undefined || height === undefined) {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-    } else {
-      this.width = width;
-      this.height = height;
-    }
+  /**
+   * Create a new stage.
+   *
+   * @constructor
+   * @param {int} [width] - Optional stage width. Defaults to browser width.
+   * @param {int} [height] - Optional stage height. Defaults to browser height.
+   */
+  constructor(width = window.innerWidth, height = window.innerHeight) {
+    this.frame = 0;
+    this.width = width;
+    this.height = height;
 
     // Stage properties
     window.gravity = 1;
@@ -7139,18 +7140,20 @@ class Stage {
     window.lineWidth = 2;
 
     // Initialize
-    this.children = [];
+    this.actors = [];
     this.render();
   }
 
-  resize(width, height) {
-    if (width === undefined || height === undefined) {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-    } else {
-      this.width = width;
-      this.height = height;
-    }
+  /**
+   * Resize the stage.
+   * This is often called by a resize event handler.
+   *
+   * @param {int} [width] - Optional stage width. Defaults to browser width.
+   * @param {int} [height] - Optional stage height. Defaults to browser height.
+   */
+  resize(width = window.innerWidth, height = window.innerHeight) {
+    this.width = width;
+    this.height = height;
     let scale = window.devicePixelRatio;
     this.canvas.width = Math.floor(this.width * scale);
     this.canvas.height = Math.floor(this.height * scale);
@@ -7159,37 +7162,60 @@ class Stage {
     this.context.scale(scale, scale);
   }
 
-  addChild(obj) {
-    this.children.push(obj);
+  /**
+   * Add an actor to the stage.
+   *
+   * @param {Actor} actor - Actor to add to the stage.
+   */
+  addChild(actor) {
+    this.actors.push(actor);
   }
 
+  /**
+   * Clear all actors from the stage.
+   */
   clear() {
-    this.children = [];
+    this.actors = [];
   }
 
+  /**
+   * Render a single frame.
+   */
   render() {
     this.frame++;
     this.context.clearRect(0, 0, this.width, this.height);
 
     // Detect collisions
-    for (let i = 0; i < this.children.length; i++) {
-      for (let j = i + 1; j < this.children.length; j++) {
-        if (this.children[i].collidesWith(this.children[j])) {
-          this.children[i].stroke = 'red';
-          this.children[j].stroke = 'red';
+    for (let i = 0; i < this.actors.length; i++) {
+      for (let j = i + 1; j < this.actors.length; j++) {
+        let collision = this.actors[i].collidesWith(this.actors[j]);
+        if (collision) {
+          this.actors[i].stroke = 'red';
+          this.actors[j].stroke = 'red';
         }
       }
     }
 
     // Update actors
-    for (let actor of this.children) {
+    for (let actor of this.actors) {
       actor.update();
       actor.render(this.context);
     }
-    if (typeof window._kidjs_.onframe == 'function') {
-      window._kidjs_.onframe();
-    }
+
+    window._kidjs_.onframe();
     requestAnimationFrame(() => this.render());
+  }
+}
+
+;// CONCATENATED MODULE: ./src/stage/collision.js
+
+
+class Collision {
+
+  constructor({depth, normal, start}) {
+    this.depth = depth;
+    this.normal = normal;
+    this.start = start;
   }
 }
 
@@ -7249,7 +7275,18 @@ class Vector {
 ;// CONCATENATED MODULE: ./src/stage/actor.js
 
 
+
+
 class Actor {
+
+  /**
+   * Create a new actor and add it to the stage.
+   *
+   * @constructor
+   * @param {int} x - Initial x coordinate
+   * @param {int} y - Initial y coordinate
+   * @param {Stage} [stage] - Optional stage to add actor to. Defaults to stage object on window.
+   */
   constructor(x, y, stage) {
 
     // Current state
@@ -7283,6 +7320,10 @@ class Actor {
     }
   }
 
+  /**
+   * Update the position of Actor on stage.
+   * This is called each frame.
+   */
   update() {
     this.frame++;
 
@@ -7314,13 +7355,47 @@ class Actor {
     this.state = 'default';
   }
 
+  /**
+   * Detect if this actor collects with another actor.
+   *
+   * @param {Actor} actor - Second actor
+   * @returns {(object|false)} Object containing collision data, or false if no collision occured.
+   */
   collidesWith(actor) {
-    let v = new Vector(this.x - actor.x, this.y - actor.y);
-    if (v.length < this.boundingRadius + actor.boundingRadius) {
-      return true;
-    } else {
-      return false;
+
+    // Circle colliding with circle
+   if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
+      let v = new Vector(this.x - actor.x, this.y - actor.y);
+      let distance = v.length;
+      let radiusSum = this.boundingRadius + actor.boundingRadius;
+      if (distance < radiusSum) {
+
+        // Circles at exactly the same position
+        if (distance === 0) {
+          return new Collision({
+            'depth': radiusSum,
+            'normal': new Vector(0, -1),
+            'start': this.boundingRadius > actor.boundingRadius ?
+              new Vector(this.x, this.y + this.boundingRadius) :
+              new Vector(actor.x, actor.x + actor.boundingRadius)
+          });
+
+        // Circles at different positions
+        } else {
+          let u = v.normalize().scale(-actor.boundingRadius);
+          return new Collision({
+            'depth': radiusSum - distance,
+            'normal': v.normalize(),
+            'start': new Vector(actor.x + u.x, actor.y + u.y)
+          });
+        }
+      } else {
+        return false;
+      }
     }
+
+    // Unable to determine collision
+    return false;
   }
 }
 

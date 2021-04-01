@@ -7357,7 +7357,7 @@ class Actor {
 
     // Circle colliding with circle
    if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
-      let v = new Vector(this.x - actor.x, this.y - actor.y);
+      let v = this.position.subtract(actor.position);
       let distance = v.length;
       let radiusSum = this.boundingRadius + actor.boundingRadius;
       if (distance < radiusSum) {
@@ -7378,7 +7378,7 @@ class Actor {
           return new Collision({
             'depth': radiusSum - distance,
             'normal': v.normalize(),
-            'start': new Vector(actor.x + u.x, actor.y + u.y)
+            'start': actor.position.add(u)
           });
         }
       } else {

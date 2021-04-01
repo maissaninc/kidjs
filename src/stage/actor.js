@@ -21,6 +21,10 @@ export default class Actor {
     this.angle = 0;
     this.angularVelocity = 0;
     this.angularAcceleration = 0;
+    this.mass = 1;
+    this.inverseMass = 1;
+    this.friction = 0.8;
+    this.bounciness = 0.2;
     this.weightless = true;
 
     // Bounds
@@ -38,6 +42,17 @@ export default class Actor {
   get y() { return this.position.y; }
   set x(value) { this.position.x = value; }
   set y(value) { this.position.y = value; }
+
+  set mass(value) {
+    this.mass = value;
+    if (value != 0) {
+      this.inverseMass = 1 / value;
+    }
+  }
+
+  get inertia() {
+    return this.mass * Math.pow(this.boundingRadius, 2);
+  }
 
   /**
    * Update the position of Actor on stage.
@@ -82,7 +97,7 @@ export default class Actor {
 
     // Circle colliding with circle
    if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
-      let v = new Vector(this.x - actor.x, this.y - actor.y);
+      let v = this.position.subtract(actor.position);
       let distance = v.length;
       let radiusSum = this.boundingRadius + actor.boundingRadius;
       if (distance < radiusSum) {
@@ -103,7 +118,7 @@ export default class Actor {
           return new Collision({
             'depth': radiusSum - distance,
             'normal': v.normalize(),
-            'start': new Vector(actor.x + u.x, actor.y + u.y)
+            'start': actor.position.add(u)
           });
         }
       } else {

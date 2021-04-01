@@ -70,7 +70,7 @@ export default class Stage {
       for (let j = i + 1; j < this.children.length; j++) {
         if (this.children[i].collidesWith(this.children[j])) {
           this.children[i].stroke = 'red';
-          this.children[j].colliding = 'red';
+          this.children[j].stroke = 'red';
         }
       }
     }

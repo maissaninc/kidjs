@@ -53,7 +53,7 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
-        // Add trigger for each call to on method with expression
+        // Look for calls to on() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'on' &&
@@ -61,7 +61,7 @@ async function compile(code) {
           node.body[i].expression.arguments[0].type == 'BinaryExpression'
         ) {
 
-          // Function name
+          // Function name passed as second parameter
           if (node.body[i].expression.arguments[1].type == 'Identifier') {
             triggers.push({
               'condition': astring.generate(node.body[i].expression.arguments[0]),
@@ -69,7 +69,7 @@ async function compile(code) {
             });
           }
 
-          // Inline function
+          // Inline function passed as second parameter
           if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
             triggers.push({
               'condition': astring.generate(node.body[i].expression.arguments[0]),
@@ -78,7 +78,7 @@ async function compile(code) {
           }
         }
 
-        // Convert calls to display method with expression to "live"
+        // Look for calls to display() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'display' &&

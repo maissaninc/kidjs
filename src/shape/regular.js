@@ -18,6 +18,11 @@ export default class RegularPolygon extends Polygon {
   }
 }
 
+export function triangle(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 3);
+  return shape;
+}
+
 export function square(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
   return shape;

@@ -6,9 +6,8 @@ import { display } from './stage/text';
 import { circle } from './shape/circle';
 import { line } from './shape/line';
 import { rect } from './shape/rect';
-import { square, pentagon, hexagon, heptagon, octagon } from './shape/regular';
+import { triangle, square, pentagon, hexagon, heptagon, octagon } from './shape/regular';
 import { star } from './shape/star';
-import { triangle } from './shape/triangle';
 
 // Initialize framework
 init();

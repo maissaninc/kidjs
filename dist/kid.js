@@ -7176,7 +7176,7 @@ class Stage {
       for (let j = i + 1; j < this.children.length; j++) {
         if (this.children[i].collidesWith(this.children[j])) {
           this.children[i].stroke = 'red';
-          this.children[j].colliding = 'red';
+          this.children[j].stroke = 'red';
         }
       }
     }
@@ -7535,6 +7535,11 @@ class RegularPolygon extends Polygon {
   }
 }
 
+function triangle(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 3);
+  return shape;
+}
+
 function square(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
   return shape;
@@ -7592,29 +7597,7 @@ function star(x, y, outerRadius, innerRadius = false, points = 5) {
   return shape;
 }
 
-;// CONCATENATED MODULE: ./src/shape/triangle.js
-
-
-class Triangle extends Polygon {
-  constructor(x, y, width, height) {
-    super(x, y);
-    this.addPoint(0, -height / 2);
-    this.addPoint(width / 2, height / 2);
-    this.addPoint(-width / 2, height / 2);
-  }
-}
-
-function triangle(x, y, width, height = false) {
-  if (height === false) {
-    height = width * Math.sqrt(3) / 2;
-  }
-
-  let shape = new Triangle(x, y, width, height);
-  return shape;
-}
-
 ;// CONCATENATED MODULE: ./src/index.js
-
 
 
 

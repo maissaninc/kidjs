@@ -22,10 +22,9 @@ export default class Actor {
     this.angularVelocity = 0;
     this.angularAcceleration = 0;
     this.mass = 1;
-    this.inverseMass = 1;
     this.friction = 0.8;
     this.bounciness = 0.2;
-    this.weightless = true;
+    this.anchored = true;
 
     // Bounds
     this.boundingRadius = 0;
@@ -43,11 +42,8 @@ export default class Actor {
   set x(value) { this.position.x = value; }
   set y(value) { this.position.y = value; }
 
-  set mass(value) {
-    this.mass = value;
-    if (value != 0) {
-      this.inverseMass = 1 / value;
-    }
+  get inverseMass() {
+    return this.anchored || this.mass === 0 ? 0 : 1 / this.mass;
   }
 
   get inertia() {
@@ -66,7 +62,7 @@ export default class Actor {
     this.angle = this.angle + this.angularVelocity;
 
     // Apply gravity
-    if (!this.weightless) {
+    if (!this.anchored) {
       this.velocity.y = this.velocity.y + parseInt(window.gravity) / 2;
       if (window.floor && this.position.y > stage.height) {
         this.position.y = stage.height;
@@ -91,42 +87,47 @@ export default class Actor {
    * Detect if this actor collects with another actor.
    *
    * @param {Actor} actor - Second actor
-   * @returns {(object|false)} Object containing collision data, or false if no collision occured.
+   * @returns {(Collision|false)} Object containing collision data, or false if no collision occured.
    */
   collidesWith(actor) {
+    let v = this.position.subtract(actor.position);
+    let distance = v.length;
+    let radiusSum = this.boundingRadius + actor.boundingRadius;
 
-    // Circle colliding with circle
-   if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
-      let v = this.position.subtract(actor.position);
-      let distance = v.length;
-      let radiusSum = this.boundingRadius + actor.boundingRadius;
-      if (distance < radiusSum) {
-
-        // Circles at exactly the same position
-        if (distance === 0) {
-          return new Collision({
-            'depth': radiusSum,
-            'normal': new Vector(0, -1),
-            'start': this.boundingRadius > actor.boundingRadius ?
-              new Vector(this.x, this.y + this.boundingRadius) :
-              new Vector(actor.x, actor.x + actor.boundingRadius)
-          });
-
-        // Circles at different positions
-        } else {
-          let u = v.normalize().scale(-actor.boundingRadius);
-          return new Collision({
-            'depth': radiusSum - distance,
-            'normal': v.normalize(),
-            'start': actor.position.add(u)
-          });
-        }
-      } else {
-        return false;
-      }
+    // Bounding circles do not collide
+    if (distance >= radiusSum) {
+      return false;
     }
 
-    // Unable to determine collision
-    return false;
+    // Circle colliding with circle
+    if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
+      let v = actor.position.subtract(this.position);
+      let distance = v.length;
+      let radiusSum = this.boundingRadius + actor.boundingRadius;
+
+      // Circles at exactly the same position
+      if (distance === 0) {
+        return new Collision({
+          'a': this,
+          'b': actor,
+          'depth': radiusSum,
+          'normal': new Vector(0, -1),
+          'start': this.boundingRadius > actor.boundingRadius ?
+            new Vector(this.x, this.y + this.boundingRadius) :
+            new Vector(actor.x, actor.x + actor.boundingRadius)
+        });
+
+      // Circles at different positions
+      } else {
+        let u = v.normalize().scale(-actor.boundingRadius);
+        return new Collision({
+          'a': this,
+          'b': actor,
+          'depth': radiusSum - distance,
+          'normal': v.normalize(),
+          'start': actor.position.add(u)
+        });
+      }
+    }
   }
 }

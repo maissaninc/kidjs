@@ -1,4 +1,5 @@
 import { evaluateTriggers } from '../core';
+import { resolveCollision } from './collision';
 
 export default class Stage {
 
@@ -84,6 +85,7 @@ export default class Stage {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
         if (collision) {
+          resolveCollision(collision);
           this.actors[i].stroke = 'red';
           this.actors[j].stroke = 'red';
         }

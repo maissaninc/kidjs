@@ -7,7 +7,7 @@ export default class RegularPolygon extends Polygon {
 
     if (sides > 2) {
       let angle = 360 / sides;
-      let v = new Vector(0, -radius);
+      let v = new Vector(0, radius);
 
       for (let i = 0; i < sides; i++) {
         this.addPoint(v.x, v.y);

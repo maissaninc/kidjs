@@ -7375,6 +7375,7 @@ class Actor {
 
     // Bounds
     this.boundingRadius = 0;
+    this.boundingPolygon = [];
 
     // Add to stage
     if (typeof stage === 'undefined') {
@@ -7515,12 +7516,6 @@ class Shape extends Actor {
   }
 
   prerender(context) {
-
-    context.strokeStyle = 'gray';
-    context.beginPath();
-    context.arc(this.x, this.y, this.boundingRadius, 0, Math.PI * 2);
-    context.stroke();
-
     context.fillStyle = this.fill;
     context.strokeStyle = this.stroke;
     context.lineWidth = this.lineWidth;
@@ -7634,18 +7629,75 @@ class Polygon extends Shape {
       this.boundingRadius = v.length;
     }
     this.points.push(v);
+    if (this.points.length > 2) {
+      this.updateBoundingPolygon();
+    }
+  }
+
+  /**
+   * Use gift wraping algorithm to determine convex hull.
+   */
+  updateBoundingPolygon() {
+
+    const orientation = function(p, q, r) {
+      let a = (q.y - p.y) * (r.x - q.x) -
+        (q.x - p.x) * (r.y - q.y);
+      if (a == 0) return 0;
+      return a > 0 ? 1 : 2;
+    }
+
+    this.boundingPolygon = [];
+    if (this.points.length > 2) {
+      let leftmost = 0;
+      for (let i = 1; i < this.points.length; i++) {
+        if (this.points[i].x < leftmost.x) {
+          leftmost = i;
+        }
+      }
+      let p = leftmost;
+      let q = leftmost;
+      do {
+        this.boundingPolygon.push(this.points[p]);
+        q = (p + 1) % this.points.length;
+        for (let j = 0; j < this.points.length; j++) {
+          if (orientation(this.points[p], this.points[j], this.points[q]) == 2) {
+            q = j;
+          }
+        }
+        p = q;
+      } while (p != leftmost)
+    }
   }
 
   render(context) {
     if (this.points.length < 2) {
       return;
     }
+
+    // Draw bounding polygon
+    if (this.boundingPolygon.length > 1) {
+      context.strokeStyle = 'gray';
+      context.beginPath();
+      context.moveTo(
+        this.position.x + this.boundingPolygon[0].x,
+        this.position.y + this.boundingPolygon[0].y
+      );
+      for (let i = 1; i < this.boundingPolygon.length; i++) {
+        context.lineTo(
+          this.position.x + this.boundingPolygon[i].x,
+          this.position.y + this.boundingPolygon[i].y
+        );
+      }
+      context.closePath();
+      context.stroke();
+    }
+
     this.prerender(context);
     let v = this.points[0].rotate(this.angle);
-    context.moveTo(this.x + v.x, this.y - v.y);
+    context.moveTo(this.x + v.x, this.y + v.y);
     for (let point of this.points) {
       v = point.rotate(this.angle);
-      context.lineTo(this.x + v.x, this.y - v.y);
+      context.lineTo(this.x + v.x, this.y + v.y);
     }
     this.postrender(context);
   }
@@ -7679,7 +7731,7 @@ class RegularPolygon extends Polygon {
 
     if (sides > 2) {
       let angle = 360 / sides;
-      let v = new Vector(0, -radius);
+      let v = new Vector(0, radius);
 
       for (let i = 0; i < sides; i++) {
         this.addPoint(v.x, v.y);
@@ -7729,8 +7781,8 @@ class Star extends Polygon {
     super(x, y);
 
     let angle = 360 / points;
-    let outerVector = new Vector(0, -outerRadius);
-    let innerVector = new Vector(0, -innerRadius);
+    let outerVector = new Vector(0, outerRadius);
+    let innerVector = new Vector(0, innerRadius);
     innerVector = innerVector.rotate(angle / 2);
 
     for (let i = 0; i < points; i++) {

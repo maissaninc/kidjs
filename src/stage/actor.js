@@ -28,6 +28,7 @@ export default class Actor {
 
     // Bounds
     this.boundingRadius = 0;
+    this.boundingPolygon = [];
 
     // Add to stage
     if (typeof stage === 'undefined') {

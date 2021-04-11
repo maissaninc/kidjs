@@ -9,12 +9,6 @@ export default class Shape extends Actor {
   }
 
   prerender(context) {
-
-    context.strokeStyle = 'gray';
-    context.beginPath();
-    context.arc(this.x, this.y, this.boundingRadius, 0, Math.PI * 2);
-    context.stroke();
-
     context.fillStyle = this.fill;
     context.strokeStyle = this.stroke;
     context.lineWidth = this.lineWidth;

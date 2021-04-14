@@ -1,11 +1,13 @@
 import initKeyboardEvents from './keyboard';
 import initMouseEvents from './mouse';
+import initDeviceOrientationEvents from './device-orientation';
 
 let listeners = [];
 
 export default function() {
   initKeyboardEvents();
   initMouseEvents();
+  initDeviceOrientationEvents();
 }
 
 export function on(condition, callback) {

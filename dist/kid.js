@@ -6705,7 +6705,7 @@ function generate(node, options) {
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(516);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(193);
 
 
 
@@ -6909,7 +6909,7 @@ function end() {
 
 /***/ }),
 
-/***/ 516:
+/***/ 193:
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -6995,7 +6995,58 @@ function onMouseMove(e) {
   }
 }
 
+;// CONCATENATED MODULE: ./src/events/device-orientation.js
+const threshold = 10;
+
+function getHorizontalTilt(e) {
+  if (window.matchMedia('(orientation: portrait)').matches) {
+    return e.gamma;
+  } else {
+    return -e.beta;
+  }
+}
+
+function getVerticalTilt(e) {
+  if (window.matchMedia('(orientation: portrait)').matches) {
+    return e.beta;
+  } else {
+    return e.gamma;
+  }
+}
+
+function onDeviceOrientation(e) {
+
+  // Trigger "tiltleft" event
+  if (getHorizontalTilt(e) < -threshold) {
+    let event = new Event('tiltleft')
+    window.dispatchEvent(event);
+  }
+
+  // Trigger "tiltright" event
+  if (getHorizontalTilt(e) > threshold) {
+    let event = new Event('tiltright')
+    window.dispatchEvent(event);
+  }
+
+  // Trigger "tiltup" event
+  if (getVerticalTilt(e) < -threshold) {
+    let event = new Event('tiltup')
+    window.dispatchEvent(event);
+  }
+
+  // Trigger "tiltdown" event
+  if (getVerticalTilt(e) > threshold) {
+    let event = new Event('tiltdown')
+    window.dispatchEvent(event);
+  }
+}
+
+/* harmony default export */ function device_orientation() {
+  window.addEventListener('deviceorientation', onDeviceOrientation);
+}
+
 ;// CONCATENATED MODULE: ./src/events/index.js
+
 
 
 
@@ -7004,6 +7055,7 @@ let listeners = [];
 /* harmony default export */ function events() {
   keyboard();
   mouse();
+  device_orientation();
 }
 
 function on(condition, callback) {
@@ -7101,8 +7153,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./src/core/index.js
 var core = __webpack_require__(763);
-// EXTERNAL MODULE: ./src/events/index.js + 2 modules
-var events = __webpack_require__(516);
+// EXTERNAL MODULE: ./src/events/index.js + 3 modules
+var events = __webpack_require__(193);
 ;// CONCATENATED MODULE: ./src/core/vector.js
 class Vector {
   constructor(x, y) {
@@ -7667,11 +7719,25 @@ function line(x1, y1, x2, y2) {
 
 
 class Polygon extends Shape {
+
+  /**
+   * Create a new polygon and add it to the stage.
+   *
+   * @constructor
+   * @param {int} x - Initial x coordinate
+   * @param {int} y - Initial y coordinate
+   */
   constructor(x, y) {
     super(x, y);
     this.points = [];
   }
 
+  /**
+   * Add point to the polygon.
+   *
+   * @param {int} x - X coordinate
+   * @param {int} y - Y coordinate
+   */
   addPoint(x, y) {
     let v = new Vector(x, -y);
     if (v.length > this.boundingRadius) {
@@ -7718,6 +7784,11 @@ class Polygon extends Shape {
     }
   }
 
+  /**
+   * Render polygon.
+   *
+   * @param {CanvasRenderingContext2D} context - Canvas drawing context.
+   */
   render(context) {
     if (this.points.length < 2) {
       return;

@@ -29,6 +29,7 @@ export default class Actor {
     // Bounds
     this.boundingRadius = 0;
     this.boundingPolygon = [];
+    this.faceNormals = [];
 
     // Add to stage
     if (typeof stage === 'undefined') {
@@ -129,6 +130,11 @@ export default class Actor {
           'start': actor.position.add(u)
         });
       }
+    }
+
+    // Polygon colliding with polygon
+    if (this.constructor.name !== 'Circle' && this.constructor.name !== 'Circle') {
+
     }
   }
 }

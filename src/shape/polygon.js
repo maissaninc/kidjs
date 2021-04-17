@@ -27,9 +27,8 @@ export default class Polygon extends Shape {
       this.boundingRadius = v.length;
     }
     this.points.push(v);
-    if (this.points.length > 2) {
-      this.updateBoundingPolygon();
-    }
+    this.updateBoundingPolygon();
+    this.updateFaceNormals();
   }
 
   /**
@@ -68,6 +67,35 @@ export default class Polygon extends Shape {
   }
 
   /**
+   * Compute face normals. These are used in collision detection.
+   */
+  updateFaceNormals() {
+    this.faceNormals = [];
+    if (this.boundingPolygon.length > 2) {
+
+      // Determine if points are clockwise
+      let sum = 0;
+      for (let i = 0; i < this.boundingPolygon.length; i++) {
+        let p1 = this.boundingPolygon[i];
+        let p2 = this.boundingPolygon[(i + 1) % this.boundingPolygon.length];
+        sum = sum + (p2.x - p1.x) * (p2.y + p1.y);
+      }
+      const clockwise = (sum >= 0);
+
+      // Calculate face normal for each edge
+      for (let i = 0; i < this.boundingPolygon.length; i++) {
+        let edge = this.boundingPolygon[i].subtract(
+          this.boundingPolygon[(i + 1) % this.boundingPolygon.length]
+        );
+        let perpendicular = clockwise ?
+          new Vector(edge.y, -edge.x) :
+          new Vector(-edge.y, edge.x);
+        this.faceNormals.push(perpendicular.normalize());
+      }
+    }
+  }
+
+  /**
    * Render polygon.
    *
    * @param {CanvasRenderingContext2D} context - Canvas drawing context.
@@ -93,6 +121,23 @@ export default class Polygon extends Shape {
       }
       context.closePath();
       context.stroke();
+    }
+
+    // Draw face normals
+    if (this.boundingPolygon.length > 1) {
+      context.strokeStyle = 'pink';
+      for (let i = 0; i < this.faceNormals.length; i++) {
+        context.beginPath();
+        context.moveTo(
+          this.position.x + this.boundingPolygon[i].x,
+          this.position.y + this.boundingPolygon[i].y
+        );
+        context.lineTo(
+          this.position.x + this.boundingPolygon[i].x + (this.faceNormals[i].x * 20),
+          this.position.y + this.boundingPolygon[i].y + (this.faceNormals[i].y * 20)
+        );
+        context.stroke();
+      }
     }
 
     this.prerender(context);

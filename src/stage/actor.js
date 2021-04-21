@@ -133,8 +133,52 @@ export default class Actor {
     }
 
     // Polygon colliding with polygon
-    if (this.constructor.name !== 'Circle' && this.constructor.name !== 'Circle') {
+    if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
 
+      const findSupportPoint = function(direction, p) {
+        let supportPoint = false;
+        let max;
+        for (let i = 0; i < this.boundingPolygon.length; i++) {
+          let v = this.boundingPolygon[i].subtract(p);
+          let projection = v.dot(direction);
+          if (projection > 0 && (supportPoint === false || projection > max)) {
+            max = projection;
+            supportPoint = this.boundingPolygon[i];
+          }
+        }
+        return {
+          'point': supportPoint,
+          'distance': max
+        }
+      }
+
+      const findAxisLeastPenetration = function() {
+        let supportPoint;
+        let faceNormal = false;
+        let min;
+
+        for (let i = 0; i < this.faceNormals.length; i++) {
+          let supportPoint = findSupportPoint(
+            this.faceNormals[i].scale(-1),
+            this.boundingPolygon[i]
+          );
+          if (supportPoint.point === false) {
+            break;
+          }
+          if (faceNormal === false || supportPoint.distance < min) {
+            min = supportPoint.distance;
+            faceNormal = this.faceNormals[i];
+          }
+        }
+
+        return new Collision({
+          'a': this,
+          'b': actor,
+          'depth': min,
+          'normal': faceNormal,
+          'start': supportPoint.point.add(faceNormal.scale(min))
+        });
+      }
     }
   }
 }

@@ -49,3 +49,5 @@ window.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('resize', function() {
   window.stage.resize();
 });
+
+export { reset, run }

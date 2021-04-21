@@ -7151,6 +7151,8 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 !function() {
 
+// UNUSED EXPORTS: reset, run
+
 // EXTERNAL MODULE: ./src/core/index.js
 var core = __webpack_require__(763);
 // EXTERNAL MODULE: ./src/events/index.js + 3 modules
@@ -7581,8 +7583,52 @@ class Actor {
     }
 
     // Polygon colliding with polygon
-    if (this.constructor.name !== 'Circle' && this.constructor.name !== 'Circle') {
+    if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
 
+      const findSupportPoint = function(direction, p) {
+        let supportPoint = false;
+        let max;
+        for (let i = 0; i < this.boundingPolygon.length; i++) {
+          let v = this.boundingPolygon[i].subtract(p);
+          let projection = v.dot(direction);
+          if (projection > 0 && (supportPoint === false || projection > max)) {
+            max = projection;
+            supportPoint = this.boundingPolygon[i];
+          }
+        }
+        return {
+          'point': supportPoint,
+          'distance': max
+        }
+      }
+
+      const findAxisLeastPenetration = function() {
+        let supportPoint;
+        let faceNormal = false;
+        let min;
+
+        for (let i = 0; i < this.faceNormals.length; i++) {
+          let supportPoint = findSupportPoint(
+            this.faceNormals[i].scale(-1),
+            this.boundingPolygon[i]
+          );
+          if (supportPoint.point === false) {
+            break;
+          }
+          if (faceNormal === false || supportPoint.distance < min) {
+            min = supportPoint.distance;
+            faceNormal = this.faceNormals[i];
+          }
+        }
+
+        return new Collision({
+          'a': this,
+          'b': actor,
+          'depth': min,
+          'normal': faceNormal,
+          'start': supportPoint.point.add(faceNormal.scale(min))
+        });
+      }
     }
   }
 }
@@ -8027,6 +8073,8 @@ window.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('resize', function() {
   window.stage.resize();
 });
+
+
 
 }();
 /******/ })()

@@ -7151,8 +7151,6 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 !function() {
 
-// UNUSED EXPORTS: reset, run
-
 // EXTERNAL MODULE: ./src/core/index.js
 var core = __webpack_require__(763);
 // EXTERNAL MODULE: ./src/events/index.js + 3 modules
@@ -8074,7 +8072,10 @@ window.addEventListener('resize', function() {
   window.stage.resize();
 });
 
-
+window.KID = {
+  'reset': core/* reset */.mc,
+  'run': core/* run */.KH
+};
 
 }();
 /******/ })()

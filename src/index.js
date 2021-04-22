@@ -50,4 +50,7 @@ window.addEventListener('resize', function() {
   window.stage.resize();
 });
 
-export { reset, run }
+window.KID = {
+  'reset': reset,
+  'run': run
+};

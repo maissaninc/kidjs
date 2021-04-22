@@ -1,4 +1,4 @@
-import { init, run, reset, wait } from './core';
+import { init, run, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
 import { speak } from './audio/speech';
@@ -22,7 +22,6 @@ window.octagon = octagon;
 window.on = on;
 window.pentagon = pentagon;
 window.rect = rect;
-window.reset = reset;
 window.square = square;
 window.star = star;
 window.triangle = triangle;
@@ -51,6 +50,8 @@ window.addEventListener('resize', function() {
 });
 
 window.KID = {
-  'reset': reset,
+  'reset': function() {
+    window.stage.clear();
+  },
   'run': run
 };

@@ -1,5 +1,6 @@
 import Circle from '../shape/circle';
 import Collision from './collision';
+import { circleCollidesWithCircle, polygonCollidesWithPolygon} from './collision';
 import Vector from '../core/vector';
 
 export default class Actor {
@@ -103,82 +104,12 @@ export default class Actor {
 
     // Circle colliding with circle
     if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
-      let v = actor.position.subtract(this.position);
-      let distance = v.length;
-      let radiusSum = this.boundingRadius + actor.boundingRadius;
-
-      // Circles at exactly the same position
-      if (distance === 0) {
-        return new Collision({
-          'a': this,
-          'b': actor,
-          'depth': radiusSum,
-          'normal': new Vector(0, -1),
-          'start': this.boundingRadius > actor.boundingRadius ?
-            new Vector(this.x, this.y + this.boundingRadius) :
-            new Vector(actor.x, actor.x + actor.boundingRadius)
-        });
-
-      // Circles at different positions
-      } else {
-        let u = v.normalize().scale(-actor.boundingRadius);
-        return new Collision({
-          'a': this,
-          'b': actor,
-          'depth': radiusSum - distance,
-          'normal': v.normalize(),
-          'start': actor.position.add(u)
-        });
-      }
+      return circleCollidesWithCircle(this, actor);
     }
 
     // Polygon colliding with polygon
     if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
-
-      const findSupportPoint = function(direction, p) {
-        let supportPoint = false;
-        let max;
-        for (let i = 0; i < this.boundingPolygon.length; i++) {
-          let v = this.boundingPolygon[i].subtract(p);
-          let projection = v.dot(direction);
-          if (projection > 0 && (supportPoint === false || projection > max)) {
-            max = projection;
-            supportPoint = this.boundingPolygon[i];
-          }
-        }
-        return {
-          'point': supportPoint,
-          'distance': max
-        }
-      }
-
-      const findAxisLeastPenetration = function() {
-        let supportPoint;
-        let faceNormal = false;
-        let min;
-
-        for (let i = 0; i < this.faceNormals.length; i++) {
-          let supportPoint = findSupportPoint(
-            this.faceNormals[i].scale(-1),
-            this.boundingPolygon[i]
-          );
-          if (supportPoint.point === false) {
-            break;
-          }
-          if (faceNormal === false || supportPoint.distance < min) {
-            min = supportPoint.distance;
-            faceNormal = this.faceNormals[i];
-          }
-        }
-
-        return new Collision({
-          'a': this,
-          'b': actor,
-          'depth': min,
-          'normal': faceNormal,
-          'start': supportPoint.point.add(faceNormal.scale(min))
-        });
-      }
+      return polygonCollidesWithPolygon(this, actor);
     }
   }
 }

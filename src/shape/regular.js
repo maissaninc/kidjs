@@ -11,7 +11,6 @@ export default class RegularPolygon extends Polygon {
 
       for (let i = 0; i < sides; i++) {
         this.addPoint(v.x, v.y);
-        this.addPoint(v.x, v.y);
         v = v.rotate(angle);
       }
     }

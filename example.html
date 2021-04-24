@@ -7,7 +7,8 @@
   <body>
     <script type="kidjs">
 
-      star(250, 250, 50);
+      let s = star(400, 250, 50);
+      s.anchored = false;
 
       triangle(400, 400, 100);
 
@@ -17,15 +18,9 @@
 
       let b = circle(650, 375, 100);
 
-      a.anchored = false;
-      b.anchored = true;
+      //a.anchored = false;
+      //b.anchored = true;
 
-
-      rect(100, 100, 10, 50).spin(4);
-
-      let p = pentagon(400, 400, 40);
-      p.spin();
-      p.weightless = false;
 
       let st = 'Chris';
       let i = 0;

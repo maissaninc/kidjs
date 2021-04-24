@@ -26,6 +26,139 @@ export default class Collision {
 }
 
 /**
+ * Find the farthest point in the opposite direction of a face normal.
+ * This is used in detecting collisions between polygons.
+ *
+ * @param {Actor} actor - Polygon
+ * @param {Vector} direction - Normal vector indicating direction
+ * @param {Vector} p - Point on face
+ * @return {Object} Object containing support point and distance
+ */
+function findSupportPoint(actor, direction, p) {
+  let supportPoint = false;
+  let max;
+  for (let i = 0; i < actor.boundingPolygon.length; i++) {
+    let v = actor.boundingPolygon[i].subtract(p);
+    let projection = v.dot(direction);
+    if (projection > 0 && (supportPoint === false || projection > max)) {
+      max = projection;
+      supportPoint = actor.boundingPolygon[i];
+    }
+  }
+  return {
+    'point': supportPoint,
+    'distance': max
+  }
+}
+
+/**
+ * Determine the axis of least penetration between two polygons.
+ * This is used in detecting collisions between polygons.
+ *
+ * @param {Actor} actor - First polygon
+ * @param {Actor} actor - Second polygon
+ * @return {Collision} Object containing collision data
+ */
+function findAxisLeastPenetration(a, b) {
+  let supportPoint;
+  let faceNormal = false;
+  let min;
+  for (let i = 0; i < a.faceNormals.length; i++) {
+    supportPoint = findSupportPoint(b,
+      a.faceNormals[i].scale(-1),
+      a.boundingPolygon[i]
+    );
+    if (supportPoint.point === false) {
+      return false;
+    }
+    if (faceNormal === false || supportPoint.distance < min) {
+      min = supportPoint.distance;
+      faceNormal = a.faceNormals[i];
+    }
+  }
+
+  return new Collision({
+    'a': a,
+    'b': b,
+    'depth': min,
+    'normal': faceNormal,
+    'start': supportPoint.point.add(faceNormal.scale(min))
+  });
+}
+
+/**
+ * Determine if two polygons collide.
+ *
+ * @param {Actor} actor - First polygon
+ * @param {Actor} actor - Second polygon
+ * @return {Collision} Object containing collision data
+ */
+export function polygonCollidesWithPolygon(a, b) {
+  let collisionA = findAxisLeastPenetration(a, b);
+  if (collisionA) {
+    let collisionB = findAxisLeastPenetration(b, a);
+    if (collisionB) {
+      if (collisionA.depth < collisionB.depth) {
+        let v = collisionA.normal.scale(collisionA.depth);
+        return new Collision({
+          'a': a,
+          'b': b,
+          'depth': collisionA.depth,
+          'normal': collisionA.normal,
+          'start': collisionA.start.subtract(v)
+        });
+      } else {
+        return new Collision({
+          'a': a,
+          'b': b,
+          'depth': collisionB.depth,
+          'normal': collisionB.normal.scale(-1),
+          'start': collisionB.start
+        });
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Determine if two circles collide.
+ *
+ * @param {Actor} actor - First circle
+ * @param {Actor} actor - Second circle
+ * @return {Collision} Object containing collision data
+ */
+export function circleCollidesWithCircle(a, b) {
+  let v = b.position.subtract(a.position);
+  let distance = v.length;
+  let radiusSum = a.boundingRadius + b.boundingRadius;
+
+  // Circles at exactly the same position
+  if (distance === 0) {
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': radiusSum,
+      'normal': new Vector(0, -1),
+      'start': a.boundingRadius > b.boundingRadius ?
+        new Vector(a.x, a.y + a.boundingRadius) :
+        new Vector(b.x, b.x + b.boundingRadius)
+    });
+
+  // Circles at different positions
+  } else {
+    let u = v.normalize().scale(-b.boundingRadius);
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': radiusSum - distance,
+      'normal': v.normalize(),
+      'start': b.position.add(u)
+    });
+  }
+}
+
+/**
  * Attempt to resolve a collision between two actors.
  *
  * @param {Collision} collision - Object containing collision data

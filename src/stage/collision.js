@@ -62,6 +62,7 @@ function findSupportPoint(actor, direction, p) {
 function findAxisLeastPenetration(a, b) {
   let supportPoint;
   let faceNormal = false;
+  let faceNormalIndex = -1;
   let min;
   for (let i = 0; i < a.faceNormals.length; i++) {
     supportPoint = findSupportPoint(b,
@@ -74,8 +75,13 @@ function findAxisLeastPenetration(a, b) {
     if (faceNormal === false || supportPoint.distance < min) {
       min = supportPoint.distance;
       faceNormal = a.faceNormals[i];
+      faceNormalIndex = i;
     }
   }
+
+  console.log(a);
+  console.log(faceNormalIndex);
+  console.log(faceNormal);
 
   return new Collision({
     'a': a,

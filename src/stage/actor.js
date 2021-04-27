@@ -24,12 +24,11 @@ export default class Actor {
     this.angularAcceleration = 0;
     this.mass = 1;
     this.friction = 0.8;
-    this.bounciness = 0.8;
+    this.bounciness = 0.2;
     this.anchored = true;
 
     // Bounds
     this.boundingRadius = 0;
-    this.boundingPolygon = [];
     this.faceNormals = [];
 
     // Add to stage

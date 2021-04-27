@@ -6698,10 +6698,10 @@ function generate(node, options) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "S1": function() { return /* binding */ init; },
-/* harmony export */   "mc": function() { return /* binding */ reset; },
 /* harmony export */   "KH": function() { return /* binding */ run; },
 /* harmony export */   "Dc": function() { return /* binding */ wait; }
 /* harmony export */ });
+/* unused harmony export reset */
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
@@ -7273,6 +7273,7 @@ function findSupportPoint(actor, direction, p) {
 function findAxisLeastPenetration(a, b) {
   let supportPoint;
   let faceNormal = false;
+  let faceNormalIndex = -1;
   let min;
   for (let i = 0; i < a.faceNormals.length; i++) {
     supportPoint = findSupportPoint(b,
@@ -7285,8 +7286,13 @@ function findAxisLeastPenetration(a, b) {
     if (faceNormal === false || supportPoint.distance < min) {
       min = supportPoint.distance;
       faceNormal = a.faceNormals[i];
+      faceNormalIndex = i;
     }
   }
+
+  console.log(a);
+  console.log(faceNormalIndex);
+  console.log(faceNormal);
 
   return new Collision({
     'a': a,
@@ -7605,12 +7611,11 @@ class Actor {
     this.angularAcceleration = 0;
     this.mass = 1;
     this.friction = 0.8;
-    this.bounciness = 0.8;
+    this.bounciness = 0.2;
     this.anchored = true;
 
     // Bounds
     this.boundingRadius = 0;
-    this.boundingPolygon = [];
     this.faceNormals = [];
 
     // Add to stage
@@ -7844,6 +7849,17 @@ class Polygon extends Shape {
   constructor(x, y) {
     super(x, y);
     this.points = [];
+    this._boundingPolygon = [];
+  }
+
+  get boundingPolygon() {
+    let points = [];
+    for (let i = 0; i < this._boundingPolygon.length; i++) {
+      let p = this._boundingPolygon[i].rotate(this.angle);
+      p = p.add(this.position);
+      points.push(p);
+    }
+    return points;
   }
 
   /**
@@ -7874,7 +7890,7 @@ class Polygon extends Shape {
       return a > 0 ? 1 : 2;
     }
 
-    this.boundingPolygon = [];
+    this._boundingPolygon = [];
     if (this.points.length > 2) {
       let leftmost = 0;
       for (let i = 1; i < this.points.length; i++) {
@@ -7885,7 +7901,7 @@ class Polygon extends Shape {
       let p = leftmost;
       let q = leftmost;
       do {
-        this.boundingPolygon.push(this.points[p]);
+        this._boundingPolygon.push(this.points[p]);
         q = (p + 1) % this.points.length;
         for (let j = 0; j < this.points.length; j++) {
           if (orientation(this.points[p], this.points[j], this.points[q]) == 2) {
@@ -7902,21 +7918,21 @@ class Polygon extends Shape {
    */
   updateFaceNormals() {
     this.faceNormals = [];
-    if (this.boundingPolygon.length > 2) {
+    if (this._boundingPolygon.length > 2) {
 
       // Determine if points are clockwise
       let sum = 0;
-      for (let i = 0; i < this.boundingPolygon.length; i++) {
-        let p1 = this.boundingPolygon[i];
-        let p2 = this.boundingPolygon[(i + 1) % this.boundingPolygon.length];
+      for (let i = 0; i < this._boundingPolygon.length; i++) {
+        let p1 = this._boundingPolygon[i];
+        let p2 = this._boundingPolygon[(i + 1) % this._boundingPolygon.length];
         sum = sum + (p2.x - p1.x) * (p2.y + p1.y);
       }
       const clockwise = (sum >= 0);
 
       // Calculate face normal for each edge
-      for (let i = 0; i < this.boundingPolygon.length; i++) {
-        let edge = this.boundingPolygon[i].subtract(
-          this.boundingPolygon[(i + 1) % this.boundingPolygon.length]
+      for (let i = 0; i < this._boundingPolygon.length; i++) {
+        let edge = this._boundingPolygon[i].subtract(
+          this._boundingPolygon[(i + 1) % this._boundingPolygon.length]
         );
         let perpendicular = clockwise ?
           new Vector(edge.y, -edge.x) :
@@ -7935,42 +7951,6 @@ class Polygon extends Shape {
     if (this.points.length < 2) {
       return;
     }
-
-    // Draw bounding polygon
-    if (this.boundingPolygon.length > 1) {
-      context.strokeStyle = 'gray';
-      context.beginPath();
-      context.moveTo(
-        this.position.x + this.boundingPolygon[0].x,
-        this.position.y + this.boundingPolygon[0].y
-      );
-      for (let i = 1; i < this.boundingPolygon.length; i++) {
-        context.lineTo(
-          this.position.x + this.boundingPolygon[i].x,
-          this.position.y + this.boundingPolygon[i].y
-        );
-      }
-      context.closePath();
-      context.stroke();
-    }
-
-    // Draw face normals
-    if (this.boundingPolygon.length > 1) {
-      context.strokeStyle = 'pink';
-      for (let i = 0; i < this.faceNormals.length; i++) {
-        context.beginPath();
-        context.moveTo(
-          this.position.x + this.boundingPolygon[i].x,
-          this.position.y + this.boundingPolygon[i].y
-        );
-        context.lineTo(
-          this.position.x + this.boundingPolygon[i].x + (this.faceNormals[i].x * 20),
-          this.position.y + this.boundingPolygon[i].y + (this.faceNormals[i].y * 20)
-        );
-        context.stroke();
-      }
-    }
-
     this.prerender(context);
     let v = this.points[0].rotate(this.angle);
     context.moveTo(this.x + v.x, this.y + v.y);
@@ -8107,7 +8087,6 @@ window.octagon = octagon;
 window.on = events.on;
 window.pentagon = pentagon;
 window.rect = rect;
-window.reset = core/* reset */.mc;
 window.square = square;
 window.star = star;
 window.triangle = triangle;
@@ -8136,7 +8115,9 @@ window.addEventListener('resize', function() {
 });
 
 window.KID = {
-  'reset': core/* reset */.mc,
+  'reset': function() {
+    window.stage.clear();
+  },
   'run': core/* run */.KH
 };
 

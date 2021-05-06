@@ -74,6 +74,16 @@ export default class Stage {
   }
 
   /**
+   * Clear stage and reset fill and stroke.
+   */
+  reset() {
+    window.fill = 'white';
+    window.stroke = 'black';
+    window.lineWidth = 2;
+    this.clear();
+  }
+
+  /**
    * Render a single frame.
    */
   render() {

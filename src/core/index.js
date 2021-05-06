@@ -172,8 +172,13 @@ export function reset() {
 }
 
 export async function run(code) {
+  try {
+    let processed = await compile(code);
+  } catch(exception) {
+    console.log(exception);
+    return;
+  }
   reset();
-  let processed = await compile(code);
   eval(processed);
 }
 

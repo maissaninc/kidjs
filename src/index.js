@@ -50,8 +50,5 @@ window.addEventListener('resize', function() {
 });
 
 window.KID = {
-  'reset': function() {
-    window.stage.clear();
-  },
   'run': run
 };

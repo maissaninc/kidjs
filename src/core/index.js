@@ -168,6 +168,7 @@ function createStepStatement(location) {
 export function reset() {
   triggers = [];
   removeAllEventListeners();
+  window.stage.clear();
 }
 
 export async function run(code) {

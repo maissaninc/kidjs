@@ -100,6 +100,15 @@ export default class Actor {
   }
 
   /**
+   * Determine if this Actor is a polygon.
+   *
+   * @returns {boolean} True if Actor is a polygon.
+   */
+  isPolygon() {
+    if (this.boundingPolygon && this.boundingPolygon.length > 2);
+  }
+
+  /**
    * Detect if this actor collects with another actor.
    *
    * @param {Actor} actor - Second actor
@@ -121,15 +130,15 @@ export default class Actor {
     }
 
     // Polygon colliding with polygon
-    if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
+    if (this.isPolygon() && actor.isPolygon()) {
       return polygonCollidesWithPolygon(this, actor);
     }
 
     // Circle colliding with polygon
-    if (this.constructor.name === 'Circle' && actor.constructor.name !== 'Circle') {
+    if (this.constructor.name === 'Circle' && actor.isPolygon()) {
       return circleCollidesWithPolygon(this, actor);
     }
-    if (actor.constructor.name === 'Circle' && this.constructor.name !== 'Circle') {
+    if (actor.constructor.name === 'Circle' && this.isPolygon()) {
       return circleCollidesWithPolygon(actor, this);
     }
   }

@@ -7290,10 +7290,6 @@ function findAxisLeastPenetration(a, b) {
     }
   }
 
-  console.log(a);
-  console.log(faceNormalIndex);
-  console.log(faceNormal);
-
   return new Collision({
     'a': a,
     'b': b,
@@ -7372,6 +7368,104 @@ function circleCollidesWithCircle(a, b) {
       'normal': v.normalize(),
       'start': b.position.add(u)
     });
+  }
+}
+
+/**
+ * Determine if a circle and polygon collide.
+ *
+ * @param {Actor} actor - Circle
+ * @param {Actor} actor - Polygon
+ * @return {Collision} Object containing collision data
+ */
+function circleCollidesWithPolygon(a, b) {
+  let inside = true;
+  let distance = false;
+  let edge = false;
+
+  // Find closest edge
+  for (let i = 0; i < b.boundingPolygon.length; i++) {
+    let v = a.position.subtract(b.boundingPolygon[i]);
+    let projection = v.dot(b.faceNormals[i]);
+    if (projection > 0) {
+      distance = projection;
+      edge = i;
+      inside = false;
+      break;
+    }
+    if (distance == false || projection > distance) {
+      distance = projection;
+      edge = i;
+    }
+  }
+
+  // Center of circle is inside of polygon
+  if (inside) {
+    let v = b.faceNormals[edge].scale(a.radius);
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': a.radius - distance,
+      'normal': b.faceNormals[edge],
+      'start': a.position.subtract(v)
+    });
+  }
+
+  // Center of circle is outside of polygon
+  let v1 = a.position.subtract(b.boundingPolygon[edge]);
+  let v2 = b.boundingPolygon[(edge + 1) % b.boundingPolygon.length].subtract(b.boundingPolygon[edge]);
+  let dot = v1.dot(v2);
+
+  // Circle in first corner region
+  if (dot < 0) {
+    distance = v1.length;
+    if (distance > a.radius) {
+      return false;
+    } else {
+      let normal = v1.normalize();
+      return new Collision({
+        'a': a,
+        'b': b,
+        'depth': a.radius - distance,
+        'normal': normal,
+        'start': a.position.add(normal.scale(-a.radius))
+      });
+    }
+  }
+
+  v1 = a.position.subtract(b.boundingPolygon[(edge + 1) % b.boundingPolygon.length]);
+  v2 = v2.scale(-1);
+  dot = v1.dot(v2);
+
+  // Circle in second corner region
+  if (dot < 0) {
+    distance = v1.length;
+    if (distance > a.radius) {
+      return false;
+    } else {
+      let normal = v1.normalize();
+      return new Collision({
+        'a': a,
+        'b': b,
+        'depth': a.radius - distance,
+        'normal': normal,
+        'start': a.position.add(normal.scale(-a.radius))
+      });
+    }
+  }
+
+  // Circle with projection of edge
+  if (distance < a.radius) {
+    let v = b.faceNormals[edge].scale(a.radius);
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': a.radius - distance,
+      'normal': b.faceNormals[edge],
+      'start': a.position.subtract(v)
+    });
+  } else {
+    return false;
   }
 }
 
@@ -7696,6 +7790,14 @@ class Actor {
     // Polygon colliding with polygon
     if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
       return polygonCollidesWithPolygon(this, actor);
+    }
+
+    // Circle colliding with polygon
+    if (this.constructor.name === 'Circle' && actor.constructor.name !== 'Circle') {
+      return circleCollidesWithPolygon(this, actor);
+    }
+    if (actor.constructor.name === 'Circle' && this.constructor.name !== 'Circle') {
+      return circleCollidesWithPolygon(actor, this);
     }
   }
 }

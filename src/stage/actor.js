@@ -1,6 +1,6 @@
 import Circle from '../shape/circle';
 import Collision from './collision';
-import { circleCollidesWithCircle, polygonCollidesWithPolygon} from './collision';
+import { circleCollidesWithCircle, polygonCollidesWithPolygon, circleCollidesWithPolygon } from './collision';
 import Vector from '../core/vector';
 
 export default class Actor {
@@ -109,6 +109,14 @@ export default class Actor {
     // Polygon colliding with polygon
     if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
       return polygonCollidesWithPolygon(this, actor);
+    }
+
+    // Circle colliding with polygon
+    if (this.constructor.name === 'Circle' && actor.constructor.name !== 'Circle') {
+      return circleCollidesWithPolygon(this, actor);
+    }
+    if (actor.constructor.name === 'Circle' && this.constructor.name !== 'Circle') {
+      return circleCollidesWithPolygon(actor, this);
     }
   }
 }

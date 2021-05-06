@@ -174,12 +174,11 @@ export function reset() {
 export async function run(code) {
   try {
     let processed = await compile(code);
+    reset();
+    eval(processed);
   } catch(exception) {
     console.log(exception);
-    return;
   }
-  reset();
-  eval(processed);
 }
 
 export async function wait(seconds) {

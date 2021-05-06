@@ -80,18 +80,22 @@ export default class Actor {
    * Rotate specified number of degrees.
    *
    * @param {float} angle - Number of degrees to rotate
+   * @return {Actor} Reference to self
    */
   rotate(degrees) {
     this.angle = this.angle + degrees;
+    return this;
   }
 
   /**
    * Start spinning motion.
    *
    * @param {float} speed - Angular velocity
+   * @return {Actor} Reference to self
    */
   spin(speed = 5) {
     this.angularVelocity = speed;
+    return this;
   }
 
   stop() {

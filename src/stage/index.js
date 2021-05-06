@@ -34,6 +34,10 @@ export default class Stage {
     window.stroke = 'black';
     window.lineWidth = 2;
 
+    // Set global width and height
+    window.width = width;
+    window.height = height;
+
     // Initialize
     this.actors = [];
     this.render();
@@ -55,6 +59,8 @@ export default class Stage {
     this.canvas.style.width = this.width + 'px';
     this.canvas.style.height = this.height + 'px';
     this.context.scale(scale, scale);
+    window.width = width;
+    window.height = height;
   }
 
   /**

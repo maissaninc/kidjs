@@ -100,10 +100,8 @@ export default class Stage {
     for (let i = 0; i < this.actors.length; i++) {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision) {
+        if (collision && !(this.actors[i].anchored && this.actors[j].anchored)) {
           resolveCollision(collision);
-          this.actors[i].stroke = 'red';
-          this.actors[j].stroke = 'red';
         }
       }
     }

@@ -2,7 +2,7 @@ import Polygon from './polygon';
 
 export default class Rect extends Polygon {
   constructor(x, y, width, height) {
-    super(x + (width / 2), y + (height / 2));
+    super(x, y);
     this.addPoint(-width / 2, -height / 2);
     this.addPoint(width / 2, -height / 2);
     this.addPoint(width / 2, height / 2);

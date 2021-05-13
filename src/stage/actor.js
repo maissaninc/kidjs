@@ -88,6 +88,19 @@ export default class Actor {
   }
 
   /**
+   * Change the position.
+   *
+   * @param {int} x - Number of pixels to move along x axis
+   * @param {int} y - Number of pixels to move along y axis
+   * @return {Actor} Reference to self
+   */
+  move(x = 0, y = 0) {
+    this.position.x = this.position.x + x;
+    this.position.y = this.position.y + y;
+    return this;
+  }
+
+  /**
    * Start spinning motion.
    *
    * @param {float} speed - Angular velocity

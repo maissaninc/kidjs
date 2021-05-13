@@ -123,7 +123,7 @@ async function compile(code) {
   }
 
   let processed = astring.generate(ast);
-  console.log(processed);
+  console.log(triggers);
   return `
     (async function() {
       window._kidjs_.eval = function(key) {

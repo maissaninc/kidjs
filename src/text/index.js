@@ -1,4 +1,4 @@
-import Actor from './actor';
+import Actor from '../stage/actor';
 
 export default class Text extends Actor {
   constructor(x, y, text, live) {

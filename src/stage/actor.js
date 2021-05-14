@@ -31,6 +31,9 @@ export default class Actor {
     this.boundingRadius = 0;
     this.faceNormals = [];
 
+    // Destination coordinates
+    this.destination = new Vector(x, y);
+
     // Add to stage
     if (typeof stage === 'undefined') {
       window.stage.addChild(this);
@@ -74,6 +77,14 @@ export default class Actor {
     // Update velocity
     this.velocity = this.velocity.add(this.acceleration);
     this.angularVelocity = this.angularVelocity + this.angularAcceleration;
+
+    // Move along vector to destination
+    let v = this.destination.subtract(this.position);
+    if (v.length > 0.05) {
+      this.position = this.position.add(v.scale(0.05));
+    } else {
+      this.position = this.destination;
+    }
   }
 
   /**
@@ -88,7 +99,7 @@ export default class Actor {
   }
 
   /**
-   * Change the position.
+   * Move relative to current position.
    *
    * @param {int} x - Number of pixels to move along x axis
    * @param {int} y - Number of pixels to move along y axis
@@ -98,6 +109,18 @@ export default class Actor {
     this.position.x = this.position.x + x;
     this.position.y = this.position.y + y;
     return this;
+  }
+
+  /**
+   * Slide relative to current position.
+   *
+   * @param {int} x - Number of pixels to move along x axis
+   * @param {int} y - Number of pixels to move along y axis
+   * @return {Actor} Reference to self
+   */
+  slide(x = 0, y = 0) {
+      this.destination.x = this.position.x + x;
+      this.destination.y = this.position.y + y;
   }
 
   /**

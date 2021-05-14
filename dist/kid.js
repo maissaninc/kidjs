@@ -6831,7 +6831,7 @@ async function compile(code) {
   }
 
   let processed = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
-  console.log(processed);
+  console.log(triggers);
   return `
     (async function() {
       window._kidjs_.eval = function(key) {
@@ -6876,12 +6876,17 @@ function createStepStatement(location) {
 function reset() {
   triggers = [];
   (0,_events__WEBPACK_IMPORTED_MODULE_3__/* .removeAllEventListeners */ .R)();
+  window.stage.reset();
 }
 
 async function run(code) {
-  reset();
-  let processed = await compile(code);
-  eval(processed);
+  try {
+    let processed = await compile(code);
+    reset();
+    eval(processed);
+  } catch(exception) {
+    console.log(exception);
+  }
 }
 
 async function wait(seconds) {
@@ -7609,6 +7614,10 @@ class Stage {
     window.stroke = 'black';
     window.lineWidth = 2;
 
+    // Set global width and height
+    window.width = width;
+    window.height = height;
+
     // Initialize
     this.actors = [];
     this.render();
@@ -7630,6 +7639,8 @@ class Stage {
     this.canvas.style.width = this.width + 'px';
     this.canvas.style.height = this.height + 'px';
     this.context.scale(scale, scale);
+    window.width = width;
+    window.height = height;
   }
 
   /**
@@ -7649,6 +7660,16 @@ class Stage {
   }
 
   /**
+   * Clear stage and reset fill and stroke.
+   */
+  reset() {
+    window.fill = 'white';
+    window.stroke = 'black';
+    window.lineWidth = 2;
+    this.clear();
+  }
+
+  /**
    * Render a single frame.
    */
   render() {
@@ -7659,10 +7680,8 @@ class Stage {
     for (let i = 0; i < this.actors.length; i++) {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision) {
+        if (collision && !(this.actors[i].anchored && this.actors[j].anchored)) {
           resolveCollision(collision);
-          this.actors[i].stroke = 'red';
-          this.actors[j].stroke = 'red';
         }
       }
     }
@@ -7712,6 +7731,9 @@ class Actor {
     this.boundingRadius = 0;
     this.faceNormals = [];
 
+    // Destination coordinates
+    this.destination = new Vector(x, y);
+
     // Add to stage
     if (typeof stage === 'undefined') {
       window.stage.addChild(this);
@@ -7755,15 +7777,75 @@ class Actor {
     // Update velocity
     this.velocity = this.velocity.add(this.acceleration);
     this.angularVelocity = this.angularVelocity + this.angularAcceleration;
+
+    // Move along vector to destination
+    let v = this.destination.subtract(this.position);
+    if (v.length > 0.05) {
+      this.position = this.position.add(v.scale(0.05));
+    } else {
+      this.position = this.destination;
+    }
   }
 
+  /**
+   * Rotate specified number of degrees.
+   *
+   * @param {float} angle - Number of degrees to rotate
+   * @return {Actor} Reference to self
+   */
+  rotate(degrees) {
+    this.angle = this.angle + degrees;
+    return this;
+  }
+
+  /**
+   * Move relative to current position.
+   *
+   * @param {int} x - Number of pixels to move along x axis
+   * @param {int} y - Number of pixels to move along y axis
+   * @return {Actor} Reference to self
+   */
+  move(x = 0, y = 0) {
+    this.position.x = this.position.x + x;
+    this.position.y = this.position.y + y;
+    return this;
+  }
+
+  /**
+   * Slide relative to current position.
+   *
+   * @param {int} x - Number of pixels to move along x axis
+   * @param {int} y - Number of pixels to move along y axis
+   * @return {Actor} Reference to self
+   */
+  slide(x = 0, y = 0) {
+      this.destination.x = this.position.x + x;
+      this.destination.y = this.position.y + y;
+  }
+
+  /**
+   * Start spinning motion.
+   *
+   * @param {float} speed - Angular velocity
+   * @return {Actor} Reference to self
+   */
   spin(speed = 5) {
     this.angularVelocity = speed;
+    return this;
   }
 
   stop() {
     this.frame = 0;
     this.state = 'default';
+  }
+
+  /**
+   * Determine if this Actor is a polygon.
+   *
+   * @returns {boolean} True if Actor is a polygon.
+   */
+  isPolygon() {
+    if (this.boundingPolygon && this.boundingPolygon.length > 2);
   }
 
   /**
@@ -7788,42 +7870,18 @@ class Actor {
     }
 
     // Polygon colliding with polygon
-    if (this.constructor.name !== 'Circle' && actor.constructor.name !== 'Circle') {
+    if (this.isPolygon() && actor.isPolygon()) {
       return polygonCollidesWithPolygon(this, actor);
     }
 
     // Circle colliding with polygon
-    if (this.constructor.name === 'Circle' && actor.constructor.name !== 'Circle') {
+    if (this.constructor.name === 'Circle' && actor.isPolygon()) {
       return circleCollidesWithPolygon(this, actor);
     }
-    if (actor.constructor.name === 'Circle' && this.constructor.name !== 'Circle') {
+    if (actor.constructor.name === 'Circle' && this.isPolygon()) {
       return circleCollidesWithPolygon(actor, this);
     }
   }
-}
-
-;// CONCATENATED MODULE: ./src/stage/text.js
-
-
-class Text extends Actor {
-  constructor(x, y, text, live) {
-    super(x, y);
-    this.text = text;
-    this.live = live;
-  }
-
-  render(context) {
-    context.fillStyle = 'black';
-    context.font = '80px Verdana';
-    context.textBaseline = 'top';
-    const output = this.live ? window._kidjs_.eval(this.text) : this.text;
-    context.fillText(output, this.x, this.y);
-  }
-}
-
-function display(x, y, text, live = false) {
-  const actor = new Text(x, y, text, live);
-  return actor;
 }
 
 ;// CONCATENATED MODULE: ./src/shape/index.js
@@ -8069,7 +8127,7 @@ class Polygon extends Shape {
 
 class Rect extends Polygon {
   constructor(x, y, width, height) {
-    super(x, y);
+    super(x + (width / 2), y + (height / 2));
     this.addPoint(-width / 2, -height / 2);
     this.addPoint(width / 2, -height / 2);
     this.addPoint(width / 2, height / 2);
@@ -8164,6 +8222,30 @@ function star(x, y, outerRadius, innerRadius = false, points = 5) {
   return shape;
 }
 
+;// CONCATENATED MODULE: ./src/text/index.js
+
+
+class Text extends Actor {
+  constructor(x, y, text, live) {
+    super(x, y);
+    this.text = text;
+    this.live = live;
+  }
+
+  render(context) {
+    context.fillStyle = 'black';
+    context.font = '80px Verdana';
+    context.textBaseline = 'top';
+    const output = this.live ? window._kidjs_.eval(this.text) : this.text;
+    context.fillText(output, this.x, this.y);
+  }
+}
+
+function display(x, y, text, live = false) {
+  const actor = new Text(x, y, text, live);
+  return actor;
+}
+
 ;// CONCATENATED MODULE: ./src/index.js
 
 
@@ -8217,9 +8299,6 @@ window.addEventListener('resize', function() {
 });
 
 window.KID = {
-  'reset': function() {
-    window.stage.clear();
-  },
   'run': core/* run */.KH
 };
 

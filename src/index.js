@@ -2,12 +2,12 @@ import { init, run, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
 import { speak } from './audio/speech';
-import { display } from './stage/text';
 import { circle } from './shape/circle';
 import { line } from './shape/line';
 import { rect } from './shape/rect';
 import { triangle, square, pentagon, hexagon, heptagon, octagon } from './shape/regular';
 import { star } from './shape/star';
+import { display } from './text';
 
 // Initialize framework
 init();

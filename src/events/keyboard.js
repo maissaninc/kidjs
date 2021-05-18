@@ -1,9 +1,11 @@
+let keys = [];
+
 function onKeyDown(e) {
-  window.keyPressed = e.key;
+  keys[e.code] = true;
 }
 
 function onKeyUp(e) {
-  window.keyPressed = false;
+  keys[e.code] = false;
 }
 
 export default function() {

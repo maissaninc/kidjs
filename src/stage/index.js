@@ -40,6 +40,7 @@ export default class Stage {
 
     // Initialize
     this.actors = [];
+    this.eventListeners = {};
     this.render();
   }
 
@@ -114,5 +115,49 @@ export default class Stage {
 
     window._kidjs_.onframe();
     requestAnimationFrame(() => this.render());
+  }
+
+  /**
+   * Add event listener to stage.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  addEventListener(event, handler) {
+    if (this.eventsListeners[event] == undefined) {
+      this.eventsListeners[event] = [];
+    }
+    this.eventListeners[event].push(handler);
+  }
+
+  /**
+   * Remove event listener from stage.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to remove.
+   */
+  removeEventListener(event, handler) {
+    if (this.eventsListeners[event] !== undefined) {
+      this.eventsListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+    }
+  }
+
+  /**
+   * Execute event handler.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  dispatchEvent(event, context) {
+    if (this.eventsListeners[event] !== undefined) {
+      for (let handler of this.eventListeners[event]) {
+        switch (event.constructor.name) {
+          case 'KeyboardEvent':
+            handler.call(context, event.key);
+            break;
+          default:
+            handler.call(context);
+        }
+      }
+    }
   }
 }

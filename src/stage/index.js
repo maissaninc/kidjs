@@ -124,8 +124,8 @@ export default class Stage {
    * @param {function} [handler] - Event handler to execute when event occurs.
    */
   addEventListener(event, handler) {
-    if (this.eventsListeners[event] == undefined) {
-      this.eventsListeners[event] = [];
+    if (this.eventListeners[event] == undefined) {
+      this.eventListeners[event] = [];
     }
     this.eventListeners[event].push(handler);
   }
@@ -137,8 +137,8 @@ export default class Stage {
    * @param {function} [handler] - Event handler to remove.
    */
   removeEventListener(event, handler) {
-    if (this.eventsListeners[event] !== undefined) {
-      this.eventsListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+    if (this.eventListeners[event] !== undefined) {
+      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
     }
   }
 
@@ -147,9 +147,9 @@ export default class Stage {
    *
    * @param {Event} [event] - Event object.
    */
-  dispatchEvent(event, context) {
-    if (this.eventsListeners[event] !== undefined) {
-      for (let handler of this.eventListeners[event]) {
+  dispatchEvent(event, context = window) {
+    if (this.eventListeners[event.type] !== undefined) {
+      for (let handler of this.eventListeners[event.type]) {
         switch (event.constructor.name) {
           case 'KeyboardEvent':
             handler.call(context, event.key);

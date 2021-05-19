@@ -12,6 +12,7 @@ export function init() {
     },
 
     onframe: function() {
+      window.dispatchEvent(new Event('animationframe'));
       for (let i = 0; i < triggers.length; i++) {
         try {
           if (window._kidjs_.eval(triggers[i].condition)) {
@@ -123,7 +124,6 @@ async function compile(code) {
   }
 
   let processed = astring.generate(ast);
-  console.log(triggers);
   return `
     (async function() {
       window._kidjs_.eval = function(key) {
@@ -167,7 +167,6 @@ function createStepStatement(location) {
 
 export function reset() {
   triggers = [];
-  removeAllEventListeners();
   window.stage.reset();
 }
 

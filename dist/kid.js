@@ -6705,7 +6705,6 @@ function generate(node, options) {
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(193);
 
 
 
@@ -6720,6 +6719,7 @@ function init() {
     },
 
     onframe: function() {
+      window.dispatchEvent(new Event('animationframe'));
       for (let i = 0; i < triggers.length; i++) {
         try {
           if (window._kidjs_.eval(triggers[i].condition)) {
@@ -6831,7 +6831,6 @@ async function compile(code) {
   }
 
   let processed = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
-  console.log(triggers);
   return `
     (async function() {
       window._kidjs_.eval = function(key) {
@@ -6875,7 +6874,6 @@ function createStepStatement(location) {
 
 function reset() {
   triggers = [];
-  (0,_events__WEBPACK_IMPORTED_MODULE_3__/* .removeAllEventListeners */ .R)();
   window.stage.reset();
 }
 
@@ -6912,31 +6910,87 @@ function end() {
 }
 
 
-/***/ }),
+/***/ })
 
-/***/ 193:
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	!function() {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = function(exports, definition) {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	!function() {
+/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+!function() {
 
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "Z": function() { return /* binding */ events; },
-  "on": function() { return /* binding */ on; },
-  "R": function() { return /* binding */ removeAllEventListeners; }
-});
-
+// EXTERNAL MODULE: ./src/core/index.js
+var core = __webpack_require__(763);
 ;// CONCATENATED MODULE: ./src/events/keyboard.js
+let keysDown = [];
+
 function onKeyDown(e) {
-  window.keyPressed = e.key;
+  if (!keysDown.includes(e.key)) {
+    keysDown.push(e.key);
+  }
 }
 
 function onKeyUp(e) {
-  window.keyPressed = false;
+  keysDown = keysDown.filter(item => item != e.key);
+  window.stage.dispatchEvent(new KeyboardEvent('keyup', {
+    key: e.key
+  }));
+}
+
+function onAnimationFrame() {
+  for (let key of keysDown) {
+    window.stage.dispatchEvent(new KeyboardEvent('keydown', {
+      key: key
+    }));
+  }
 }
 
 /* harmony default export */ function keyboard() {
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
+  window.addEventListener('animationframe', onAnimationFrame);
 }
 
 ;// CONCATENATED MODULE: ./src/events/mouse.js
@@ -7055,111 +7109,24 @@ function onDeviceOrientation(e) {
 
 
 
-let listeners = [];
-
 /* harmony default export */ function events() {
   keyboard();
   mouse();
   device_orientation();
 }
 
-function on(condition, callback) {
-
-  // If condition is an event name
-  if (typeof condition === 'string') {
-    switch (condition) {
-
-      case 'keypress':
-        addEventListener('keypress', (e) => {
-          callback(e.key);
-        });
-        break;
-
-      case 'keydown':
-        addEventListener('keydown', (e) => {
-          callback(e.key);
-        });
-        break;
-
-      case 'keyup':
-        addEventListener('keyup', (e) => {
-          callback();
-        });
-        break;
-    }
+/**
+ * Add event listener to stage.
+ *
+ * @param {string} [event] - Name of event.
+ * @param {function} [handler] - Event handler to execute when event occurs.
+ */
+function on(event, handler) {
+  if (typeof event === 'string') {
+    window.stage.addEventListener(event, handler);
   }
 }
 
-function addEventListener(type, listener) {
-  listeners.push({
-    type: type,
-    listener: listener
-  });
-  window.addEventListener(type, listener);
-}
-
-function removeAllEventListeners() {
-  for (let obj of listeners) {
-    window.removeEventListener(obj.type, obj.listener);
-  }
-}
-
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	!function() {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = function(exports, definition) {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	!function() {
-/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
-/******/ 	}();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-!function() {
-
-// EXTERNAL MODULE: ./src/core/index.js
-var core = __webpack_require__(763);
-// EXTERNAL MODULE: ./src/events/index.js + 3 modules
-var events = __webpack_require__(193);
 ;// CONCATENATED MODULE: ./src/core/vector.js
 class Vector {
   constructor(x, y) {
@@ -7620,6 +7587,7 @@ class Stage {
 
     // Initialize
     this.actors = [];
+    this.eventListeners = {};
     this.render();
   }
 
@@ -7694,6 +7662,50 @@ class Stage {
 
     window._kidjs_.onframe();
     requestAnimationFrame(() => this.render());
+  }
+
+  /**
+   * Add event listener to stage.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  addEventListener(event, handler) {
+    if (this.eventListeners[event] == undefined) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(handler);
+  }
+
+  /**
+   * Remove event listener from stage.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to remove.
+   */
+  removeEventListener(event, handler) {
+    if (this.eventListeners[event] !== undefined) {
+      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+    }
+  }
+
+  /**
+   * Execute event handler.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  dispatchEvent(event, context = window) {
+    if (this.eventListeners[event.type] !== undefined) {
+      for (let handler of this.eventListeners[event.type]) {
+        switch (event.constructor.name) {
+          case 'KeyboardEvent':
+            handler.call(context, event.key);
+            break;
+          default:
+            handler.call(context);
+        }
+      }
+    }
   }
 }
 
@@ -8268,7 +8280,7 @@ window.heptagon = heptagon;
 window.hexagon = hexagon;
 window.line = line;
 window.octagon = octagon;
-window.on = events.on;
+window.on = on;
 window.pentagon = pentagon;
 window.rect = rect;
 window.square = square;
@@ -8285,7 +8297,7 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.appendChild(stage.canvas);
 
   // Setup events
-  (0,events/* default */.Z)();
+  events();
 
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');

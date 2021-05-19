@@ -7,33 +7,27 @@
   <body>
     <script type="kidjs">
 
-      let s = circle(400, 250, 50);
-      s.anchored = false;
+      let a = rect(10, 200, 10, 100);
+      let b = rect(width - 20, 200, 10, 100);
 
-      let sq = rect(100, 100, 100, 100);
-      sq.slide(500, 500);
+      on('keydown', function(key) {
+        if (key == 'a') {
+          a.move(0, -10);
+        }
+        if (key == 'z') {
+          a.move(0, 10);
+        }
+        if (key == 'ArrowUp') {
+          b.move(0, -10);
+        }
+        if (key == 'ArrowDown') {
+          b.move(0, 10);
+        }
+      })
 
-      let a = circle(600, 150, 200);
-
-      a.angularVelocity = 5;
-
-      let b = circle(650, 375, 100);
-
-      //a.anchored = false;
-      //b.anchored = true;
-
-
-      let st = 'Chris';
-      let i = 0;
-      display(40, 40, i + st);
-
-      on('keypress', function() {
-        i++;
-      });
-
-      on (i == 5, function() {
-        console.log('yeah!');
-      });
+      on('keyup', function(key) {
+        console.log(key)
+      })
 
 
     </script>

@@ -2,51 +2,20 @@ import initKeyboardEvents from './keyboard';
 import initMouseEvents from './mouse';
 import initDeviceOrientationEvents from './device-orientation';
 
-let listeners = [];
-
 export default function() {
   initKeyboardEvents();
   initMouseEvents();
   initDeviceOrientationEvents();
 }
 
-export function on(condition, callback) {
-
-  // If condition is an event name
-  if (typeof condition === 'string') {
-    switch (condition) {
-
-      case 'keypress':
-        addEventListener('keypress', (e) => {
-          callback(e.key);
-        });
-        break;
-
-      case 'keydown':
-        addEventListener('keydown', (e) => {
-          callback(e.key);
-        });
-        break;
-
-      case 'keyup':
-        addEventListener('keyup', (e) => {
-          callback();
-        });
-        break;
-    }
-  }
-}
-
-function addEventListener(type, listener) {
-  listeners.push({
-    type: type,
-    listener: listener
-  });
-  window.addEventListener(type, listener);
-}
-
-export function removeAllEventListeners() {
-  for (let obj of listeners) {
-    window.removeEventListener(obj.type, obj.listener);
+/**
+ * Add event listener to stage.
+ *
+ * @param {string} [event] - Name of event.
+ * @param {function} [handler] - Event handler to execute when event occurs.
+ */
+export function on(event, handler) {
+  if (typeof event === 'string') {
+    window.stage.addEventListener(event, handler);
   }
 }

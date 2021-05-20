@@ -48,7 +48,7 @@ export default class Actor {
   set y(value) { this.position.y = value; }
 
   get inverseMass() {
-    return this.anchored || this.mass === 0 ? 0 : 1 / this.mass;
+    return this.mass === 0 ? 0 : 1 / this.mass;
   }
 
   get inertia() {
@@ -79,11 +79,14 @@ export default class Actor {
     this.angularVelocity = this.angularVelocity + this.angularAcceleration;
 
     // Move along vector to destination
-    let v = this.destination.subtract(this.position);
-    if (v.length > 0.05) {
-      this.position = this.position.add(v.scale(0.05));
-    } else {
-      this.position = this.destination;
+    if (this.status == 'sliding') {
+      let v = this.destination.subtract(this.position);
+      if (v.length > 0.05) {
+        this.position = this.position.add(v.scale(0.05));
+        this.status = 'default';
+      } else {
+        this.position = this.destination;
+      }
     }
   }
 
@@ -119,6 +122,7 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   slide(x = 0, y = 0) {
+      this.status = 'sliding';
       this.destination.x = this.position.x + x;
       this.destination.y = this.position.y + y;
   }
@@ -145,7 +149,11 @@ export default class Actor {
    * @returns {boolean} True if Actor is a polygon.
    */
   isPolygon() {
-    if (this.boundingPolygon && this.boundingPolygon.length > 2);
+    if (this.boundingPolygon && this.boundingPolygon.length > 2) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

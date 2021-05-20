@@ -7574,6 +7574,7 @@ class Stage {
     this.canvas.height = Math.floor(this.height * scale);
     this.canvas.style.width = this.width + 'px';
     this.canvas.style.height = this.height + 'px';
+    this.canvas.style.display = 'block';
     this.context.scale(scale, scale);
 
     // Set initial fill and stroke
@@ -7648,7 +7649,7 @@ class Stage {
     for (let i = 0; i < this.actors.length; i++) {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision && !(this.actors[i].anchored && this.actors[j].anchored)) {
+        if (collision) {
           resolveCollision(collision);
         }
       }
@@ -7760,7 +7761,7 @@ class Actor {
   set y(value) { this.position.y = value; }
 
   get inverseMass() {
-    return this.anchored || this.mass === 0 ? 0 : 1 / this.mass;
+    return this.mass === 0 ? 0 : 1 / this.mass;
   }
 
   get inertia() {
@@ -7791,11 +7792,14 @@ class Actor {
     this.angularVelocity = this.angularVelocity + this.angularAcceleration;
 
     // Move along vector to destination
-    let v = this.destination.subtract(this.position);
-    if (v.length > 0.05) {
-      this.position = this.position.add(v.scale(0.05));
-    } else {
-      this.position = this.destination;
+    if (this.status == 'sliding') {
+      let v = this.destination.subtract(this.position);
+      if (v.length > 0.05) {
+        this.position = this.position.add(v.scale(0.05));
+        this.status = 'default';
+      } else {
+        this.position = this.destination;
+      }
     }
   }
 
@@ -7831,6 +7835,7 @@ class Actor {
    * @return {Actor} Reference to self
    */
   slide(x = 0, y = 0) {
+      this.status = 'sliding';
       this.destination.x = this.position.x + x;
       this.destination.y = this.position.y + y;
   }
@@ -7857,7 +7862,11 @@ class Actor {
    * @returns {boolean} True if Actor is a polygon.
    */
   isPolygon() {
-    if (this.boundingPolygon && this.boundingPolygon.length > 2);
+    if (this.boundingPolygon && this.boundingPolygon.length > 2) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

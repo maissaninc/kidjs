@@ -27,6 +27,7 @@ export default class Stage {
     this.canvas.height = Math.floor(this.height * scale);
     this.canvas.style.width = this.width + 'px';
     this.canvas.style.height = this.height + 'px';
+    this.canvas.style.display = 'block';
     this.context.scale(scale, scale);
 
     // Set initial fill and stroke
@@ -101,7 +102,7 @@ export default class Stage {
     for (let i = 0; i < this.actors.length; i++) {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision && !(this.actors[i].anchored && this.actors[j].anchored)) {
+        if (collision) {
           resolveCollision(collision);
         }
       }

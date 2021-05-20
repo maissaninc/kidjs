@@ -7,8 +7,12 @@
   <body>
     <script type="kidjs">
 
-      let a = rect(10, 200, 10, 100);
-      let b = rect(width - 20, 200, 10, 100);
+      let a = circle(10, 200, 100);
+      let b = circle(width - 10, 200, 100);
+      let ball = circle(width / 2, height / 2, 20);
+      ball.velocity.x = 1;
+      console.log(ball);
+      console.log(ball.isPolygon());
 
       on('keydown', function(key) {
         if (key == 'a') {
@@ -23,10 +27,23 @@
         if (key == 'ArrowDown') {
           b.move(0, 10);
         }
+        if (key == 'ArrowLeft') {
+          b.move(-1, 0);
+        }
+        if (key == 'ArrowRight') {
+          b.move(1, 0);
+        }
+        if (key == ' ') {
+          ball.acceleration.x = 1;
+        }
+        if (key == 'c') {
+          console.log(window.stage.actors);
+        }
       })
 
       on('keyup', function(key) {
         console.log(key)
+        ball.acceleration.x = 0;
       })
 
 

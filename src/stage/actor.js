@@ -157,6 +157,39 @@ export default class Actor {
   }
 
   /**
+   * Determine if Actor contains point.
+   *
+   * @param {int} x - Point X coordinate
+   * @param {int} y - Point Y coordinate
+   * @return {boolean}
+   */
+  containsPoint(x, y) {
+
+    // If polygon
+    if (this.isPolygon()) {
+      let inside = false;
+      for (let i = 0; i < this.boundingPolygon.length; i++) {
+        let j = i + 1 % this.boundingPolygon.length;
+        if (
+          ((this.boundingPolygon[j].y > y) != (this.boundingPolygon[i] > y)) &&
+          (x < (this.boundingPolygon[i].x - this.boundingPolygon[j].x) *
+          (y - this.boundingPolygon[j].y) /
+          (this.boundingPolygon[i].y - this.boundingPolygon[j].y) +
+          this.boundingPolygon[j].x)
+        ) {
+          inside = !inside;
+        }
+      }
+
+    // Circle
+    } else {
+      let v = this.position.subtract(new Vector(x, y));
+      let distance = v.length;
+      return (distance < this.boundingRadius);
+    }
+  }
+
+  /**
    * Detect if this actor collects with another actor.
    *
    * @param {Actor} actor - Second actor

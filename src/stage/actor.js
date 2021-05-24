@@ -34,6 +34,9 @@ export default class Actor {
     // Destination coordinates
     this.destination = new Vector(x, y);
 
+    // Event listeners
+    this.eventListeners = {};
+
     // Add to stage
     if (typeof stage === 'undefined') {
       window.stage.addChild(this);
@@ -169,9 +172,9 @@ export default class Actor {
     if (this.isPolygon()) {
       let inside = false;
       for (let i = 0; i < this.boundingPolygon.length; i++) {
-        let j = i + 1 % this.boundingPolygon.length;
+        let j = (i + 1) % this.boundingPolygon.length;
         if (
-          ((this.boundingPolygon[j].y > y) != (this.boundingPolygon[i] > y)) &&
+          ((this.boundingPolygon[j].y > y) != (this.boundingPolygon[i].y > y)) &&
           (x < (this.boundingPolygon[i].x - this.boundingPolygon[j].x) *
           (y - this.boundingPolygon[j].y) /
           (this.boundingPolygon[i].y - this.boundingPolygon[j].y) +
@@ -180,6 +183,7 @@ export default class Actor {
           inside = !inside;
         }
       }
+      return inside;
 
     // Circle
     } else {
@@ -221,6 +225,58 @@ export default class Actor {
     }
     if (actor.constructor.name === 'Circle' && this.isPolygon()) {
       return circleCollidesWithPolygon(actor, this);
+    }
+  }
+
+  /**
+   * Add event listener to actor.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  addEventListener(event, handler) {
+    if (this.eventListeners[event] == undefined) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(handler);
+  }
+
+  /**
+   * Alias for add event listener.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  on(event, handler) {
+    console.log(typeof handler);
+    console.log(typeof this[handler]);
+    if (typeof event === 'string') {
+      this.addEventListener(event, handler);
+    }
+  }
+
+  /**
+   * Remove event listener from actor.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to remove.
+   */
+  removeEventListener(event, handler) {
+    if (this.eventListeners[event] !== undefined) {
+      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+    }
+  }
+
+  /**
+   * Execute event handler.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  dispatchEvent(event, context = window) {
+    if (this.eventListeners[event.type] !== undefined) {
+      for (let handler of this.eventListeners[event.type]) {
+        handler.call(context);
+      }
     }
   }
 }

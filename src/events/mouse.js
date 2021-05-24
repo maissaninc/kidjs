@@ -46,6 +46,15 @@ function onMouseMove(e) {
   window.mouseY = e.clientY;
 }
 
+function onClick(e) {
+  for (let i = window.stage.actors.length - 1; i >= 0; i--) {
+    if (window.stage.actors[i].containsPoint(e.clientX, e.clientY)) {
+      window.stage.actors[i].dispatchEvent(e);
+      return;
+    }
+  }
+}
+
 export default function() {
   if ('ontouchstart' in window) {
     window.addEventListener('touchstart', onMouseDown);
@@ -56,4 +65,5 @@ export default function() {
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
   }
+  window.addEventListener('click', onClick);
 }

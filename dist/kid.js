@@ -7042,6 +7042,15 @@ function onMouseMove(e) {
   window.mouseY = e.clientY;
 }
 
+function onClick(e) {
+  for (let i = window.stage.actors.length - 1; i >= 0; i--) {
+    if (window.stage.actors[i].containsPoint(e.clientX, e.clientY)) {
+      window.stage.actors[i].dispatchEvent(e);
+      return;
+    }
+  }
+}
+
 /* harmony default export */ function mouse() {
   if ('ontouchstart' in window) {
     window.addEventListener('touchstart', onMouseDown);
@@ -7052,6 +7061,7 @@ function onMouseMove(e) {
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
   }
+  window.addEventListener('click', onClick);
 }
 
 ;// CONCATENATED MODULE: ./src/events/device-orientation.js
@@ -7747,6 +7757,9 @@ class Actor {
     // Destination coordinates
     this.destination = new Vector(x, y);
 
+    // Event listeners
+    this.eventListeners = {};
+
     // Add to stage
     if (typeof stage === 'undefined') {
       window.stage.addChild(this);
@@ -7870,6 +7883,40 @@ class Actor {
   }
 
   /**
+   * Determine if Actor contains point.
+   *
+   * @param {int} x - Point X coordinate
+   * @param {int} y - Point Y coordinate
+   * @return {boolean}
+   */
+  containsPoint(x, y) {
+
+    // If polygon
+    if (this.isPolygon()) {
+      let inside = false;
+      for (let i = 0; i < this.boundingPolygon.length; i++) {
+        let j = (i + 1) % this.boundingPolygon.length;
+        if (
+          ((this.boundingPolygon[j].y > y) != (this.boundingPolygon[i].y > y)) &&
+          (x < (this.boundingPolygon[i].x - this.boundingPolygon[j].x) *
+          (y - this.boundingPolygon[j].y) /
+          (this.boundingPolygon[i].y - this.boundingPolygon[j].y) +
+          this.boundingPolygon[j].x)
+        ) {
+          inside = !inside;
+        }
+      }
+      return inside;
+
+    // Circle
+    } else {
+      let v = this.position.subtract(new Vector(x, y));
+      let distance = v.length;
+      return (distance < this.boundingRadius);
+    }
+  }
+
+  /**
    * Detect if this actor collects with another actor.
    *
    * @param {Actor} actor - Second actor
@@ -7901,6 +7948,58 @@ class Actor {
     }
     if (actor.constructor.name === 'Circle' && this.isPolygon()) {
       return circleCollidesWithPolygon(actor, this);
+    }
+  }
+
+  /**
+   * Add event listener to actor.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  addEventListener(event, handler) {
+    if (this.eventListeners[event] == undefined) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(handler);
+  }
+
+  /**
+   * Alias for add event listener.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  on(event, handler) {
+    console.log(typeof handler);
+    console.log(typeof this[handler]);
+    if (typeof event === 'string') {
+      this.addEventListener(event, handler);
+    }
+  }
+
+  /**
+   * Remove event listener from actor.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to remove.
+   */
+  removeEventListener(event, handler) {
+    if (this.eventListeners[event] !== undefined) {
+      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+    }
+  }
+
+  /**
+   * Execute event handler.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  dispatchEvent(event, context = window) {
+    if (this.eventListeners[event.type] !== undefined) {
+      for (let handler of this.eventListeners[event.type]) {
+        handler.call(context);
+      }
     }
   }
 }

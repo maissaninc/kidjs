@@ -9,43 +9,15 @@
 
       let a = circle(10, 200, 100);
       let b = circle(width - 10, 200, 100);
-      let ball = circle(width / 2, height / 2, 20);
-      ball.velocity.x = 1;
-      console.log(ball);
-      console.log(ball.isPolygon());
+      let s = triangle(400, 400, 300);
 
-      on('keydown', function(key) {
-        if (key == 'a') {
-          a.move(0, -10);
-        }
-        if (key == 'z') {
-          a.move(0, 10);
-        }
-        if (key == 'ArrowUp') {
-          b.move(0, -10);
-        }
-        if (key == 'ArrowDown') {
-          b.move(0, 10);
-        }
-        if (key == 'ArrowLeft') {
-          b.move(-1, 0);
-        }
-        if (key == 'ArrowRight') {
-          b.move(1, 0);
-        }
-        if (key == ' ') {
-          ball.acceleration.x = 1;
-        }
-        if (key == 'c') {
-          console.log(window.stage.actors);
-        }
-      })
+      function clicked() {
+        console.log('clicked');
+      }
 
-      on('keyup', function(key) {
-        console.log(key)
-        ball.acceleration.x = 0;
-      })
-
+      a.on('click', clicked);
+      b.on('click', clicked);
+      s.on('click', clicked);
 
     </script>
   </body>

@@ -6786,6 +6786,18 @@ async function compile(code) {
           }
         }
 
+        // Look for calls to on() method of object
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          typeof node.body[i].expression.callee.property !== 'undefined' &&
+          node.body[i].expression.callee.property.name == 'on' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[1].type == 'Identifier'
+        ) {
+          node.body[i].expression.arguments[1].type = 'Literal';
+          node.body[i].expression.arguments[1].value = node.body[i].expression.arguments[1].name;
+        }
+
         // Look for calls to display() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
@@ -6835,6 +6847,11 @@ async function compile(code) {
     (async function() {
       window._kidjs_.eval = function(key) {
         return eval(key);
+      };
+      window._kidjs_.get = function(key) {
+        if (eval('typeof ' + key) !== 'undefined') {
+          return eval(key);
+        }
       };
       ${processed}
       window._kidjs_.end();
@@ -7865,6 +7882,11 @@ class Actor {
   }
 
   stop() {
+    this.angularVelocity = 0;
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    this.acceleration.x = 0;
+    this.acceleration.y = 0;
     this.frame = 0;
     this.state = 'default';
   }
@@ -7971,9 +7993,14 @@ class Actor {
    * @param {function} [handler] - Event handler to execute when event occurs.
    */
   on(event, handler) {
-    console.log(typeof handler);
-    console.log(typeof this[handler]);
     if (typeof event === 'string') {
+      if (typeof handler === 'string') {
+        if (typeof this[handler] == 'function') {
+          handler = this[handler];
+        } else if (typeof window._kidjs_.get(handler) == 'function') {
+          handler = window._kidjs_.get(handler);
+        }
+      }
       this.addEventListener(event, handler);
     }
   }
@@ -7995,7 +8022,7 @@ class Actor {
    *
    * @param {Event} [event] - Event object.
    */
-  dispatchEvent(event, context = window) {
+  dispatchEvent(event, context = this) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
         handler.call(context);

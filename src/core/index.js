@@ -79,6 +79,18 @@ async function compile(code) {
           }
         }
 
+        // Look for calls to on() method of object
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          typeof node.body[i].expression.callee.property !== 'undefined' &&
+          node.body[i].expression.callee.property.name == 'on' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[1].type == 'Identifier'
+        ) {
+          node.body[i].expression.arguments[1].type = 'Literal';
+          node.body[i].expression.arguments[1].value = node.body[i].expression.arguments[1].name;
+        }
+
         // Look for calls to display() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
@@ -128,6 +140,11 @@ async function compile(code) {
     (async function() {
       window._kidjs_.eval = function(key) {
         return eval(key);
+      };
+      window._kidjs_.get = function(key) {
+        if (eval('typeof ' + key) !== 'undefined') {
+          return eval(key);
+        }
       };
       ${processed}
       window._kidjs_.end();

@@ -11,13 +11,14 @@
       let b = circle(width - 10, 200, 100);
       let s = triangle(400, 400, 300);
 
-      function clicked() {
-        console.log('clicked');
-      }
 
-      a.on('click', clicked);
-      b.on('click', clicked);
-      s.on('click', clicked);
+      s.on('click', spin);
+
+      a.on('click', function() {
+        s.stop();
+      });
+
+      //s.spin();
 
     </script>
   </body>

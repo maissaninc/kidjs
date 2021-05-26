@@ -142,6 +142,11 @@ export default class Actor {
   }
 
   stop() {
+    this.angularVelocity = 0;
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    this.acceleration.x = 0;
+    this.acceleration.y = 0;
     this.frame = 0;
     this.state = 'default';
   }
@@ -248,9 +253,14 @@ export default class Actor {
    * @param {function} [handler] - Event handler to execute when event occurs.
    */
   on(event, handler) {
-    console.log(typeof handler);
-    console.log(typeof this[handler]);
     if (typeof event === 'string') {
+      if (typeof handler === 'string') {
+        if (typeof this[handler] == 'function') {
+          handler = this[handler];
+        } else if (typeof window._kidjs_.get(handler) == 'function') {
+          handler = window._kidjs_.get(handler);
+        }
+      }
       this.addEventListener(event, handler);
     }
   }
@@ -272,7 +282,7 @@ export default class Actor {
    *
    * @param {Event} [event] - Event object.
    */
-  dispatchEvent(event, context = window) {
+  dispatchEvent(event, context = this) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
         handler.call(context);

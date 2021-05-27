@@ -6,6 +6,7 @@ import { circle } from './shape/circle';
 import { line } from './shape/line';
 import { rect } from './shape/rect';
 import { triangle, square, pentagon, hexagon, heptagon, octagon } from './shape/regular';
+import { semicircle } from './shape/semicircle';
 import { star } from './shape/star';
 import { display } from './text';
 
@@ -22,6 +23,7 @@ window.octagon = octagon;
 window.on = on;
 window.pentagon = pentagon;
 window.rect = rect;
+window.semicircle = semicircle;
 window.square = square;
 window.star = star;
 window.triangle = triangle;

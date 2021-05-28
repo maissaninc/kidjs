@@ -88,6 +88,7 @@ export default class Stage {
     window.fill = 'white';
     window.stroke = 'black';
     window.lineWidth = 2;
+    window.tempo = 60;
     this.clear();
   }
 

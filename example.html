@@ -7,18 +7,13 @@
   <body>
     <script type="kidjs">
 
-      let a = circle(10, 200, 100);
-      let b = circle(width - 10, 200, 100);
-      let s = triangle(400, 400, 300);
+      semicircle(500, 500, 50).spin();
 
+      oval(100, 100, 40, 400).spin(1);
 
-      s.on('click', spin);
-
-      a.on('click', function() {
-        s.stop();
+      on('click', function() {
+        beep();
       });
-
-      //s.spin();
 
     </script>
   </body>

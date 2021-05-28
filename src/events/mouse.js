@@ -50,9 +50,9 @@ function onClick(e) {
   for (let i = window.stage.actors.length - 1; i >= 0; i--) {
     if (window.stage.actors[i].containsPoint(e.clientX, e.clientY)) {
       window.stage.actors[i].dispatchEvent(e);
-      return;
     }
   }
+  window.stage.dispatchEvent(e);
 }
 
 export default function() {

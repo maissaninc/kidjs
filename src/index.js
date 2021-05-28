@@ -1,6 +1,7 @@
 import { init, run, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
+import { beep, note, song, sound } from './audio';
 import { speak } from './audio/speech';
 import { circle } from './shape/circle';
 import { line } from './shape/line';
@@ -15,17 +16,21 @@ import { display } from './text';
 init();
 
 // Assign functions to global object
+window.beep = beep;
 window.circle = circle;
 window.display = display;
 window.heptagon = heptagon;
 window.hexagon = hexagon;
 window.line = line;
+window.note = note;
 window.octagon = octagon;
 window.on = on;
 window.oval = oval;
 window.pentagon = pentagon;
 window.rect = rect;
 window.semicircle = semicircle;
+window.song = song;
+window.sound = sound;
 window.square = square;
 window.star = star;
 window.triangle = triangle;

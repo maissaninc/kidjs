@@ -17,7 +17,8 @@
       });
 
       a.on('collision', function(x) {
-        console.log(x);
+        this.fill = 'yellow';
+        x.fill = 'red';
       });
 
     </script>

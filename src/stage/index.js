@@ -106,7 +106,9 @@ export default class Stage {
         if (collision) {
           this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
           this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
-          resolveCollision(collision);
+          if (!(this.actors[i].anchored && this.actors[j].anchored)) {
+            resolveCollision(collision);
+          }
         }
       }
     }

@@ -7678,6 +7678,8 @@ class Stage {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
         if (collision) {
+          this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
+          this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
           resolveCollision(collision);
         }
       }
@@ -8203,7 +8205,13 @@ class Actor {
   dispatchEvent(event, context = this) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
-        handler.call(context);
+        switch (event.type) {
+          case 'collision':
+            handler.call(context, event.detail);
+            break;
+          default:
+            handler.call(context);
+        }
       }
     }
   }

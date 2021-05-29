@@ -104,6 +104,8 @@ export default class Stage {
       for (let j = i + 1; j < this.actors.length; j++) {
         let collision = this.actors[i].collidesWith(this.actors[j]);
         if (collision) {
+          this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
+          this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
           resolveCollision(collision);
         }
       }

@@ -285,7 +285,13 @@ export default class Actor {
   dispatchEvent(event, context = this) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
-        handler.call(context);
+        switch (event.type) {
+          case 'collision':
+            handler.call(context, event.detail);
+            break;
+          default:
+            handler.call(context);
+        }
       }
     }
   }

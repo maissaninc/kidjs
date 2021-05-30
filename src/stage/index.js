@@ -35,6 +35,11 @@ export default class Stage {
     window.stroke = 'black';
     window.lineWidth = 2;
 
+    // Set initial font properties
+    window.font = 'Arial';
+    window.fontColor = 'black';
+    window.fontSize = '40px';
+
     // Set global width and height
     window.width = width;
     window.height = height;

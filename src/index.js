@@ -10,7 +10,7 @@ import { rect } from './shape/rect';
 import { triangle, square, pentagon, hexagon, heptagon, octagon } from './shape/regular';
 import { semicircle } from './shape/semicircle';
 import { star } from './shape/star';
-import { display } from './text';
+import { display, write } from './text';
 
 // Initialize framework
 init();
@@ -35,6 +35,7 @@ window.square = square;
 window.star = star;
 window.triangle = triangle;
 window.wait = wait;
+window.write = write;
 
 window.addEventListener('DOMContentLoaded', function() {
 

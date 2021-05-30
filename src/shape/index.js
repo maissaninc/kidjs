@@ -9,7 +9,19 @@ export default class Shape extends Actor {
   }
 
   prerender(context) {
-    context.fillStyle = this.fill;
+    switch (this.fill) {
+      case 'random':
+        let r = Math.floor(Math.random() * 256);
+        let g = Math.floor(Math.random() * 256);
+        let b = Math.floor(Math.random() * 256);
+        this.fill = `rgb(${r}, ${g}, ${b})`;
+        context.fillStyle = this.fill;
+        break;
+
+      default:
+        context.fillStyle = this.fill;
+    }
+
     context.strokeStyle = this.stroke;
     context.lineWidth = this.lineWidth;
     context.beginPath();

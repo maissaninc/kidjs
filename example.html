@@ -16,9 +16,9 @@
         }
       });
 
-      a.on('collision', function(x) {
-        this.fill = 'yellow';
-        x.fill = 'red';
+      a.on('collision', function(x, y) {
+        x.fill = 'yellow';
+        y.fill = 'red';
       });
 
       display(10, 10, a.position.x);

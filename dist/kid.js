@@ -8214,7 +8214,7 @@ class Actor {
       for (let handler of this.eventListeners[event.type]) {
         switch (event.type) {
           case 'collision':
-            handler.call(context, event.detail);
+            handler.call(context, this, event.detail);
             break;
           default:
             handler.call(context);

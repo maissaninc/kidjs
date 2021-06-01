@@ -1,4 +1,4 @@
-export function sound(frequency, duration = 0.25) {
+export function frequency(frequency, duration = 0.25) {
   return new Promise((resolve) => {
 
     // Play frequency
@@ -156,7 +156,7 @@ export async function note(note, beats = 1) {
   note = note.toLowerCase();
   let duration = window.tempo / 60 * beats;
   if (typeof frequencies[note] !== 'undefined') {
-    await sound(frequencies[note], duration);
+    await frequency(frequencies[note], duration);
   }
 }
 
@@ -171,5 +171,5 @@ export async function song(...notes) {
 }
 
 export function beep() {
-  sound(1000, 0.25);
+  frequency(1000, 0.25);
 }

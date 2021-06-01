@@ -1,7 +1,8 @@
 import { init, run, wait } from './core';
 import initEvents, { on } from './events';
 import Stage from './stage';
-import { beep, note, song, sound } from './audio';
+import { beep, frequency, note, song } from './audio';
+import { sound } from './audio/sound';
 import { speak } from './audio/speech';
 import { circle } from './shape/circle';
 import { line } from './shape/line';

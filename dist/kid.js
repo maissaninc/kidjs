@@ -7748,7 +7748,7 @@ class Stage {
 }
 
 ;// CONCATENATED MODULE: ./src/audio/index.js
-function sound(frequency, duration = 0.25) {
+function frequency(frequency, duration = 0.25) {
   return new Promise((resolve) => {
 
     // Play frequency
@@ -7906,7 +7906,7 @@ async function note(note, beats = 1) {
   note = note.toLowerCase();
   let duration = window.tempo / 60 * beats;
   if (typeof frequencies[note] !== 'undefined') {
-    await sound(frequencies[note], duration);
+    await frequency(frequencies[note], duration);
   }
 }
 
@@ -7921,7 +7921,43 @@ async function song(...notes) {
 }
 
 function beep() {
-  sound(1000, 0.25);
+  frequency(1000, 0.25);
+}
+
+;// CONCATENATED MODULE: ./src/audio/sound.js
+class Sound {
+
+  /**
+   * Create a new actor and add it to the stage.
+   *
+   * @constructor
+   * @param {string} url - Path to sound file
+   * @param {boolean} autoplay - Play sound automatically once loaded
+   */
+  constructor(url, autoplay = true) {
+    this.sound = new Audio();
+    this.sound.autoplay = autoplay;
+    this.sound.src = url;
+    this.sound.load();
+  }
+
+  play() {
+    this.sound.play();
+  }
+
+  pause() {
+    this.sound.pause();
+  }
+
+  stop() {
+    this.sound.pause();
+    this.sound.currentTime = 0;
+  }
+}
+
+function sound(url, autoplay) {
+  let sound = new Sound(url, autoplay);
+  return sound;
 }
 
 ;// CONCATENATED MODULE: ./src/stage/actor.js
@@ -8698,6 +8734,7 @@ function write(x, y, text) {
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 

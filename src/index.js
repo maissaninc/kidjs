@@ -9,6 +9,7 @@ import { oval } from './shape/oval';
 import { rect } from './shape/rect';
 import { triangle, square, pentagon, hexagon, heptagon, octagon } from './shape/regular';
 import { semicircle } from './shape/semicircle';
+import { image } from './sprite';
 import { star } from './shape/star';
 import { display, write } from './text';
 
@@ -21,6 +22,7 @@ window.circle = circle;
 window.display = display;
 window.heptagon = heptagon;
 window.hexagon = hexagon;
+window.image = image;
 window.line = line;
 window.note = note;
 window.octagon = octagon;

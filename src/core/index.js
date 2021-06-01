@@ -3,12 +3,50 @@ import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { removeAllEventListeners } from '../events';
 
+import { on } from '../events';
+import { beep, frequency, note, song } from '../audio';
+import { sound } from '../audio/sound';
+import { speak } from '../audio/speech';
+import { circle } from '../shape/circle';
+import { line } from '../shape/line';
+import { oval } from '../shape/oval';
+import { rect } from '../shape/rect';
+import { triangle, square, pentagon, hexagon, heptagon, octagon } from '../shape/regular';
+import { semicircle } from '../shape/semicircle';
+import { image } from '../sprite';
+import { star } from '../shape/star';
+import { display, write } from '../text';
+
 let triggers = [];
 
 export function init() {
   window._kidjs_ = {
     settings: {
       slowMotion: false,
+    },
+
+    setGlobals: function() {
+      window.beep = beep;
+      window.circle = circle;
+      window.display = display;
+      window.heptagon = heptagon;
+      window.hexagon = hexagon;
+      window.image = image;
+      window.line = line;
+      window.note = note;
+      window.octagon = octagon;
+      window.on = on;
+      window.oval = oval;
+      window.pentagon = pentagon;
+      window.rect = rect;
+      window.semicircle = semicircle;
+      window.song = song;
+      window.sound = sound;
+      window.square = square;
+      window.star = star;
+      window.triangle = triangle;
+      window.wait = wait;
+      window.write = write;
     },
 
     onframe: function() {
@@ -25,6 +63,7 @@ export function init() {
     },
 
     step: async function(line, column) {
+      this.setGlobals();
       window.dispatchEvent(new CustomEvent('KID.step', {
         detail: {
           line: line,
@@ -40,6 +79,8 @@ export function init() {
       window.dispatchEvent(new CustomEvent('KID.end'));
     }
   };
+
+  window._kidjs_.setGlobals();
 }
 
 async function compile(code) {

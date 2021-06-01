@@ -6693,1061 +6693,15 @@ function generate(node, options) {
 
 /***/ }),
 
-/***/ 763:
+/***/ 820:
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "S1": function() { return /* binding */ init; },
-/* harmony export */   "KH": function() { return /* binding */ run; },
-/* harmony export */   "Dc": function() { return /* binding */ wait; }
+/* harmony export */   "JP": function() { return /* binding */ note; },
+/* harmony export */   "K_": function() { return /* binding */ song; },
+/* harmony export */   "Vp": function() { return /* binding */ beep; }
 /* harmony export */ });
-/* unused harmony export reset */
-/* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
-/* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
-/* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-
-
-
-
-
-let triggers = [];
-
-function init() {
-  window._kidjs_ = {
-    settings: {
-      slowMotion: false,
-    },
-
-    onframe: function() {
-      window.dispatchEvent(new Event('animationframe'));
-      for (let i = 0; i < triggers.length; i++) {
-        try {
-          if (window._kidjs_.eval(triggers[i].condition)) {
-            window._kidjs_.eval(triggers[i].code);
-          }
-        } catch(ex) {
-          // Carry on
-        }
-      }
-    },
-
-    step: async function(line, column) {
-      window.dispatchEvent(new CustomEvent('KID.step', {
-        detail: {
-          line: line,
-          column: column
-        }
-      }));
-      if (window._kidjs_.settings.slowMotion) {
-        await wait(1);
-      }
-    },
-
-    end: function() {
-      window.dispatchEvent(new CustomEvent('KID.end'));
-    }
-  };
-}
-
-async function compile(code) {
-
-  // Parse code into source tree
-  let ast = acorn__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .Qc(code, {
-    locations: true
-  });
-
-  // Walk entire source tree
-  acorn_walk__WEBPACK_IMPORTED_MODULE_1__/* .full */ .rp(ast, function(node) {
-    if (node.body) {
-      for (let i = node.body.length - 1; i >= 0; i = i - 1) {
-
-        // Look for calls to on() method with an expression passed
-        if (node.body[i].type == 'ExpressionStatement' &&
-          typeof node.body[i].expression.callee !== 'undefined' &&
-          node.body[i].expression.callee.name == 'on' &&
-          node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[0].type == 'BinaryExpression'
-        ) {
-
-          // Function name passed as second parameter
-          if (node.body[i].expression.arguments[1].type == 'Identifier') {
-            triggers.push({
-              'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
-              'code': node.body[i].expression.arguments[1].name + '();'
-            });
-          }
-
-          // Inline function passed as second parameter
-          if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
-            triggers.push({
-              'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
-              'code': '(' + astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[1]) + ')();'
-            });
-          }
-        }
-
-        // Look for calls to on() method of object
-        if (node.body[i].type == 'ExpressionStatement' &&
-          typeof node.body[i].expression.callee !== 'undefined' &&
-          typeof node.body[i].expression.callee.property !== 'undefined' &&
-          node.body[i].expression.callee.property.name == 'on' &&
-          node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[1].type == 'Identifier'
-        ) {
-          node.body[i].expression.arguments[1].type = 'Literal';
-          node.body[i].expression.arguments[1].value = node.body[i].expression.arguments[1].name;
-        }
-
-        // Look for calls to display() method with an expression passed
-        if (node.body[i].type == 'ExpressionStatement' &&
-          typeof node.body[i].expression.callee !== 'undefined' &&
-          node.body[i].expression.callee.name == 'display' &&
-          node.body[i].expression.arguments.length == 3 &&
-          node.body[i].expression.arguments[2].type != 'Literal'
-        ) {
-          let expression = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[2]);
-          node.body[i].expression.arguments[2] = {
-            type: 'Literal',
-            value: expression
-          };
-          node.body[i].expression.arguments[3] = {
-            type: 'Literal',
-            value: true
-          };
-        }
-
-        // Convert all functions to async
-        if (node.body[i].type == 'FunctionDeclaration') {
-          node.body[i].async = true;
-        }
-
-        // Add await to wait() calls
-        if (node.body[i].type == 'ExpressionStatement' &&
-          node.body[i].expression.type == 'CallExpression' &&
-          node.body[i].expression.callee.name == 'wait'
-        ) {
-          node.body[i].expression = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node.body[i].expression)
-          };
-        }
-      }
-    }
-  });
-
-  // Insert step statements
-  for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
-    if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
-      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc));
-    }
-  }
-
-  let processed = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
-  return `
-    (async function() {
-      window._kidjs_.eval = function(key) {
-        return eval(key);
-      };
-      window._kidjs_.get = function(key) {
-        if (eval('typeof ' + key) !== 'undefined') {
-          return eval(key);
-        }
-      };
-      ${processed}
-      window._kidjs_.end();
-    })();
-  `
-}
-
-function createStepStatement(location) {
-  return {
-    type: 'ExpressionStatement',
-    expression: {
-      type: 'AwaitExpression',
-      argument: {
-        type: 'CallExpression',
-        callee: {
-          type: 'MemberExpression',
-          object: {
-            type: 'Identifier',
-            name: 'window._kidjs_'
-          },
-          property: {
-            type: 'Identifier',
-            name: 'step'
-          }
-        },
-        arguments: [{
-          type: 'Literal',
-          value: location.start.line
-        }, {
-          type: 'Literal',
-          value: location.start.column
-        }]
-      }
-    }
-  };
-}
-
-function reset() {
-  triggers = [];
-  window.stage.reset();
-}
-
-async function run(code) {
-  try {
-    let processed = await compile(code);
-    reset();
-    eval(processed);
-  } catch(exception) {
-    console.log(exception);
-  }
-}
-
-async function wait(seconds) {
-  await new Promise(function(resolve) {
-    setTimeout(resolve, seconds * 1000)
-  })
-}
-
-async function step(location) {
-  window.dispatchEvent(new CustomEvent('KID.step', {
-    detail: {
-      line: line,
-      column: column
-    }
-  }));
-  if (window._kidjs_.settings.slowMotion) {
-    await wait(1);
-  }
-}
-
-function end() {
-  window.dispatchEvent(new Event('KID.complete'));
-}
-
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	!function() {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = function(exports, definition) {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	!function() {
-/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
-/******/ 	}();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-!function() {
-
-// EXTERNAL MODULE: ./src/core/index.js
-var core = __webpack_require__(763);
-;// CONCATENATED MODULE: ./src/events/keyboard.js
-let keysDown = [];
-
-function onKeyDown(e) {
-  if (!keysDown.includes(e.key)) {
-    keysDown.push(e.key);
-  }
-}
-
-function onKeyUp(e) {
-  keysDown = keysDown.filter(item => item != e.key);
-  window.stage.dispatchEvent(new KeyboardEvent('keyup', {
-    key: e.key
-  }));
-}
-
-function onAnimationFrame() {
-  for (let key of keysDown) {
-    window.stage.dispatchEvent(new KeyboardEvent('keydown', {
-      key: key
-    }));
-  }
-}
-
-/* harmony default export */ function keyboard() {
-  window.addEventListener('keydown', onKeyDown);
-  window.addEventListener('keyup', onKeyUp);
-  window.addEventListener('animationframe', onAnimationFrame);
-}
-
-;// CONCATENATED MODULE: ./src/events/mouse.js
-const SWIPE_MIN_DISTANCE = 150;
-const SWIPE_CROSS_MAX_DISTANCE = 100;
-const SWIPE_MAX_TIME = 200;
-
-let x = false;
-let y = false;
-let t = false;
-
-function onMouseDown(e) {
-  x = e.clientX;
-  y = e.clientY;
-  t = Date.now();
-  window.mouseButton = e.button == 2 ? 'right' : 'left'
-}
-
-function onMouseUp(e) {
-  window.mouseButton = false;
-
-  // Check for swipe
-  if (x !== false && y !== false && t !== false) {
-    let deltaX = e.clientX - x;
-    let deltaY = e.clientY - y;
-    let deltaT = Date.now() - t;
-
-    if (deltaT < SWIPE_MAX_TIME) {
-      if (deltaX > SWIPE_MIN_DISTANCE && Math.abs(deltaY) < SWIPE_CROSS_MAX_DISTANCE) {
-        window.dispatchEvent(new CustomEvent('swiperight'));
-      }
-      if (deltaX < -SWIPE_MIN_DISTANCE && Math.abs(deltaY) < SWIPE_CROSS_MAX_DISTANCE) {
-        window.dispatchEvent(new CustomEvent('swipeleft'));
-      }
-      if (deltaY > SWIPE_MIN_DISTANCE && Math.abs(deltaX) < SWIPE_CROSS_MAX_DISTANCE) {
-        window.dispatchEvent(new CustomEvent('swipedown'));
-      }
-      if (deltaY < -SWIPE_MIN_DISTANCE && Math.abs(deltaX) < SWIPE_CROSS_MAX_DISTANCE) {
-        window.dispatchEvent(new CustomEvent('swipeup'));
-      }
-    }
-  }
-
-  t = false;
-}
-
-function onMouseMove(e) {
-  window.mouseX = e.clientX;
-  window.mouseY = e.clientY;
-}
-
-function onClick(e) {
-  for (let i = window.stage.actors.length - 1; i >= 0; i--) {
-    if (window.stage.actors[i].containsPoint(e.clientX, e.clientY)) {
-      window.stage.actors[i].dispatchEvent(e);
-    }
-  }
-  window.stage.dispatchEvent(e);
-}
-
-/* harmony default export */ function mouse() {
-  if ('ontouchstart' in window) {
-    window.addEventListener('touchstart', onMouseDown);
-    window.addEventListener('touchend', onMouseUp);
-    window.addEventListener('touchmove', onMouseMove);
-  } else {
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mouseup', onMouseUp);
-    window.addEventListener('mousemove', onMouseMove);
-  }
-  window.addEventListener('click', onClick);
-}
-
-;// CONCATENATED MODULE: ./src/events/device-orientation.js
-const threshold = 10;
-
-function getHorizontalTilt(e) {
-  if (window.matchMedia('(orientation: portrait)').matches) {
-    return e.gamma;
-  } else {
-    return -e.beta;
-  }
-}
-
-function getVerticalTilt(e) {
-  if (window.matchMedia('(orientation: portrait)').matches) {
-    return e.beta;
-  } else {
-    return e.gamma;
-  }
-}
-
-function onDeviceOrientation(e) {
-
-  // Trigger "tiltleft" event
-  if (getHorizontalTilt(e) < -threshold) {
-    let event = new Event('tiltleft')
-    window.dispatchEvent(event);
-  }
-
-  // Trigger "tiltright" event
-  if (getHorizontalTilt(e) > threshold) {
-    let event = new Event('tiltright')
-    window.dispatchEvent(event);
-  }
-
-  // Trigger "tiltup" event
-  if (getVerticalTilt(e) < -threshold) {
-    let event = new Event('tiltup')
-    window.dispatchEvent(event);
-  }
-
-  // Trigger "tiltdown" event
-  if (getVerticalTilt(e) > threshold) {
-    let event = new Event('tiltdown')
-    window.dispatchEvent(event);
-  }
-}
-
-/* harmony default export */ function device_orientation() {
-  window.addEventListener('deviceorientation', onDeviceOrientation);
-}
-
-;// CONCATENATED MODULE: ./src/events/index.js
-
-
-
-
-/* harmony default export */ function events() {
-  keyboard();
-  mouse();
-  device_orientation();
-}
-
-/**
- * Add event listener to stage.
- *
- * @param {string} [event] - Name of event.
- * @param {function} [handler] - Event handler to execute when event occurs.
- */
-function on(event, handler) {
-  if (typeof event === 'string') {
-    window.stage.addEventListener(event, handler);
-  }
-}
-
-;// CONCATENATED MODULE: ./src/core/vector.js
-class Vector {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  get length() {
-    return Math.sqrt(
-      Math.pow(this.x, 2) + Math.pow(this.y, 2)
-    );
-  }
-
-  add(v) {
-    return new Vector(this.x + v.x, this.y + v.y);
-  }
-
-  subtract(v) {
-    return new Vector(this.x - v.x, this.y - v.y);
-  }
-
-  scale(s) {
-    return new Vector(this.x * s, this.y * s);
-  }
-
-  normalize() {
-    let l = this.length;
-    return l > 0 ? new Vector(this.x / l, this.y / l) : new Vector(0, 0);
-  }
-
-  dot(v) {
-    return (this.x * v.x + this.y * v.y);
-  }
-
-  cross(v) {
-    return (this.x * v.y - this.y * v.x);
-  }
-
-  rotate(deg) {
-    let angle = deg * (Math.PI / 180);
-    return new Vector(
-      this.x * Math.cos(angle) - this.y * Math.sin(angle),
-      this.x * Math.sin(angle) + this.y * Math.cos(angle)
-    );
-  }
-
-  distance(v) {
-    return Math.sqrt(
-      Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2)
-    );
-  }
-}
-
-;// CONCATENATED MODULE: ./src/stage/collision.js
-
-
-class Collision {
-
-  /**
-   * Create an object containing collision data.
-   *
-   * @constructor
-   * @param {Actor} a - First actor in collision
-   * @param {Actor} b - Second actor in collision
-   * @param {int} depth - Depth of collision
-   * @param {Vector} normal - Normal vector indicating direction of collision
-   * @param {Vector} start - Start of collision vector
-   */
-  constructor({a, b, depth, normal, start}) {
-    this.a = a;
-    this.b = b;
-    this.depth = depth;
-    this.normal = normal;
-    this.start = start;
-  }
-
-  get end() {
-    return this.start.add(this.normal.scale(this.depth));
-  }
-}
-
-/**
- * Find the farthest point in the opposite direction of a face normal.
- * This is used in detecting collisions between polygons.
- *
- * @param {Actor} actor - Polygon
- * @param {Vector} direction - Normal vector indicating direction
- * @param {Vector} p - Point on face
- * @return {Object} Object containing support point and distance
- */
-function findSupportPoint(actor, direction, p) {
-  let supportPoint = false;
-  let max;
-  for (let i = 0; i < actor.boundingPolygon.length; i++) {
-    let v = actor.boundingPolygon[i].subtract(p);
-    let projection = v.dot(direction);
-    if (projection > 0 && (supportPoint === false || projection > max)) {
-      max = projection;
-      supportPoint = actor.boundingPolygon[i];
-    }
-  }
-  return {
-    'point': supportPoint,
-    'distance': max
-  }
-}
-
-/**
- * Determine the axis of least penetration between two polygons.
- * This is used in detecting collisions between polygons.
- *
- * @param {Actor} actor - First polygon
- * @param {Actor} actor - Second polygon
- * @return {Collision} Object containing collision data
- */
-function findAxisLeastPenetration(a, b) {
-  let supportPoint;
-  let faceNormal = false;
-  let faceNormalIndex = -1;
-  let min;
-  for (let i = 0; i < a.faceNormals.length; i++) {
-    supportPoint = findSupportPoint(b,
-      a.faceNormals[i].scale(-1),
-      a.boundingPolygon[i]
-    );
-    if (supportPoint.point === false) {
-      return false;
-    }
-    if (faceNormal === false || supportPoint.distance < min) {
-      min = supportPoint.distance;
-      faceNormal = a.faceNormals[i];
-      faceNormalIndex = i;
-    }
-  }
-
-  return new Collision({
-    'a': a,
-    'b': b,
-    'depth': min,
-    'normal': faceNormal,
-    'start': supportPoint.point.add(faceNormal.scale(min))
-  });
-}
-
-/**
- * Determine if two polygons collide.
- *
- * @param {Actor} actor - First polygon
- * @param {Actor} actor - Second polygon
- * @return {Collision} Object containing collision data
- */
-function polygonCollidesWithPolygon(a, b) {
-  let collisionA = findAxisLeastPenetration(a, b);
-  if (collisionA) {
-    let collisionB = findAxisLeastPenetration(b, a);
-    if (collisionB) {
-      if (collisionA.depth < collisionB.depth) {
-        let v = collisionA.normal.scale(collisionA.depth);
-        return new Collision({
-          'a': a,
-          'b': b,
-          'depth': collisionA.depth,
-          'normal': collisionA.normal,
-          'start': collisionA.start.subtract(v)
-        });
-      } else {
-        return new Collision({
-          'a': a,
-          'b': b,
-          'depth': collisionB.depth,
-          'normal': collisionB.normal.scale(-1),
-          'start': collisionB.start
-        });
-      }
-    }
-  }
-  return false;
-}
-
-/**
- * Determine if two circles collide.
- *
- * @param {Actor} actor - First circle
- * @param {Actor} actor - Second circle
- * @return {Collision} Object containing collision data
- */
-function circleCollidesWithCircle(a, b) {
-  let v = b.position.subtract(a.position);
-  let distance = v.length;
-  let radiusSum = a.boundingRadius + b.boundingRadius;
-
-  // Circles at exactly the same position
-  if (distance === 0) {
-    return new Collision({
-      'a': a,
-      'b': b,
-      'depth': radiusSum,
-      'normal': new Vector(0, -1),
-      'start': a.boundingRadius > b.boundingRadius ?
-        new Vector(a.x, a.y + a.boundingRadius) :
-        new Vector(b.x, b.x + b.boundingRadius)
-    });
-
-  // Circles at different positions
-  } else {
-    let u = v.normalize().scale(-b.boundingRadius);
-    return new Collision({
-      'a': a,
-      'b': b,
-      'depth': radiusSum - distance,
-      'normal': v.normalize(),
-      'start': b.position.add(u)
-    });
-  }
-}
-
-/**
- * Determine if a circle and polygon collide.
- *
- * @param {Actor} actor - Circle
- * @param {Actor} actor - Polygon
- * @return {Collision} Object containing collision data
- */
-function circleCollidesWithPolygon(a, b) {
-  let inside = true;
-  let distance = false;
-  let edge = false;
-
-  // Find closest edge
-  for (let i = 0; i < b.boundingPolygon.length; i++) {
-    let v = a.position.subtract(b.boundingPolygon[i]);
-    let projection = v.dot(b.faceNormals[i]);
-    if (projection > 0) {
-      distance = projection;
-      edge = i;
-      inside = false;
-      break;
-    }
-    if (distance == false || projection > distance) {
-      distance = projection;
-      edge = i;
-    }
-  }
-
-  // Center of circle is inside of polygon
-  if (inside) {
-    let v = b.faceNormals[edge].scale(a.radius);
-    return new Collision({
-      'a': a,
-      'b': b,
-      'depth': a.radius - distance,
-      'normal': b.faceNormals[edge],
-      'start': a.position.subtract(v)
-    });
-  }
-
-  // Center of circle is outside of polygon
-  let v1 = a.position.subtract(b.boundingPolygon[edge]);
-  let v2 = b.boundingPolygon[(edge + 1) % b.boundingPolygon.length].subtract(b.boundingPolygon[edge]);
-  let dot = v1.dot(v2);
-
-  // Circle in first corner region
-  if (dot < 0) {
-    distance = v1.length;
-    if (distance > a.radius) {
-      return false;
-    } else {
-      let normal = v1.normalize();
-      return new Collision({
-        'a': a,
-        'b': b,
-        'depth': a.radius - distance,
-        'normal': normal,
-        'start': a.position.add(normal.scale(-a.radius))
-      });
-    }
-  }
-
-  v1 = a.position.subtract(b.boundingPolygon[(edge + 1) % b.boundingPolygon.length]);
-  v2 = v2.scale(-1);
-  dot = v1.dot(v2);
-
-  // Circle in second corner region
-  if (dot < 0) {
-    distance = v1.length;
-    if (distance > a.radius) {
-      return false;
-    } else {
-      let normal = v1.normalize();
-      return new Collision({
-        'a': a,
-        'b': b,
-        'depth': a.radius - distance,
-        'normal': normal,
-        'start': a.position.add(normal.scale(-a.radius))
-      });
-    }
-  }
-
-  // Circle with projection of edge
-  if (distance < a.radius) {
-    let v = b.faceNormals[edge].scale(a.radius);
-    return new Collision({
-      'a': a,
-      'b': b,
-      'depth': a.radius - distance,
-      'normal': b.faceNormals[edge],
-      'start': a.position.subtract(v)
-    });
-  } else {
-    return false;
-  }
-}
-
-/**
- * Attempt to resolve a collision between two actors.
- *
- * @param {Collision} collision - Object containing collision data
- */
-function resolveCollision(collision) {
-
-  // Both objects are anchored
-  if (collision.a.inverseMass === 0 && collision.b.inverseMass === 0) {
-    return;
-  }
-
-  // Reposition objects
-  let v = collision.normal.scale(
-    collision.depth / (collision.a.inverseMass + collision.b.inverseMass)
-  );
-  collision.a.position = collision.a.position.add(
-    v.scale(-collision.a.inverseMass)
-  );
-  collision.b.position = collision.b.position.add(
-    v.scale(collision.b.inverseMass)
-  );
-
-  // Determine point of collision
-  let start = collision.start.scale(
-    collision.b.inverseMass / (collision.a.inverseMass + collision.b.inverseMass)
-  );
-  let end = collision.end.scale(
-    collision.a.inverseMass / (collision.a.inverseMass + collision.b.inverseMass)
-  );
-  let p = start.add(end);
-  let r1 = p.subtract(collision.a.position);
-  let r2 = p.subtract(collision.b.position);
-
-  // Determine linear velocities at point of collision
-  let v1 = collision.a.velocity.add(new Vector(
-    -1 * collision.a.angularVelocity * r1.y,
-    collision.a.angularVelocity * r1.x
-  ));
-  let v2 = collision.b.velocity.add(new Vector(
-    -1 * collision.b.angularVelocity * r2.y,
-    collision.b.angularVelocity * r2.x
-  ));
-
-  // Calculate relative velocities
-  let relativeVelocity = v2.subtract(v1);
-  let relativeVelocityInNormal = relativeVelocity.dot(collision.normal);
-
-  // Objects are already moving apart
-  if (relativeVelocityInNormal > 0) return;
-
-  // Apply impulse along normal
-  let bounciness = Math.min(collision.a.bounciness, collision.b.bounciness);
-  let friction = Math.min(collision.a.friction, collision.b.friction);
-  let r1CrossNormal = r1.cross(collision.normal);
-  let r2CrossNormal = r2.cross(collision.normal);
-  let jN = -(1 + bounciness) * relativeVelocityInNormal;
-  jN = jN / (
-    collision.a.inverseMass + collision.b.inverseMass +
-    Math.pow(r1CrossNormal, 2) * collision.a.inertia +
-    Math.pow(r2CrossNormal, 2) * collision.b.inertia
-  );
-
-  // Adjust linear velocity
-  collision.a.velocity = collision.a.velocity.subtract(
-    collision.normal.scale(jN * collision.a.inverseMass)
-  );
-  collision.b.velocity = collision.b.velocity.add(
-    collision.normal.scale(jN * collision.b.inverseMass)
-  );
-
-  // Adjust rotational velocity
-  collision.a.angularVelocity = collision.a.angularVelocity - (r1CrossNormal * jN * collision.a.inertia);
-  collision.b.angularVelocity = collision.b.angularVelocity + (r2CrossNormal * jN * collision.b.inertia);
-
-  // Apply impulse along tangent
-  let tangent = relativeVelocity.subtract(
-    collision.normal.scale(relativeVelocity.dot(collision.normal))
-  );
-  tangent = tangent.normalize().scale(-1);
-  let r1CrossTangent = r1.cross(tangent);
-  let r2CrossTangent = r2.cross(tangent);
-  let jT = -(1 + bounciness) * relativeVelocity.dot(tangent) * friction;
-  jT = jT / (
-    collision.a.inverseMass + collision.b.inverseMass +
-    Math.pow(r1CrossTangent, 2) * collision.a.inertia +
-    Math.pow(r2CrossTangent, 2) * collision.b.inertia
-  );
-  jT = Math.min(jT, jN);
-
-  // Adjust linear velocity
-  collision.a.velocity = collision.a.velocity.subtract(
-    tangent.scale(jT * collision.a.inverseMass)
-  );
-  collision.b.velocity = collision.b.velocity.add(
-    tangent.scale(jT * collision.b.inverseMass)
-  );
-
-  // Adjust angular velocity
-  collision.a.angularVelocity = collision.a.angularVelocity - (r1CrossTangent * jT * collision.a.inertia);
-  collision.b.angularVelocity = collision.b.angularVelocity + (r2CrossTangent * jT * collision.b.inertia);
-}
-
-;// CONCATENATED MODULE: ./src/stage/index.js
-
-
-
-class Stage {
-
-  /**
-   * Create a new stage.
-   *
-   * @constructor
-   * @param {int} [width] - Optional stage width. Defaults to browser width.
-   * @param {int} [height] - Optional stage height. Defaults to browser height.
-   */
-  constructor(width = window.innerWidth, height = window.innerHeight) {
-    this.frame = 0;
-    this.width = width;
-    this.height = height;
-
-    // Stage properties
-    window.gravity = 1;
-    window.floor = true;
-
-    // Create canvas
-    let scale = window.devicePixelRatio;
-    this.canvas = document.createElement('canvas');
-    this.context = this.canvas.getContext('2d');
-    this.canvas.width = Math.floor(this.width * scale);
-    this.canvas.height = Math.floor(this.height * scale);
-    this.canvas.style.width = this.width + 'px';
-    this.canvas.style.height = this.height + 'px';
-    this.canvas.style.display = 'block';
-    this.context.scale(scale, scale);
-
-    // Set initial fill and stroke
-    window.fill = 'white';
-    window.stroke = 'black';
-    window.lineWidth = 2;
-
-    // Set initial font properties
-    window.font = 'Arial';
-    window.fontColor = 'black';
-    window.fontSize = '40px';
-
-    // Set global width and height
-    window.width = width;
-    window.height = height;
-
-    // Initialize
-    this.actors = [];
-    this.eventListeners = {};
-    this.render();
-  }
-
-  /**
-   * Resize the stage.
-   * This is often called by a resize event handler.
-   *
-   * @param {int} [width] - Optional stage width. Defaults to browser width.
-   * @param {int} [height] - Optional stage height. Defaults to browser height.
-   */
-  resize(width = window.innerWidth, height = window.innerHeight) {
-    this.width = width;
-    this.height = height;
-    let scale = window.devicePixelRatio;
-    this.canvas.width = Math.floor(this.width * scale);
-    this.canvas.height = Math.floor(this.height * scale);
-    this.canvas.style.width = this.width + 'px';
-    this.canvas.style.height = this.height + 'px';
-    this.context.scale(scale, scale);
-    window.width = width;
-    window.height = height;
-  }
-
-  /**
-   * Add an actor to the stage.
-   *
-   * @param {Actor} actor - Actor to add to the stage.
-   */
-  addChild(actor) {
-    this.actors.push(actor);
-  }
-
-  /**
-   * Clear all actors from the stage.
-   */
-  clear() {
-    this.actors = [];
-  }
-
-  /**
-   * Clear stage and reset fill and stroke.
-   */
-  reset() {
-    window.fill = 'white';
-    window.stroke = 'black';
-    window.lineWidth = 2;
-    window.tempo = 60;
-    this.clear();
-  }
-
-  /**
-   * Render a single frame.
-   */
-  render() {
-    this.frame++;
-    this.context.clearRect(0, 0, this.width, this.height);
-
-    // Detect collisions
-    for (let i = 0; i < this.actors.length; i++) {
-      for (let j = i + 1; j < this.actors.length; j++) {
-        let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision) {
-          this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
-          this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
-          if (!(this.actors[i].anchored && this.actors[j].anchored)) {
-            resolveCollision(collision);
-          }
-        }
-      }
-    }
-
-    // Update actors
-    for (let actor of this.actors) {
-      actor.update();
-      actor.render(this.context);
-    }
-
-    window._kidjs_.onframe();
-    requestAnimationFrame(() => this.render());
-  }
-
-  /**
-   * Add event listener to stage.
-   *
-   * @param {string} [event] - Name of event.
-   * @param {function} [handler] - Event handler to execute when event occurs.
-   */
-  addEventListener(event, handler) {
-    if (this.eventListeners[event] == undefined) {
-      this.eventListeners[event] = [];
-    }
-    this.eventListeners[event].push(handler);
-  }
-
-  /**
-   * Remove event listener from stage.
-   *
-   * @param {string} [event] - Name of event.
-   * @param {function} [handler] - Event handler to remove.
-   */
-  removeEventListener(event, handler) {
-    if (this.eventListeners[event] !== undefined) {
-      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
-    }
-  }
-
-  /**
-   * Execute event handler.
-   *
-   * @param {Event} [event] - Event object.
-   */
-  dispatchEvent(event, context = window) {
-    if (this.eventListeners[event.type] !== undefined) {
-      for (let handler of this.eventListeners[event.type]) {
-        switch (event.constructor.name) {
-          case 'KeyboardEvent':
-            handler.call(context, event.key);
-            break;
-          default:
-            handler.call(context);
-        }
-      }
-    }
-  }
-}
-
-;// CONCATENATED MODULE: ./src/audio/index.js
+/* unused harmony export frequency */
 function frequency(frequency, duration = 0.25) {
   return new Promise((resolve) => {
 
@@ -7924,7 +6878,16 @@ function beep() {
   frequency(1000, 0.25);
 }
 
-;// CONCATENATED MODULE: ./src/audio/sound.js
+
+/***/ }),
+
+/***/ 639:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "e": function() { return /* binding */ sound; }
+/* harmony export */ });
+/* unused harmony export default */
 class Sound {
 
   /**
@@ -7960,7 +6923,1101 @@ function sound(url, autoplay) {
   return sound;
 }
 
-;// CONCATENATED MODULE: ./src/stage/actor.js
+
+/***/ }),
+
+/***/ 763:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "S1": function() { return /* binding */ init; },
+/* harmony export */   "KH": function() { return /* binding */ run; }
+/* harmony export */ });
+/* unused harmony exports reset, wait */
+/* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
+/* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
+/* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(193);
+/* harmony import */ var _audio__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(820);
+/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(639);
+/* harmony import */ var _shape_circle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(516);
+/* harmony import */ var _shape_line__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(898);
+/* harmony import */ var _shape_oval__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(778);
+/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(85);
+/* harmony import */ var _shape_regular__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(511);
+/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(958);
+/* harmony import */ var _sprite__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(759);
+/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(806);
+/* harmony import */ var _text__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(470);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let triggers = [];
+
+function init() {
+  window._kidjs_ = {
+    settings: {
+      slowMotion: false,
+    },
+
+    setGlobals: function() {
+      window.beep = _audio__WEBPACK_IMPORTED_MODULE_3__/* .beep */ .Vp;
+      window.circle = _shape_circle__WEBPACK_IMPORTED_MODULE_4__/* .circle */ .X;
+      window.display = _text__WEBPACK_IMPORTED_MODULE_5__/* .display */ .jf;
+      window.heptagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .heptagon */ .cE;
+      window.hexagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .hexagon */ .bL;
+      window.image = _sprite__WEBPACK_IMPORTED_MODULE_7__/* .image */ .B;
+      window.line = _shape_line__WEBPACK_IMPORTED_MODULE_8__/* .line */ .j;
+      window.note = _audio__WEBPACK_IMPORTED_MODULE_3__/* .note */ .JP;
+      window.octagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .octagon */ .ky;
+      window.on = _events__WEBPACK_IMPORTED_MODULE_9__.on;
+      window.oval = _shape_oval__WEBPACK_IMPORTED_MODULE_10__/* .oval */ .B;
+      window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .pentagon */ .BR;
+      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_11__/* .rect */ .J;
+      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_12__/* .semicircle */ .g;
+      window.song = _audio__WEBPACK_IMPORTED_MODULE_3__/* .song */ .K_;
+      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_13__/* .sound */ .e;
+      window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .square */ .h6;
+      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_14__/* .star */ .h;
+      window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .triangle */ .cP;
+      window.wait = wait;
+      window.write = _text__WEBPACK_IMPORTED_MODULE_5__/* .write */ .cW;
+    },
+
+    onframe: function() {
+      window.dispatchEvent(new Event('animationframe'));
+      for (let i = 0; i < triggers.length; i++) {
+        try {
+          if (window._kidjs_.eval(triggers[i].condition)) {
+            window._kidjs_.eval(triggers[i].code);
+          }
+        } catch(ex) {
+          // Carry on
+        }
+      }
+    },
+
+    step: async function(line, column) {
+      this.setGlobals();
+      window.dispatchEvent(new CustomEvent('KID.step', {
+        detail: {
+          line: line,
+          column: column
+        }
+      }));
+      if (window._kidjs_.settings.slowMotion) {
+        await wait(1);
+      }
+    },
+
+    end: function() {
+      window.dispatchEvent(new CustomEvent('KID.end'));
+    }
+  };
+
+  window._kidjs_.setGlobals();
+}
+
+async function compile(code) {
+
+  // Parse code into source tree
+  let ast = acorn__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .Qc(code, {
+    locations: true
+  });
+
+  // Walk entire source tree
+  acorn_walk__WEBPACK_IMPORTED_MODULE_1__/* .full */ .rp(ast, function(node) {
+    if (node.body) {
+      for (let i = node.body.length - 1; i >= 0; i = i - 1) {
+
+        // Look for calls to on() method with an expression passed
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          node.body[i].expression.callee.name == 'on' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[0].type == 'BinaryExpression'
+        ) {
+
+          // Function name passed as second parameter
+          if (node.body[i].expression.arguments[1].type == 'Identifier') {
+            triggers.push({
+              'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
+              'code': node.body[i].expression.arguments[1].name + '();'
+            });
+          }
+
+          // Inline function passed as second parameter
+          if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
+            triggers.push({
+              'condition': astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[0]),
+              'code': '(' + astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[1]) + ')();'
+            });
+          }
+        }
+
+        // Look for calls to on() method of object
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          typeof node.body[i].expression.callee.property !== 'undefined' &&
+          node.body[i].expression.callee.property.name == 'on' &&
+          node.body[i].expression.arguments.length > 1 &&
+          node.body[i].expression.arguments[1].type == 'Identifier'
+        ) {
+          node.body[i].expression.arguments[1].type = 'Literal';
+          node.body[i].expression.arguments[1].value = node.body[i].expression.arguments[1].name;
+        }
+
+        // Look for calls to display() method with an expression passed
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.callee !== 'undefined' &&
+          node.body[i].expression.callee.name == 'display' &&
+          node.body[i].expression.arguments.length == 3 &&
+          node.body[i].expression.arguments[2].type != 'Literal'
+        ) {
+          let expression = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(node.body[i].expression.arguments[2]);
+          node.body[i].expression.arguments[2] = {
+            type: 'Literal',
+            value: expression
+          };
+          node.body[i].expression.arguments[3] = {
+            type: 'Literal',
+            value: true
+          };
+        }
+
+        // Convert all functions to async
+        if (node.body[i].type == 'FunctionDeclaration') {
+          node.body[i].async = true;
+        }
+
+        // Add await to wait() calls
+        if (node.body[i].type == 'ExpressionStatement' &&
+          node.body[i].expression.type == 'CallExpression' &&
+          node.body[i].expression.callee.name == 'wait'
+        ) {
+          node.body[i].expression = {
+            type: 'AwaitExpression',
+            argument: Object.assign({}, node.body[i].expression)
+          };
+        }
+      }
+    }
+  });
+
+  // Insert step statements
+  for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
+    if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
+      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc));
+    }
+  }
+
+  let processed = astring__WEBPACK_IMPORTED_MODULE_2__/* .generate */ .R(ast);
+  return `
+    (async function() {
+      window._kidjs_.eval = function(key) {
+        return eval(key);
+      };
+      window._kidjs_.get = function(key) {
+        if (eval('typeof ' + key) !== 'undefined') {
+          return eval(key);
+        }
+      };
+      ${processed}
+      window._kidjs_.end();
+    })();
+  `
+}
+
+function createStepStatement(location) {
+  return {
+    type: 'ExpressionStatement',
+    expression: {
+      type: 'AwaitExpression',
+      argument: {
+        type: 'CallExpression',
+        callee: {
+          type: 'MemberExpression',
+          object: {
+            type: 'Identifier',
+            name: 'window._kidjs_'
+          },
+          property: {
+            type: 'Identifier',
+            name: 'step'
+          }
+        },
+        arguments: [{
+          type: 'Literal',
+          value: location.start.line
+        }, {
+          type: 'Literal',
+          value: location.start.column
+        }]
+      }
+    }
+  };
+}
+
+function reset() {
+  triggers = [];
+  window.stage.reset();
+}
+
+async function run(code) {
+  try {
+    let processed = await compile(code);
+    reset();
+    eval(processed);
+  } catch(exception) {
+    console.log(exception);
+  }
+}
+
+async function wait(seconds) {
+  await new Promise(function(resolve) {
+    setTimeout(resolve, seconds * 1000)
+  })
+}
+
+async function step(location) {
+  window.dispatchEvent(new CustomEvent('KID.step', {
+    detail: {
+      line: _shape_line__WEBPACK_IMPORTED_MODULE_8__/* .line */ .j,
+      column: column
+    }
+  }));
+  if (window._kidjs_.settings.slowMotion) {
+    await wait(1);
+  }
+}
+
+function end() {
+  window.dispatchEvent(new Event('KID.complete'));
+}
+
+
+/***/ }),
+
+/***/ 599:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": function() { return /* binding */ Vector; }
+/* harmony export */ });
+class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  get length() {
+    return Math.sqrt(
+      Math.pow(this.x, 2) + Math.pow(this.y, 2)
+    );
+  }
+
+  add(v) {
+    return new Vector(this.x + v.x, this.y + v.y);
+  }
+
+  subtract(v) {
+    return new Vector(this.x - v.x, this.y - v.y);
+  }
+
+  scale(s) {
+    return new Vector(this.x * s, this.y * s);
+  }
+
+  normalize() {
+    let l = this.length;
+    return l > 0 ? new Vector(this.x / l, this.y / l) : new Vector(0, 0);
+  }
+
+  dot(v) {
+    return (this.x * v.x + this.y * v.y);
+  }
+
+  cross(v) {
+    return (this.x * v.y - this.y * v.x);
+  }
+
+  rotate(deg) {
+    let angle = deg * (Math.PI / 180);
+    return new Vector(
+      this.x * Math.cos(angle) - this.y * Math.sin(angle),
+      this.x * Math.sin(angle) + this.y * Math.cos(angle)
+    );
+  }
+
+  distance(v) {
+    return Math.sqrt(
+      Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2)
+    );
+  }
+}
+
+
+/***/ }),
+
+/***/ 193:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "Z": function() { return /* binding */ events; },
+  "on": function() { return /* binding */ on; }
+});
+
+;// CONCATENATED MODULE: ./src/events/keyboard.js
+let keysDown = [];
+
+function onKeyDown(e) {
+  if (!keysDown.includes(e.key)) {
+    keysDown.push(e.key);
+  }
+}
+
+function onKeyUp(e) {
+  keysDown = keysDown.filter(item => item != e.key);
+  window.stage.dispatchEvent(new KeyboardEvent('keyup', {
+    key: e.key
+  }));
+}
+
+function onAnimationFrame() {
+  for (let key of keysDown) {
+    window.stage.dispatchEvent(new KeyboardEvent('keydown', {
+      key: key
+    }));
+  }
+}
+
+/* harmony default export */ function keyboard() {
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('keyup', onKeyUp);
+  window.addEventListener('animationframe', onAnimationFrame);
+}
+
+;// CONCATENATED MODULE: ./src/events/mouse.js
+const SWIPE_MIN_DISTANCE = 150;
+const SWIPE_CROSS_MAX_DISTANCE = 100;
+const SWIPE_MAX_TIME = 200;
+
+let x = false;
+let y = false;
+let t = false;
+
+function onMouseDown(e) {
+  x = e.clientX;
+  y = e.clientY;
+  t = Date.now();
+  window.mouseButton = e.button == 2 ? 'right' : 'left'
+}
+
+function onMouseUp(e) {
+  window.mouseButton = false;
+
+  // Check for swipe
+  if (x !== false && y !== false && t !== false) {
+    let deltaX = e.clientX - x;
+    let deltaY = e.clientY - y;
+    let deltaT = Date.now() - t;
+
+    if (deltaT < SWIPE_MAX_TIME) {
+      if (deltaX > SWIPE_MIN_DISTANCE && Math.abs(deltaY) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swiperight'));
+      }
+      if (deltaX < -SWIPE_MIN_DISTANCE && Math.abs(deltaY) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swipeleft'));
+      }
+      if (deltaY > SWIPE_MIN_DISTANCE && Math.abs(deltaX) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swipedown'));
+      }
+      if (deltaY < -SWIPE_MIN_DISTANCE && Math.abs(deltaX) < SWIPE_CROSS_MAX_DISTANCE) {
+        window.dispatchEvent(new CustomEvent('swipeup'));
+      }
+    }
+  }
+
+  t = false;
+}
+
+function onMouseMove(e) {
+  window.mouseX = e.clientX;
+  window.mouseY = e.clientY;
+}
+
+function onClick(e) {
+  for (let i = window.stage.actors.length - 1; i >= 0; i--) {
+    if (window.stage.actors[i].containsPoint(e.clientX, e.clientY)) {
+      window.stage.actors[i].dispatchEvent(e);
+    }
+  }
+  window.stage.dispatchEvent(e);
+}
+
+/* harmony default export */ function mouse() {
+  if ('ontouchstart' in window) {
+    window.addEventListener('touchstart', onMouseDown);
+    window.addEventListener('touchend', onMouseUp);
+    window.addEventListener('touchmove', onMouseMove);
+  } else {
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('mousemove', onMouseMove);
+  }
+  window.addEventListener('click', onClick);
+}
+
+;// CONCATENATED MODULE: ./src/events/device-orientation.js
+const threshold = 10;
+
+function getHorizontalTilt(e) {
+  if (window.matchMedia('(orientation: portrait)').matches) {
+    return e.gamma;
+  } else {
+    return -e.beta;
+  }
+}
+
+function getVerticalTilt(e) {
+  if (window.matchMedia('(orientation: portrait)').matches) {
+    return e.beta;
+  } else {
+    return e.gamma;
+  }
+}
+
+function onDeviceOrientation(e) {
+
+  // Trigger "tiltleft" event
+  if (getHorizontalTilt(e) < -threshold) {
+    let event = new Event('tiltleft')
+    window.dispatchEvent(event);
+  }
+
+  // Trigger "tiltright" event
+  if (getHorizontalTilt(e) > threshold) {
+    let event = new Event('tiltright')
+    window.dispatchEvent(event);
+  }
+
+  // Trigger "tiltup" event
+  if (getVerticalTilt(e) < -threshold) {
+    let event = new Event('tiltup')
+    window.dispatchEvent(event);
+  }
+
+  // Trigger "tiltdown" event
+  if (getVerticalTilt(e) > threshold) {
+    let event = new Event('tiltdown')
+    window.dispatchEvent(event);
+  }
+}
+
+/* harmony default export */ function device_orientation() {
+  window.addEventListener('deviceorientation', onDeviceOrientation);
+}
+
+;// CONCATENATED MODULE: ./src/events/index.js
+
+
+
+
+/* harmony default export */ function events() {
+  keyboard();
+  mouse();
+  device_orientation();
+}
+
+/**
+ * Add event listener to stage.
+ *
+ * @param {string} [event] - Name of event.
+ * @param {function} [handler] - Event handler to execute when event occurs.
+ */
+function on(event, handler) {
+  if (typeof event === 'string') {
+    window.stage.addEventListener(event, handler);
+  }
+}
+
+
+/***/ }),
+
+/***/ 516:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "X": function() { return /* binding */ circle; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
+
+
+class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y, radius) {
+    super(x, y);
+    this.radius = radius;
+    this.boundingRadius = radius;
+  }
+
+  render(context) {
+    this.prerender(context);
+    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    this.postrender(context);
+  }
+}
+
+function circle(x, y, diameter) {
+  const shape = new Circle(x, y, diameter / 2);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 238:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": function() { return /* binding */ Shape; }
+/* harmony export */ });
+/* harmony import */ var _stage_actor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(913);
+
+
+class Shape extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y) {
+    super(x, y);
+    this.fill = window.fill;
+    this.stroke = window.stroke;
+    this.lineWidth = window.lineWidth;
+  }
+
+  prerender(context) {
+    switch (this.fill) {
+      case 'random':
+        let r = Math.floor(Math.random() * 256);
+        let g = Math.floor(Math.random() * 256);
+        let b = Math.floor(Math.random() * 256);
+        this.fill = `rgb(${r}, ${g}, ${b})`;
+        context.fillStyle = this.fill;
+        break;
+
+      default:
+        context.fillStyle = this.fill;
+    }
+
+    context.strokeStyle = this.stroke;
+    context.lineWidth = this.lineWidth;
+    context.beginPath();
+  }
+
+  postrender(context) {
+    context.closePath();
+    context.fill();
+    context.stroke();
+  }
+}
+
+
+/***/ }),
+
+/***/ 898:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "j": function() { return /* binding */ line; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(599);
+
+
+
+class Line extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x1, y1, x2, y2) {
+    super(x1, y1);
+    this.v = new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(x2 - x1, y2 - y1);
+    this.u = this.v.normalize();
+  }
+
+  render(context) {
+    this.prerender(context);
+
+    switch (this.state) {
+      case 'wiggle':
+        context.moveTo(this.x, this.y);
+        for (let i = 0; i < this.vectors.length - 1; i = i + 2) {
+          let magnitude = Math.sin(this.frame / 5) * 10
+          context.bezierCurveTo(
+            this.x + this.vectors[i].x - this.u.y * magnitude,
+            this.y + this.vectors[i].y + this.u.x * magnitude,
+            this.x + this.vectors[i].x + this.u.y * magnitude,
+            this.y + this.vectors[i].y - this.u.x * magnitude,
+            this.x + this.vectors[i + 1].x,
+            this.y + this.vectors[i + 1].y
+          );
+        }
+        if (this.frame > 300) {
+          this.frame = 0;
+          this.state = 'default';
+        }
+        break;
+
+      default:
+        context.moveTo(this.x, this.y);
+        context.lineTo(this.x + this.v.x, this.y + this.v.y);
+    }
+    this.postrender(context);
+  }
+
+  postrender(context) {
+    context.stroke();
+  }
+
+  wiggle() {
+    this.state = 'wiggle';
+    this.vectors = [];
+    let segment = this.v.length / 10;
+    for (let i = 1; i <= 10; i++) {
+      this.vectors.push(
+        new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(this.u.x * segment * i, this.u.y * segment * i)
+      );
+    }
+  }
+}
+
+function line(x1, y1, x2, y2) {
+  let shape = new Line(x1, y1, x2, y2);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 778:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "B": function() { return /* binding */ oval; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
+
+
+class Oval extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y, radiusX, radiusY) {
+    super(x, y);
+    this.radiusX = radiusX;
+    this.radiusY = radiusY;
+    this.boundingRadius = Math.max(radiusX, radiusY);
+  }
+
+  render(context) {
+    this.prerender(context);
+    let angleRadians = this.angle * (Math.PI / 180);
+    context.ellipse(this.x, this.y, this.radiusX, this.radiusY, angleRadians, 0, Math.PI * 2);
+    this.postrender(context);
+  }
+}
+
+function oval(x, y, width, height) {
+  const shape = new Oval(x, y, width / 2, height / 2);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 564:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": function() { return /* binding */ Polygon; }
+/* harmony export */ });
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(599);
+
+
+
+class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+
+  /**
+   * Create a new polygon and add it to the stage.
+   *
+   * @constructor
+   * @param {int} x - Initial x coordinate
+   * @param {int} y - Initial y coordinate
+   */
+  constructor(x, y) {
+    super(x, y);
+    this.points = [];
+    this._boundingPolygon = [];
+  }
+
+  get boundingPolygon() {
+    let points = [];
+    for (let i = 0; i < this._boundingPolygon.length; i++) {
+      let p = this._boundingPolygon[i].rotate(this.angle);
+      p = p.add(this.position);
+      points.push(p);
+    }
+    return points;
+  }
+
+  /**
+   * Add point to the polygon.
+   *
+   * @param {int} x - X coordinate
+   * @param {int} y - Y coordinate
+   */
+  addPoint(x, y) {
+    let v = new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(x, -y);
+    if (v.length > this.boundingRadius) {
+      this.boundingRadius = v.length;
+    }
+    this.points.push(v);
+    this.updateBoundingPolygon();
+    this.updateFaceNormals();
+  }
+
+  /**
+   * Use gift wraping algorithm to determine convex hull.
+   */
+  updateBoundingPolygon() {
+
+    const orientation = function(p, q, r) {
+      let a = (q.y - p.y) * (r.x - q.x) -
+        (q.x - p.x) * (r.y - q.y);
+      if (a == 0) return 0;
+      return a > 0 ? 1 : 2;
+    }
+
+    this._boundingPolygon = [];
+    if (this.points.length > 2) {
+      let leftmost = 0;
+      for (let i = 1; i < this.points.length; i++) {
+        if (this.points[i].x < leftmost.x) {
+          leftmost = i;
+        }
+      }
+      let p = leftmost;
+      let q = leftmost;
+      do {
+        this._boundingPolygon.push(this.points[p]);
+        q = (p + 1) % this.points.length;
+        for (let j = 0; j < this.points.length; j++) {
+          if (orientation(this.points[p], this.points[j], this.points[q]) == 2) {
+            q = j;
+          }
+        }
+        p = q;
+      } while (p != leftmost)
+    }
+  }
+
+  /**
+   * Compute face normals. These are used in collision detection.
+   */
+  updateFaceNormals() {
+    this.faceNormals = [];
+    if (this._boundingPolygon.length > 2) {
+
+      // Determine if points are clockwise
+      let sum = 0;
+      for (let i = 0; i < this._boundingPolygon.length; i++) {
+        let p1 = this._boundingPolygon[i];
+        let p2 = this._boundingPolygon[(i + 1) % this._boundingPolygon.length];
+        sum = sum + (p2.x - p1.x) * (p2.y + p1.y);
+      }
+      const clockwise = (sum >= 0);
+
+      // Calculate face normal for each edge
+      for (let i = 0; i < this._boundingPolygon.length; i++) {
+        let edge = this._boundingPolygon[i].subtract(
+          this._boundingPolygon[(i + 1) % this._boundingPolygon.length]
+        );
+        let perpendicular = clockwise ?
+          new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(edge.y, -edge.x) :
+          new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(-edge.y, edge.x);
+        this.faceNormals.push(perpendicular.normalize());
+      }
+    }
+  }
+
+  /**
+   * Render polygon.
+   *
+   * @param {CanvasRenderingContext2D} context - Canvas drawing context.
+   */
+  render(context) {
+    if (this.points.length < 2) {
+      return;
+    }
+    this.prerender(context);
+    let v = this.points[0].rotate(this.angle);
+    context.moveTo(this.x + v.x, this.y + v.y);
+    for (let point of this.points) {
+      v = point.rotate(this.angle);
+      context.lineTo(this.x + v.x, this.y + v.y);
+    }
+    this.postrender(context);
+  }
+}
+
+
+/***/ }),
+
+/***/ 85:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "J": function() { return /* binding */ rect; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var _polygon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(564);
+
+
+class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y, width, height) {
+    super(x + (width / 2), y + (height / 2));
+    this.addPoint(-width / 2, -height / 2);
+    this.addPoint(width / 2, -height / 2);
+    this.addPoint(width / 2, height / 2);
+    this.addPoint(-width / 2, height / 2)
+  }
+}
+
+function rect(x, y, width, height) {
+  const shape = new Rect(x, y, width, height);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 511:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "cP": function() { return /* binding */ triangle; },
+/* harmony export */   "h6": function() { return /* binding */ square; },
+/* harmony export */   "BR": function() { return /* binding */ pentagon; },
+/* harmony export */   "bL": function() { return /* binding */ hexagon; },
+/* harmony export */   "cE": function() { return /* binding */ heptagon; },
+/* harmony export */   "ky": function() { return /* binding */ octagon; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var _polygon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(564);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(599);
+
+
+
+class RegularPolygon extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y, radius, sides) {
+    super(x, y);
+
+    if (sides > 2) {
+      let angle = 360 / sides;
+      let v = new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(0, radius);
+
+      for (let i = 0; i < sides; i++) {
+        this.addPoint(v.x, v.y);
+        v = v.rotate(angle);
+      }
+    }
+  }
+}
+
+function triangle(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 3);
+  return shape;
+}
+
+function square(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 4);
+  return shape;
+}
+
+function pentagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 5);
+  return shape;
+}
+
+function hexagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 6);
+  return shape;
+}
+
+function heptagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 7);
+  return shape;
+}
+
+function octagon(x, y, diameter) {
+  let shape = new RegularPolygon(x, y, diameter / 2, 8);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 958:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "g": function() { return /* binding */ semicircle; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
+
+
+class Semicircle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y, radius) {
+    super(x, y);
+    this.radius = radius;
+    this.boundingRadius = radius;
+  }
+
+  render(context) {
+    this.prerender(context);
+    let angleRadians = this.angle * (Math.PI / 180);
+    context.arc(this.x, this.y, this.radius, angleRadians, angleRadians + Math.PI);
+    this.postrender(context);
+  }
+}
+
+function semicircle(x, y, diameter) {
+  const shape = new Semicircle(x, y, diameter / 2);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 806:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "h": function() { return /* binding */ star; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var _polygon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(564);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(599);
+
+
+
+class Star extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(x, y, outerRadius, innerRadius, points = 5) {
+    super(x, y);
+
+    let angle = 360 / points;
+    let outerVector = new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(0, outerRadius);
+    let innerVector = new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(0, innerRadius);
+    innerVector = innerVector.rotate(angle / 2);
+
+    for (let i = 0; i < points; i++) {
+      this.addPoint(outerVector.x, outerVector.y);
+      this.addPoint(innerVector.x, innerVector.y);
+      outerVector = outerVector.rotate(angle);
+      innerVector = innerVector.rotate(angle);
+    }
+  }
+}
+
+function star(x, y, outerRadius, innerRadius = false, points = 5) {
+  if (innerRadius === false) {
+    let goldenRatio = (1 + Math.sqrt(5)) / 2;
+    innerRadius = outerRadius * (1 / Math.pow(goldenRatio, 2));
+  }
+
+  let shape = new Star(x, y, outerRadius, innerRadius, points);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 759:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "B": function() { return /* binding */ image; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var _stage_actor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(913);
+
+
+class Sprite extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+
+  /**
+   * Create a new image and add it to the stage.
+   *
+   * @constructor
+   * @param {int} x - Initial x coordinate
+   * @param {int} y - Initial y coordinate
+   * @param {string} imageUrl - Path to image
+   */
+  constructor(x, y, imageUrl) {
+    super(x, y);
+    this.image = new Image();
+    this.image.onload = () => this.loaded = true;
+    this.image.src = imageUrl;
+    this.scale = 1;
+  }
+
+  /**
+   * Render image.
+   *
+   * @param {CanvasRenderingContext2D} context - Canvas drawing context.
+   */
+  render(context) {
+    if (this.loaded) {
+      context.drawImage(
+        this.image,
+        this.x - (this.image.width * this.scale / 2),
+        this.y - (this.image.height * this.scale / 2),
+        this.image.width * this.scale,
+        this.image.height * this.scale
+      );
+    }
+  }
+}
+
+function image(x, y, url) {
+  const sprite = new Sprite(x, y, url);
+  return sprite;
+}
+
+
+/***/ }),
+
+/***/ 913:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": function() { return /* binding */ Actor; }
+/* harmony export */ });
+/* harmony import */ var _collision__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(901);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(599);
 
 
 
@@ -7979,9 +8036,9 @@ class Actor {
   constructor(x, y, stage) {
     this.frame = 0;
     this.state = 'default';
-    this.position = new Vector(x, y);
-    this.velocity = new Vector(0, 0);
-    this.acceleration = new Vector(0, 0);
+    this.position = new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(x, y);
+    this.velocity = new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(0, 0);
+    this.acceleration = new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(0, 0);
     this.angle = 0;
     this.angularVelocity = 0;
     this.angularAcceleration = 0;
@@ -7995,7 +8052,7 @@ class Actor {
     this.faceNormals = [];
 
     // Destination coordinates
-    this.destination = new Vector(x, y);
+    this.destination = new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(x, y);
 
     // Event listeners
     this.eventListeners = {};
@@ -8155,7 +8212,7 @@ class Actor {
 
     // Circle
     } else {
-      let v = this.position.subtract(new Vector(x, y));
+      let v = this.position.subtract(new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(x, y));
       let distance = v.length;
       return (distance < this.boundingRadius);
     }
@@ -8179,20 +8236,20 @@ class Actor {
 
     // Circle colliding with circle
     if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
-      return circleCollidesWithCircle(this, actor);
+      return (0,_collision__WEBPACK_IMPORTED_MODULE_1__/* .circleCollidesWithCircle */ .mO)(this, actor);
     }
 
     // Polygon colliding with polygon
     if (this.isPolygon() && actor.isPolygon()) {
-      return polygonCollidesWithPolygon(this, actor);
+      return (0,_collision__WEBPACK_IMPORTED_MODULE_1__/* .polygonCollidesWithPolygon */ .HH)(this, actor);
     }
 
     // Circle colliding with polygon
     if (this.constructor.name === 'Circle' && actor.isPolygon()) {
-      return circleCollidesWithPolygon(this, actor);
+      return (0,_collision__WEBPACK_IMPORTED_MODULE_1__/* .circleCollidesWithPolygon */ .Ue)(this, actor);
     }
     if (actor.constructor.name === 'Circle' && this.isPolygon()) {
-      return circleCollidesWithPolygon(actor, this);
+      return (0,_collision__WEBPACK_IMPORTED_MODULE_1__/* .circleCollidesWithPolygon */ .Ue)(actor, this);
     }
   }
 
@@ -8260,451 +8317,398 @@ class Actor {
   }
 }
 
-;// CONCATENATED MODULE: ./src/shape/index.js
+
+/***/ }),
+
+/***/ 901:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "HH": function() { return /* binding */ polygonCollidesWithPolygon; },
+/* harmony export */   "mO": function() { return /* binding */ circleCollidesWithCircle; },
+/* harmony export */   "Ue": function() { return /* binding */ circleCollidesWithPolygon; },
+/* harmony export */   "WW": function() { return /* binding */ resolveCollision; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(599);
 
 
-class Shape extends Actor {
-  constructor(x, y) {
-    super(x, y);
-    this.fill = window.fill;
-    this.stroke = window.stroke;
-    this.lineWidth = window.lineWidth;
-  }
-
-  prerender(context) {
-    switch (this.fill) {
-      case 'random':
-        let r = Math.floor(Math.random() * 256);
-        let g = Math.floor(Math.random() * 256);
-        let b = Math.floor(Math.random() * 256);
-        this.fill = `rgb(${r}, ${g}, ${b})`;
-        context.fillStyle = this.fill;
-        break;
-
-      default:
-        context.fillStyle = this.fill;
-    }
-
-    context.strokeStyle = this.stroke;
-    context.lineWidth = this.lineWidth;
-    context.beginPath();
-  }
-
-  postrender(context) {
-    context.closePath();
-    context.fill();
-    context.stroke();
-  }
-}
-
-;// CONCATENATED MODULE: ./src/shape/circle.js
-
-
-class Circle extends Shape {
-  constructor(x, y, radius) {
-    super(x, y);
-    this.radius = radius;
-    this.boundingRadius = radius;
-  }
-
-  render(context) {
-    this.prerender(context);
-    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    this.postrender(context);
-  }
-}
-
-function circle(x, y, diameter) {
-  const shape = new Circle(x, y, diameter / 2);
-  return shape;
-}
-
-;// CONCATENATED MODULE: ./src/shape/line.js
-
-
-
-class Line extends Shape {
-  constructor(x1, y1, x2, y2) {
-    super(x1, y1);
-    this.v = new Vector(x2 - x1, y2 - y1);
-    this.u = this.v.normalize();
-  }
-
-  render(context) {
-    this.prerender(context);
-
-    switch (this.state) {
-      case 'wiggle':
-        context.moveTo(this.x, this.y);
-        for (let i = 0; i < this.vectors.length - 1; i = i + 2) {
-          let magnitude = Math.sin(this.frame / 5) * 10
-          context.bezierCurveTo(
-            this.x + this.vectors[i].x - this.u.y * magnitude,
-            this.y + this.vectors[i].y + this.u.x * magnitude,
-            this.x + this.vectors[i].x + this.u.y * magnitude,
-            this.y + this.vectors[i].y - this.u.x * magnitude,
-            this.x + this.vectors[i + 1].x,
-            this.y + this.vectors[i + 1].y
-          );
-        }
-        if (this.frame > 300) {
-          this.frame = 0;
-          this.state = 'default';
-        }
-        break;
-
-      default:
-        context.moveTo(this.x, this.y);
-        context.lineTo(this.x + this.v.x, this.y + this.v.y);
-    }
-    this.postrender(context);
-  }
-
-  postrender(context) {
-    context.stroke();
-  }
-
-  wiggle() {
-    this.state = 'wiggle';
-    this.vectors = [];
-    let segment = this.v.length / 10;
-    for (let i = 1; i <= 10; i++) {
-      this.vectors.push(
-        new Vector(this.u.x * segment * i, this.u.y * segment * i)
-      );
-    }
-  }
-}
-
-function line(x1, y1, x2, y2) {
-  let shape = new Line(x1, y1, x2, y2);
-  return shape;
-}
-
-;// CONCATENATED MODULE: ./src/shape/oval.js
-
-
-class Oval extends Shape {
-  constructor(x, y, radiusX, radiusY) {
-    super(x, y);
-    this.radiusX = radiusX;
-    this.radiusY = radiusY;
-    this.boundingRadius = Math.max(radiusX, radiusY);
-  }
-
-  render(context) {
-    this.prerender(context);
-    let angleRadians = this.angle * (Math.PI / 180);
-    context.ellipse(this.x, this.y, this.radiusX, this.radiusY, angleRadians, 0, Math.PI * 2);
-    this.postrender(context);
-  }
-}
-
-function oval(x, y, width, height) {
-  const shape = new Oval(x, y, width / 2, height / 2);
-  return shape;
-}
-
-;// CONCATENATED MODULE: ./src/shape/polygon.js
-
-
-
-class Polygon extends Shape {
+class Collision {
 
   /**
-   * Create a new polygon and add it to the stage.
+   * Create an object containing collision data.
    *
    * @constructor
-   * @param {int} x - Initial x coordinate
-   * @param {int} y - Initial y coordinate
+   * @param {Actor} a - First actor in collision
+   * @param {Actor} b - Second actor in collision
+   * @param {int} depth - Depth of collision
+   * @param {Vector} normal - Normal vector indicating direction of collision
+   * @param {Vector} start - Start of collision vector
    */
-  constructor(x, y) {
-    super(x, y);
-    this.points = [];
-    this._boundingPolygon = [];
+  constructor({a, b, depth, normal, start}) {
+    this.a = a;
+    this.b = b;
+    this.depth = depth;
+    this.normal = normal;
+    this.start = start;
   }
 
-  get boundingPolygon() {
-    let points = [];
-    for (let i = 0; i < this._boundingPolygon.length; i++) {
-      let p = this._boundingPolygon[i].rotate(this.angle);
-      p = p.add(this.position);
-      points.push(p);
-    }
-    return points;
-  }
-
-  /**
-   * Add point to the polygon.
-   *
-   * @param {int} x - X coordinate
-   * @param {int} y - Y coordinate
-   */
-  addPoint(x, y) {
-    let v = new Vector(x, -y);
-    if (v.length > this.boundingRadius) {
-      this.boundingRadius = v.length;
-    }
-    this.points.push(v);
-    this.updateBoundingPolygon();
-    this.updateFaceNormals();
-  }
-
-  /**
-   * Use gift wraping algorithm to determine convex hull.
-   */
-  updateBoundingPolygon() {
-
-    const orientation = function(p, q, r) {
-      let a = (q.y - p.y) * (r.x - q.x) -
-        (q.x - p.x) * (r.y - q.y);
-      if (a == 0) return 0;
-      return a > 0 ? 1 : 2;
-    }
-
-    this._boundingPolygon = [];
-    if (this.points.length > 2) {
-      let leftmost = 0;
-      for (let i = 1; i < this.points.length; i++) {
-        if (this.points[i].x < leftmost.x) {
-          leftmost = i;
-        }
-      }
-      let p = leftmost;
-      let q = leftmost;
-      do {
-        this._boundingPolygon.push(this.points[p]);
-        q = (p + 1) % this.points.length;
-        for (let j = 0; j < this.points.length; j++) {
-          if (orientation(this.points[p], this.points[j], this.points[q]) == 2) {
-            q = j;
-          }
-        }
-        p = q;
-      } while (p != leftmost)
-    }
-  }
-
-  /**
-   * Compute face normals. These are used in collision detection.
-   */
-  updateFaceNormals() {
-    this.faceNormals = [];
-    if (this._boundingPolygon.length > 2) {
-
-      // Determine if points are clockwise
-      let sum = 0;
-      for (let i = 0; i < this._boundingPolygon.length; i++) {
-        let p1 = this._boundingPolygon[i];
-        let p2 = this._boundingPolygon[(i + 1) % this._boundingPolygon.length];
-        sum = sum + (p2.x - p1.x) * (p2.y + p1.y);
-      }
-      const clockwise = (sum >= 0);
-
-      // Calculate face normal for each edge
-      for (let i = 0; i < this._boundingPolygon.length; i++) {
-        let edge = this._boundingPolygon[i].subtract(
-          this._boundingPolygon[(i + 1) % this._boundingPolygon.length]
-        );
-        let perpendicular = clockwise ?
-          new Vector(edge.y, -edge.x) :
-          new Vector(-edge.y, edge.x);
-        this.faceNormals.push(perpendicular.normalize());
-      }
-    }
-  }
-
-  /**
-   * Render polygon.
-   *
-   * @param {CanvasRenderingContext2D} context - Canvas drawing context.
-   */
-  render(context) {
-    if (this.points.length < 2) {
-      return;
-    }
-    this.prerender(context);
-    let v = this.points[0].rotate(this.angle);
-    context.moveTo(this.x + v.x, this.y + v.y);
-    for (let point of this.points) {
-      v = point.rotate(this.angle);
-      context.lineTo(this.x + v.x, this.y + v.y);
-    }
-    this.postrender(context);
+  get end() {
+    return this.start.add(this.normal.scale(this.depth));
   }
 }
 
-;// CONCATENATED MODULE: ./src/shape/rect.js
-
-
-class Rect extends Polygon {
-  constructor(x, y, width, height) {
-    super(x + (width / 2), y + (height / 2));
-    this.addPoint(-width / 2, -height / 2);
-    this.addPoint(width / 2, -height / 2);
-    this.addPoint(width / 2, height / 2);
-    this.addPoint(-width / 2, height / 2)
+/**
+ * Find the farthest point in the opposite direction of a face normal.
+ * This is used in detecting collisions between polygons.
+ *
+ * @param {Actor} actor - Polygon
+ * @param {Vector} direction - Normal vector indicating direction
+ * @param {Vector} p - Point on face
+ * @return {Object} Object containing support point and distance
+ */
+function findSupportPoint(actor, direction, p) {
+  let supportPoint = false;
+  let max;
+  for (let i = 0; i < actor.boundingPolygon.length; i++) {
+    let v = actor.boundingPolygon[i].subtract(p);
+    let projection = v.dot(direction);
+    if (projection > 0 && (supportPoint === false || projection > max)) {
+      max = projection;
+      supportPoint = actor.boundingPolygon[i];
+    }
+  }
+  return {
+    'point': supportPoint,
+    'distance': max
   }
 }
 
-function rect(x, y, width, height) {
-  const shape = new Rect(x, y, width, height);
-  return shape;
+/**
+ * Determine the axis of least penetration between two polygons.
+ * This is used in detecting collisions between polygons.
+ *
+ * @param {Actor} actor - First polygon
+ * @param {Actor} actor - Second polygon
+ * @return {Collision} Object containing collision data
+ */
+function findAxisLeastPenetration(a, b) {
+  let supportPoint;
+  let faceNormal = false;
+  let faceNormalIndex = -1;
+  let min;
+  for (let i = 0; i < a.faceNormals.length; i++) {
+    supportPoint = findSupportPoint(b,
+      a.faceNormals[i].scale(-1),
+      a.boundingPolygon[i]
+    );
+    if (supportPoint.point === false) {
+      return false;
+    }
+    if (faceNormal === false || supportPoint.distance < min) {
+      min = supportPoint.distance;
+      faceNormal = a.faceNormals[i];
+      faceNormalIndex = i;
+    }
+  }
+
+  return new Collision({
+    'a': a,
+    'b': b,
+    'depth': min,
+    'normal': faceNormal,
+    'start': supportPoint.point.add(faceNormal.scale(min))
+  });
 }
 
-;// CONCATENATED MODULE: ./src/shape/regular.js
-
-
-
-class RegularPolygon extends Polygon {
-  constructor(x, y, radius, sides) {
-    super(x, y);
-
-    if (sides > 2) {
-      let angle = 360 / sides;
-      let v = new Vector(0, radius);
-
-      for (let i = 0; i < sides; i++) {
-        this.addPoint(v.x, v.y);
-        v = v.rotate(angle);
+/**
+ * Determine if two polygons collide.
+ *
+ * @param {Actor} actor - First polygon
+ * @param {Actor} actor - Second polygon
+ * @return {Collision} Object containing collision data
+ */
+function polygonCollidesWithPolygon(a, b) {
+  let collisionA = findAxisLeastPenetration(a, b);
+  if (collisionA) {
+    let collisionB = findAxisLeastPenetration(b, a);
+    if (collisionB) {
+      if (collisionA.depth < collisionB.depth) {
+        let v = collisionA.normal.scale(collisionA.depth);
+        return new Collision({
+          'a': a,
+          'b': b,
+          'depth': collisionA.depth,
+          'normal': collisionA.normal,
+          'start': collisionA.start.subtract(v)
+        });
+      } else {
+        return new Collision({
+          'a': a,
+          'b': b,
+          'depth': collisionB.depth,
+          'normal': collisionB.normal.scale(-1),
+          'start': collisionB.start
+        });
       }
     }
   }
+  return false;
 }
 
-function triangle(x, y, diameter) {
-  let shape = new RegularPolygon(x, y, diameter / 2, 3);
-  return shape;
-}
+/**
+ * Determine if two circles collide.
+ *
+ * @param {Actor} actor - First circle
+ * @param {Actor} actor - Second circle
+ * @return {Collision} Object containing collision data
+ */
+function circleCollidesWithCircle(a, b) {
+  let v = b.position.subtract(a.position);
+  let distance = v.length;
+  let radiusSum = a.boundingRadius + b.boundingRadius;
 
-function square(x, y, diameter) {
-  let shape = new RegularPolygon(x, y, diameter / 2, 4);
-  return shape;
-}
+  // Circles at exactly the same position
+  if (distance === 0) {
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': radiusSum,
+      'normal': new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(0, -1),
+      'start': a.boundingRadius > b.boundingRadius ?
+        new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(a.x, a.y + a.boundingRadius) :
+        new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(b.x, b.x + b.boundingRadius)
+    });
 
-function pentagon(x, y, diameter) {
-  let shape = new RegularPolygon(x, y, diameter / 2, 5);
-  return shape;
-}
-
-function hexagon(x, y, diameter) {
-  let shape = new RegularPolygon(x, y, diameter / 2, 6);
-  return shape;
-}
-
-function heptagon(x, y, diameter) {
-  let shape = new RegularPolygon(x, y, diameter / 2, 7);
-  return shape;
-}
-
-function octagon(x, y, diameter) {
-  let shape = new RegularPolygon(x, y, diameter / 2, 8);
-  return shape;
-}
-
-;// CONCATENATED MODULE: ./src/shape/semicircle.js
-
-
-class Semicircle extends Shape {
-  constructor(x, y, radius) {
-    super(x, y);
-    this.radius = radius;
-    this.boundingRadius = radius;
-  }
-
-  render(context) {
-    this.prerender(context);
-    let angleRadians = this.angle * (Math.PI / 180);
-    context.arc(this.x, this.y, this.radius, angleRadians, angleRadians + Math.PI);
-    this.postrender(context);
+  // Circles at different positions
+  } else {
+    let u = v.normalize().scale(-b.boundingRadius);
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': radiusSum - distance,
+      'normal': v.normalize(),
+      'start': b.position.add(u)
+    });
   }
 }
 
-function semicircle(x, y, diameter) {
-  const shape = new Semicircle(x, y, diameter / 2);
-  return shape;
-}
+/**
+ * Determine if a circle and polygon collide.
+ *
+ * @param {Actor} actor - Circle
+ * @param {Actor} actor - Polygon
+ * @return {Collision} Object containing collision data
+ */
+function circleCollidesWithPolygon(a, b) {
+  let inside = true;
+  let distance = false;
+  let edge = false;
 
-;// CONCATENATED MODULE: ./src/sprite/index.js
-
-
-class Sprite extends Actor {
-
-  /**
-   * Create a new image and add it to the stage.
-   *
-   * @constructor
-   * @param {int} x - Initial x coordinate
-   * @param {int} y - Initial y coordinate
-   * @param {string} imageUrl - Path to image
-   */
-  constructor(x, y, imageUrl) {
-    super(x, y);
-    this.image = new Image();
-    this.image.onload = () => this.loaded = true;
-    this.image.src = imageUrl;
-    this.scale = 1;
-  }
-
-  /**
-   * Render image.
-   *
-   * @param {CanvasRenderingContext2D} context - Canvas drawing context.
-   */
-  render(context) {
-    if (this.loaded) {
-      context.drawImage(
-        this.image,
-        this.x - (this.image.width * this.scale / 2),
-        this.y - (this.image.height * this.scale / 2),
-        this.image.width * this.scale,
-        this.image.height * this.scale
-      );
+  // Find closest edge
+  for (let i = 0; i < b.boundingPolygon.length; i++) {
+    let v = a.position.subtract(b.boundingPolygon[i]);
+    let projection = v.dot(b.faceNormals[i]);
+    if (projection > 0) {
+      distance = projection;
+      edge = i;
+      inside = false;
+      break;
+    }
+    if (distance == false || projection > distance) {
+      distance = projection;
+      edge = i;
     }
   }
-}
 
-function sprite_image(x, y, url) {
-  const sprite = new Sprite(x, y, url);
-  return sprite;
-}
+  // Center of circle is inside of polygon
+  if (inside) {
+    let v = b.faceNormals[edge].scale(a.radius);
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': a.radius - distance,
+      'normal': b.faceNormals[edge],
+      'start': a.position.subtract(v)
+    });
+  }
 
-;// CONCATENATED MODULE: ./src/shape/star.js
+  // Center of circle is outside of polygon
+  let v1 = a.position.subtract(b.boundingPolygon[edge]);
+  let v2 = b.boundingPolygon[(edge + 1) % b.boundingPolygon.length].subtract(b.boundingPolygon[edge]);
+  let dot = v1.dot(v2);
 
-
-
-class Star extends Polygon {
-  constructor(x, y, outerRadius, innerRadius, points = 5) {
-    super(x, y);
-
-    let angle = 360 / points;
-    let outerVector = new Vector(0, outerRadius);
-    let innerVector = new Vector(0, innerRadius);
-    innerVector = innerVector.rotate(angle / 2);
-
-    for (let i = 0; i < points; i++) {
-      this.addPoint(outerVector.x, outerVector.y);
-      this.addPoint(innerVector.x, innerVector.y);
-      outerVector = outerVector.rotate(angle);
-      innerVector = innerVector.rotate(angle);
+  // Circle in first corner region
+  if (dot < 0) {
+    distance = v1.length;
+    if (distance > a.radius) {
+      return false;
+    } else {
+      let normal = v1.normalize();
+      return new Collision({
+        'a': a,
+        'b': b,
+        'depth': a.radius - distance,
+        'normal': normal,
+        'start': a.position.add(normal.scale(-a.radius))
+      });
     }
   }
-}
 
-function star(x, y, outerRadius, innerRadius = false, points = 5) {
-  if (innerRadius === false) {
-    let goldenRatio = (1 + Math.sqrt(5)) / 2;
-    innerRadius = outerRadius * (1 / Math.pow(goldenRatio, 2));
+  v1 = a.position.subtract(b.boundingPolygon[(edge + 1) % b.boundingPolygon.length]);
+  v2 = v2.scale(-1);
+  dot = v1.dot(v2);
+
+  // Circle in second corner region
+  if (dot < 0) {
+    distance = v1.length;
+    if (distance > a.radius) {
+      return false;
+    } else {
+      let normal = v1.normalize();
+      return new Collision({
+        'a': a,
+        'b': b,
+        'depth': a.radius - distance,
+        'normal': normal,
+        'start': a.position.add(normal.scale(-a.radius))
+      });
+    }
   }
 
-  let shape = new Star(x, y, outerRadius, innerRadius, points);
-  return shape;
+  // Circle with projection of edge
+  if (distance < a.radius) {
+    let v = b.faceNormals[edge].scale(a.radius);
+    return new Collision({
+      'a': a,
+      'b': b,
+      'depth': a.radius - distance,
+      'normal': b.faceNormals[edge],
+      'start': a.position.subtract(v)
+    });
+  } else {
+    return false;
+  }
 }
 
-;// CONCATENATED MODULE: ./src/text/index.js
+/**
+ * Attempt to resolve a collision between two actors.
+ *
+ * @param {Collision} collision - Object containing collision data
+ */
+function resolveCollision(collision) {
+
+  // Both objects are anchored
+  if (collision.a.inverseMass === 0 && collision.b.inverseMass === 0) {
+    return;
+  }
+
+  // Reposition objects
+  let v = collision.normal.scale(
+    collision.depth / (collision.a.inverseMass + collision.b.inverseMass)
+  );
+  collision.a.position = collision.a.position.add(
+    v.scale(-collision.a.inverseMass)
+  );
+  collision.b.position = collision.b.position.add(
+    v.scale(collision.b.inverseMass)
+  );
+
+  // Determine point of collision
+  let start = collision.start.scale(
+    collision.b.inverseMass / (collision.a.inverseMass + collision.b.inverseMass)
+  );
+  let end = collision.end.scale(
+    collision.a.inverseMass / (collision.a.inverseMass + collision.b.inverseMass)
+  );
+  let p = start.add(end);
+  let r1 = p.subtract(collision.a.position);
+  let r2 = p.subtract(collision.b.position);
+
+  // Determine linear velocities at point of collision
+  let v1 = collision.a.velocity.add(new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(
+    -1 * collision.a.angularVelocity * r1.y,
+    collision.a.angularVelocity * r1.x
+  ));
+  let v2 = collision.b.velocity.add(new _core_vector__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z(
+    -1 * collision.b.angularVelocity * r2.y,
+    collision.b.angularVelocity * r2.x
+  ));
+
+  // Calculate relative velocities
+  let relativeVelocity = v2.subtract(v1);
+  let relativeVelocityInNormal = relativeVelocity.dot(collision.normal);
+
+  // Objects are already moving apart
+  if (relativeVelocityInNormal > 0) return;
+
+  // Apply impulse along normal
+  let bounciness = Math.min(collision.a.bounciness, collision.b.bounciness);
+  let friction = Math.min(collision.a.friction, collision.b.friction);
+  let r1CrossNormal = r1.cross(collision.normal);
+  let r2CrossNormal = r2.cross(collision.normal);
+  let jN = -(1 + bounciness) * relativeVelocityInNormal;
+  jN = jN / (
+    collision.a.inverseMass + collision.b.inverseMass +
+    Math.pow(r1CrossNormal, 2) * collision.a.inertia +
+    Math.pow(r2CrossNormal, 2) * collision.b.inertia
+  );
+
+  // Adjust linear velocity
+  collision.a.velocity = collision.a.velocity.subtract(
+    collision.normal.scale(jN * collision.a.inverseMass)
+  );
+  collision.b.velocity = collision.b.velocity.add(
+    collision.normal.scale(jN * collision.b.inverseMass)
+  );
+
+  // Adjust rotational velocity
+  collision.a.angularVelocity = collision.a.angularVelocity - (r1CrossNormal * jN * collision.a.inertia);
+  collision.b.angularVelocity = collision.b.angularVelocity + (r2CrossNormal * jN * collision.b.inertia);
+
+  // Apply impulse along tangent
+  let tangent = relativeVelocity.subtract(
+    collision.normal.scale(relativeVelocity.dot(collision.normal))
+  );
+  tangent = tangent.normalize().scale(-1);
+  let r1CrossTangent = r1.cross(tangent);
+  let r2CrossTangent = r2.cross(tangent);
+  let jT = -(1 + bounciness) * relativeVelocity.dot(tangent) * friction;
+  jT = jT / (
+    collision.a.inverseMass + collision.b.inverseMass +
+    Math.pow(r1CrossTangent, 2) * collision.a.inertia +
+    Math.pow(r2CrossTangent, 2) * collision.b.inertia
+  );
+  jT = Math.min(jT, jN);
+
+  // Adjust linear velocity
+  collision.a.velocity = collision.a.velocity.subtract(
+    tangent.scale(jT * collision.a.inverseMass)
+  );
+  collision.b.velocity = collision.b.velocity.add(
+    tangent.scale(jT * collision.b.inverseMass)
+  );
+
+  // Adjust angular velocity
+  collision.a.angularVelocity = collision.a.angularVelocity - (r1CrossTangent * jT * collision.a.inertia);
+  collision.b.angularVelocity = collision.b.angularVelocity + (r2CrossTangent * jT * collision.b.inertia);
+}
 
 
-class Text extends Actor {
+/***/ }),
+
+/***/ 470:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "jf": function() { return /* binding */ display; },
+/* harmony export */   "cW": function() { return /* binding */ write; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var _stage_actor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(913);
+
+
+class Text extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   constructor(x, y, text, live) {
     super(x, y);
     this.text = text;
@@ -8733,48 +8737,247 @@ function write(x, y, text) {
   return actor;
 }
 
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	!function() {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = function(exports, definition) {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	!function() {
+/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+!function() {
+
+// EXTERNAL MODULE: ./src/core/index.js
+var core = __webpack_require__(763);
+// EXTERNAL MODULE: ./src/events/index.js + 3 modules
+var events = __webpack_require__(193);
+// EXTERNAL MODULE: ./src/stage/collision.js
+var stage_collision = __webpack_require__(901);
+;// CONCATENATED MODULE: ./src/stage/index.js
+
+
+
+class Stage {
+
+  /**
+   * Create a new stage.
+   *
+   * @constructor
+   * @param {int} [width] - Optional stage width. Defaults to browser width.
+   * @param {int} [height] - Optional stage height. Defaults to browser height.
+   */
+  constructor(width = window.innerWidth, height = window.innerHeight) {
+    this.frame = 0;
+    this.width = width;
+    this.height = height;
+
+    // Stage properties
+    window.gravity = 1;
+    window.floor = true;
+
+    // Create canvas
+    let scale = window.devicePixelRatio;
+    this.canvas = document.createElement('canvas');
+    this.context = this.canvas.getContext('2d');
+    this.canvas.width = Math.floor(this.width * scale);
+    this.canvas.height = Math.floor(this.height * scale);
+    this.canvas.style.width = this.width + 'px';
+    this.canvas.style.height = this.height + 'px';
+    this.canvas.style.display = 'block';
+    this.context.scale(scale, scale);
+
+    // Set initial fill and stroke
+    window.fill = 'white';
+    window.stroke = 'black';
+    window.lineWidth = 2;
+
+    // Set initial font properties
+    window.font = 'Arial';
+    window.fontColor = 'black';
+    window.fontSize = '40px';
+
+    // Set global width and height
+    window.width = width;
+    window.height = height;
+
+    // Initialize
+    this.actors = [];
+    this.eventListeners = {};
+    this.render();
+  }
+
+  /**
+   * Resize the stage.
+   * This is often called by a resize event handler.
+   *
+   * @param {int} [width] - Optional stage width. Defaults to browser width.
+   * @param {int} [height] - Optional stage height. Defaults to browser height.
+   */
+  resize(width = window.innerWidth, height = window.innerHeight) {
+    this.width = width;
+    this.height = height;
+    let scale = window.devicePixelRatio;
+    this.canvas.width = Math.floor(this.width * scale);
+    this.canvas.height = Math.floor(this.height * scale);
+    this.canvas.style.width = this.width + 'px';
+    this.canvas.style.height = this.height + 'px';
+    this.context.scale(scale, scale);
+    window.width = width;
+    window.height = height;
+  }
+
+  /**
+   * Add an actor to the stage.
+   *
+   * @param {Actor} actor - Actor to add to the stage.
+   */
+  addChild(actor) {
+    this.actors.push(actor);
+  }
+
+  /**
+   * Clear all actors from the stage.
+   */
+  clear() {
+    this.actors = [];
+  }
+
+  /**
+   * Clear stage and reset fill and stroke.
+   */
+  reset() {
+    window.fill = 'white';
+    window.stroke = 'black';
+    window.lineWidth = 2;
+    window.tempo = 60;
+    this.clear();
+  }
+
+  /**
+   * Render a single frame.
+   */
+  render() {
+    this.frame++;
+    this.context.clearRect(0, 0, this.width, this.height);
+
+    // Detect collisions
+    for (let i = 0; i < this.actors.length; i++) {
+      for (let j = i + 1; j < this.actors.length; j++) {
+        let collision = this.actors[i].collidesWith(this.actors[j]);
+        if (collision) {
+          this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
+          this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
+          if (!(this.actors[i].anchored && this.actors[j].anchored)) {
+            (0,stage_collision/* resolveCollision */.WW)(collision);
+          }
+        }
+      }
+    }
+
+    // Update actors
+    for (let actor of this.actors) {
+      actor.update();
+      actor.render(this.context);
+    }
+
+    window._kidjs_.onframe();
+    requestAnimationFrame(() => this.render());
+  }
+
+  /**
+   * Add event listener to stage.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  addEventListener(event, handler) {
+    if (this.eventListeners[event] == undefined) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(handler);
+  }
+
+  /**
+   * Remove event listener from stage.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to remove.
+   */
+  removeEventListener(event, handler) {
+    if (this.eventListeners[event] !== undefined) {
+      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+    }
+  }
+
+  /**
+   * Execute event handler.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  dispatchEvent(event, context = window) {
+    if (this.eventListeners[event.type] !== undefined) {
+      for (let handler of this.eventListeners[event.type]) {
+        switch (event.constructor.name) {
+          case 'KeyboardEvent':
+            handler.call(context, event.key);
+            break;
+          default:
+            handler.call(context);
+        }
+      }
+    }
+  }
+}
+
 ;// CONCATENATED MODULE: ./src/index.js
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 
 // Initialize framework
 (0,core/* init */.S1)();
-
-// Assign functions to global object
-window.beep = beep;
-window.circle = circle;
-window.display = display;
-window.heptagon = heptagon;
-window.hexagon = hexagon;
-window.image = sprite_image;
-window.line = line;
-window.note = note;
-window.octagon = octagon;
-window.on = on;
-window.oval = oval;
-window.pentagon = pentagon;
-window.rect = rect;
-window.semicircle = semicircle;
-window.song = song;
-window.sound = sound;
-window.square = square;
-window.star = star;
-window.triangle = triangle;
-window.wait = core/* wait */.Dc;
-window.write = write;
 
 window.addEventListener('DOMContentLoaded', function() {
 
@@ -8785,7 +8988,7 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.appendChild(stage.canvas);
 
   // Setup events
-  events();
+  (0,events/* default */.Z)();
 
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');

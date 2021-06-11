@@ -29,6 +29,7 @@ export function init() {
       window.beep = beep;
       window.circle = circle;
       window.display = display;
+      window.frequency = frequency;
       window.heptagon = heptagon;
       window.hexagon = hexagon;
       window.image = image;
@@ -42,6 +43,7 @@ export function init() {
       window.semicircle = semicircle;
       window.song = song;
       window.sound = sound;
+      window.speak = speak;
       window.square = square;
       window.star = star;
       window.triangle = triangle;

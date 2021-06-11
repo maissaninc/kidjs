@@ -6697,11 +6697,11 @@ function generate(node, options) {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ts": function() { return /* binding */ frequency; },
 /* harmony export */   "JP": function() { return /* binding */ note; },
 /* harmony export */   "K_": function() { return /* binding */ song; },
 /* harmony export */   "Vp": function() { return /* binding */ beep; }
 /* harmony export */ });
-/* unused harmony export frequency */
 function frequency(frequency, duration = 0.25) {
   return new Promise((resolve) => {
 
@@ -6926,6 +6926,20 @@ function sound(url, autoplay) {
 
 /***/ }),
 
+/***/ 834:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "D": function() { return /* binding */ speak; }
+/* harmony export */ });
+function speak(text) {
+  let utterance = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utterance);
+}
+
+
+/***/ }),
+
 /***/ 763:
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
@@ -6937,18 +6951,21 @@ function sound(url, autoplay) {
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(193);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(193);
 /* harmony import */ var _audio__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(820);
-/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(639);
+/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(639);
+/* harmony import */ var _audio_speech__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(834);
 /* harmony import */ var _shape_circle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(516);
-/* harmony import */ var _shape_line__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(898);
-/* harmony import */ var _shape_oval__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(778);
-/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(85);
-/* harmony import */ var _shape_regular__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(511);
-/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(958);
-/* harmony import */ var _sprite__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(759);
-/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(806);
-/* harmony import */ var _text__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(470);
+/* harmony import */ var _shape_curve__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
+/* harmony import */ var _shape_line__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(898);
+/* harmony import */ var _shape_oval__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(778);
+/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(85);
+/* harmony import */ var _shape_regular__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(511);
+/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(958);
+/* harmony import */ var _sprite__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(759);
+/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(806);
+/* harmony import */ var _text__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(470);
+
 
 
 
@@ -6979,25 +6996,28 @@ function init() {
     setGlobals: function() {
       window.beep = _audio__WEBPACK_IMPORTED_MODULE_3__/* .beep */ .Vp;
       window.circle = _shape_circle__WEBPACK_IMPORTED_MODULE_4__/* .circle */ .X;
-      window.display = _text__WEBPACK_IMPORTED_MODULE_5__/* .display */ .jf;
-      window.heptagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .heptagon */ .cE;
-      window.hexagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .hexagon */ .bL;
-      window.image = _sprite__WEBPACK_IMPORTED_MODULE_7__/* .image */ .B;
-      window.line = _shape_line__WEBPACK_IMPORTED_MODULE_8__/* .line */ .j;
+      window.curve = _shape_curve__WEBPACK_IMPORTED_MODULE_5__/* .curve */ .Q;
+      window.display = _text__WEBPACK_IMPORTED_MODULE_6__/* .display */ .jf;
+      window.frequency = _audio__WEBPACK_IMPORTED_MODULE_3__/* .frequency */ .ts;
+      window.heptagon = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .heptagon */ .cE;
+      window.hexagon = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .hexagon */ .bL;
+      window.image = _sprite__WEBPACK_IMPORTED_MODULE_8__/* .image */ .B;
+      window.line = _shape_line__WEBPACK_IMPORTED_MODULE_9__/* .line */ .j;
       window.note = _audio__WEBPACK_IMPORTED_MODULE_3__/* .note */ .JP;
-      window.octagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .octagon */ .ky;
-      window.on = _events__WEBPACK_IMPORTED_MODULE_9__.on;
-      window.oval = _shape_oval__WEBPACK_IMPORTED_MODULE_10__/* .oval */ .B;
-      window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .pentagon */ .BR;
-      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_11__/* .rect */ .J;
-      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_12__/* .semicircle */ .g;
+      window.octagon = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .octagon */ .ky;
+      window.on = _events__WEBPACK_IMPORTED_MODULE_10__.on;
+      window.oval = _shape_oval__WEBPACK_IMPORTED_MODULE_11__/* .oval */ .B;
+      window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .pentagon */ .BR;
+      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_12__/* .rect */ .J;
+      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_13__/* .semicircle */ .g;
       window.song = _audio__WEBPACK_IMPORTED_MODULE_3__/* .song */ .K_;
-      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_13__/* .sound */ .e;
-      window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .square */ .h6;
-      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_14__/* .star */ .h;
-      window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_6__/* .triangle */ .cP;
+      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_14__/* .sound */ .e;
+      window.speak = _audio_speech__WEBPACK_IMPORTED_MODULE_15__/* .speak */ .D;
+      window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .square */ .h6;
+      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_16__/* .star */ .h;
+      window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .triangle */ .cP;
       window.wait = wait;
-      window.write = _text__WEBPACK_IMPORTED_MODULE_5__/* .write */ .cW;
+      window.write = _text__WEBPACK_IMPORTED_MODULE_6__/* .write */ .cW;
     },
 
     onframe: function() {
@@ -7198,7 +7218,7 @@ async function wait(seconds) {
 async function step(location) {
   window.dispatchEvent(new CustomEvent('KID.step', {
     detail: {
-      line: _shape_line__WEBPACK_IMPORTED_MODULE_8__/* .line */ .j,
+      line: _shape_line__WEBPACK_IMPORTED_MODULE_9__/* .line */ .j,
       column: column
     }
   }));
@@ -7488,6 +7508,72 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function circle(x, y, diameter) {
   const shape = new Circle(x, y, diameter / 2);
+  return shape;
+}
+
+
+/***/ }),
+
+/***/ 7:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Q": function() { return /* binding */ curve; }
+/* harmony export */ });
+/* unused harmony export default */
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(599);
+
+
+
+class Curve extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
+  constructor(args) {
+    super();
+    this.points = [];
+    for (let i = 0; i < args.length - 1; i = i + 2) {
+      this.points.push(new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(args[i], args[i+1]));
+    }
+    console.log(this.points);
+  }
+
+  drawSpline(context) {
+    let points = [...this.points];
+    points.unshift(points[0]);
+    points.unshift(points[0]);
+    points.push(points[points.length-1]);
+    points.push(points[points.length-1]);
+    context.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 3; i++) {
+      for (let t = 0; t <= 1; t += 0.1) {
+        let ax = (-points[i].x + 3 * points[i + 1].x - 3 * points[i + 2].x + points[i + 3].x) / 6;
+        let ay = (-points[i].y + 3 * points[i + 1].y - 3 * points[i + 2].y + points[i + 3].y) / 6;
+        let bx = (points[i].x - 2 * points[i + 1].x + points[i + 2].x) / 2;
+        let by = (points[i].y - 2 * points[i + 1].y + points[i + 2].y) / 2;
+        let cx = (-points[i].x + points[i + 2].x) / 2;
+        let cy = (-points[i].y + points[i + 2].y) / 2;
+        let dx = (points[i].x + 4 * points[i + 1].x + points[i + 2].x) / 6;
+        let dy = (points[i].y + 4 * points[i + 1].y + points[i + 2].y) / 6;
+        context.lineTo(
+          ax * Math.pow(t, 3) + bx * Math.pow(t, 2) + cx * t + dx,
+          ay * Math.pow(t, 3) + by * Math.pow(t, 2) + cy * t + dy
+        );
+      }
+    }
+  }
+
+  render(context) {
+    this.prerender(context);
+    this.drawSpline(context);
+    this.postrender(context);
+  }
+
+  postrender(context) {
+    context.stroke();
+  }
+}
+
+function curve(...args) {
+  let shape = new Curve(args);
   return shape;
 }
 

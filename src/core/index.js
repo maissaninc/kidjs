@@ -8,6 +8,7 @@ import { beep, frequency, note, song } from '../audio';
 import { sound } from '../audio/sound';
 import { speak } from '../audio/speech';
 import { circle } from '../shape/circle';
+import { curve } from '../shape/curve';
 import { line } from '../shape/line';
 import { oval } from '../shape/oval';
 import { rect } from '../shape/rect';
@@ -28,6 +29,7 @@ export function init() {
     setGlobals: function() {
       window.beep = beep;
       window.circle = circle;
+      window.curve = curve;
       window.display = display;
       window.frequency = frequency;
       window.heptagon = heptagon;

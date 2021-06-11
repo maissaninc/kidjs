@@ -17,6 +17,7 @@ import { semicircle } from '../shape/semicircle';
 import { image } from '../sprite';
 import { star } from '../shape/star';
 import { display, write } from '../text';
+import { random } from './math';
 
 let triggers = [];
 
@@ -41,6 +42,7 @@ export function init() {
       window.on = on;
       window.oval = oval;
       window.pentagon = pentagon;
+      window.random = random;
       window.rect = rect;
       window.semicircle = semicircle;
       window.song = song;

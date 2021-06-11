@@ -6953,18 +6953,20 @@ function speak(text) {
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(193);
 /* harmony import */ var _audio__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(820);
-/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(639);
-/* harmony import */ var _audio_speech__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(834);
+/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(639);
+/* harmony import */ var _audio_speech__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(834);
 /* harmony import */ var _shape_circle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(516);
 /* harmony import */ var _shape_curve__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
 /* harmony import */ var _shape_line__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(898);
 /* harmony import */ var _shape_oval__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(778);
-/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(85);
+/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(85);
 /* harmony import */ var _shape_regular__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(511);
-/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(958);
+/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(958);
 /* harmony import */ var _sprite__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(759);
-/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(806);
+/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(806);
 /* harmony import */ var _text__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(470);
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(188);
+
 
 
 
@@ -7008,13 +7010,14 @@ function init() {
       window.on = _events__WEBPACK_IMPORTED_MODULE_10__.on;
       window.oval = _shape_oval__WEBPACK_IMPORTED_MODULE_11__/* .oval */ .B;
       window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .pentagon */ .BR;
-      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_12__/* .rect */ .J;
-      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_13__/* .semicircle */ .g;
+      window.random = _math__WEBPACK_IMPORTED_MODULE_12__/* .random */ .M;
+      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_13__/* .rect */ .J;
+      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_14__/* .semicircle */ .g;
       window.song = _audio__WEBPACK_IMPORTED_MODULE_3__/* .song */ .K_;
-      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_14__/* .sound */ .e;
-      window.speak = _audio_speech__WEBPACK_IMPORTED_MODULE_15__/* .speak */ .D;
+      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_15__/* .sound */ .e;
+      window.speak = _audio_speech__WEBPACK_IMPORTED_MODULE_16__/* .speak */ .D;
       window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .square */ .h6;
-      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_16__/* .star */ .h;
+      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_17__/* .star */ .h;
       window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_7__/* .triangle */ .cP;
       window.wait = wait;
       window.write = _text__WEBPACK_IMPORTED_MODULE_6__/* .write */ .cW;
@@ -7229,6 +7232,38 @@ async function step(location) {
 
 function end() {
   window.dispatchEvent(new Event('KID.complete'));
+}
+
+
+/***/ }),
+
+/***/ 188:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "M": function() { return /* binding */ random; }
+/* harmony export */ });
+/**
+ * Return a random number.
+ *
+ * @constructor
+ * @param {int} a - Minimum value
+ * @param {int} b - Maximum value
+ */
+function random(a, b) {
+
+  // Return random decimal between 0 and 1
+  if (typeof a == 'undefined' && typeof b == 'undefined') {
+    return Math.random();
+  }
+
+  // Return random integer between 0 and first parameter
+  if (typeof b == 'undefined') {
+    return Math.round(Math.random() * a);
+  }
+
+  // Return random integer between first and second parameters
+  return Math.round(Math.random() * (b - a) + a);
 }
 
 

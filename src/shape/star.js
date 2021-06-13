@@ -19,10 +19,15 @@ export default class Star extends Polygon {
   }
 }
 
-export function star(x, y, outerRadius, innerRadius = false, points = 5) {
-  if (innerRadius === false) {
+export function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
+
+  let outerRadius = outerDiameter / 2;
+
+  if (innerDiameter === false) {
     let goldenRatio = (1 + Math.sqrt(5)) / 2;
     innerRadius = outerRadius * (1 / Math.pow(goldenRatio, 2));
+  } else {
+    innerRadius = innerDiameter / 2;
   }
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);

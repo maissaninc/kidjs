@@ -24,7 +24,7 @@ export default function() {
 /**
  * Clear all event listeners
  */
-export function clearEventListeners() {
+export function removeAllEventListeners() {
   for (let listener of listeners) {
     window.removeEventListener(listener.type, listener.listener);
   }

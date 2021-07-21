@@ -8,7 +8,6 @@ export default class Curve extends Shape {
     for (let i = 0; i < args.length - 1; i = i + 2) {
       this.points.push(new Vector(args[i], args[i+1]));
     }
-    console.log(this.points);
   }
 
   drawSpline(context) {

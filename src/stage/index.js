@@ -95,6 +95,7 @@ export default class Stage {
     window.lineWidth = 2;
     window.tempo = 60;
     this.clear();
+    this.removeAllEventListeners();
   }
 
   /**
@@ -151,6 +152,13 @@ export default class Stage {
     if (this.eventListeners[event] !== undefined) {
       this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
     }
+  }
+
+  /**
+   * Remove all event listeners from stage.
+   */
+  removeAllEventListeners() {
+    this.eventListeners = {};
   }
 
   /**

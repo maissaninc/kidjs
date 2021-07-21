@@ -6986,7 +6986,6 @@ function speak(text) {
 
 
 
-
 let triggers = [];
 
 function init() {
@@ -7199,6 +7198,7 @@ function createStepStatement(location) {
 
 function reset() {
   triggers = [];
+  (0,_events__WEBPACK_IMPORTED_MODULE_10__/* .removeAllEventListeners */ .R)();
   window.stage.reset();
 }
 
@@ -7337,7 +7337,8 @@ class Vector {
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   "Z": function() { return /* binding */ events; },
-  "on": function() { return /* binding */ on; }
+  "on": function() { return /* binding */ on; },
+  "R": function() { return /* binding */ removeAllEventListeners; }
 });
 
 ;// CONCATENATED MODULE: ./src/events/keyboard.js
@@ -7496,10 +7497,32 @@ function onDeviceOrientation(e) {
 
 
 
+let parentAddEventListener;
+let listeners = [];
+
 /* harmony default export */ function events() {
   keyboard();
   mouse();
   device_orientation();
+
+  // Intercept adding event listeners
+  parentAddEventListener = window.addEventListener;
+  window.addEventListener = function(type, listener, capture) {
+    listeners.push({
+      type: type,
+      listener: listener
+    });
+    parentAddEventListener(type, listener, capture);
+  }
+}
+
+/**
+ * Clear all event listeners
+ */
+function removeAllEventListeners() {
+  for (let listener of listeners) {
+    window.removeEventListener(listener.type, listener.listener);
+  }
 }
 
 /**
@@ -7568,7 +7591,6 @@ class Curve extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     for (let i = 0; i < args.length - 1; i = i + 2) {
       this.points.push(new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(args[i], args[i+1]));
     }
-    console.log(this.points);
   }
 
   drawSpline(context) {
@@ -8064,11 +8086,11 @@ class Star extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   }
 }
 
-function star(x, y, outerRadius, innerRadius = false, points = 5) {
-  if (innerRadius === false) {
-    let goldenRatio = (1 + Math.sqrt(5)) / 2;
-    innerRadius = outerRadius * (1 / Math.pow(goldenRatio, 2));
-  }
+function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
+
+  let goldenRatio = (1 + Math.sqrt(5)) / 2;
+  let outerRadius = outerDiameter / 2;
+  let innerRadius = innerDiameter !== false ? innerDiameter / 2 : outerRadius * (1 / Math.pow(goldenRatio, 2));
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
   return shape;
@@ -9014,6 +9036,7 @@ class Stage {
     window.lineWidth = 2;
     window.tempo = 60;
     this.clear();
+    this.removeAllEventListeners();
   }
 
   /**
@@ -9070,6 +9093,13 @@ class Stage {
     if (this.eventListeners[event] !== undefined) {
       this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
     }
+  }
+
+  /**
+   * Remove all event listeners from stage.
+   */
+  removeAllEventListeners() {
+    this.eventListeners = {};
   }
 
   /**

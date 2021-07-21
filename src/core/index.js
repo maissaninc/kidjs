@@ -3,7 +3,7 @@ import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { removeAllEventListeners } from '../events';
 
-import { on } from '../events';
+import { clearEventListeners, on } from '../events';
 import { beep, frequency, note, song } from '../audio';
 import { sound } from '../audio/sound';
 import { speak } from '../audio/speech';
@@ -231,6 +231,7 @@ function createStepStatement(location) {
 
 export function reset() {
   triggers = [];
+  clearEventListeners();
   window.stage.reset();
 }
 

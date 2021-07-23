@@ -1,4 +1,4 @@
-import { init, run } from './core';
+import { init, run, stop } from './core';
 import initEvents from './events';
 import Stage from './stage';
 
@@ -28,5 +28,6 @@ window.addEventListener('resize', function() {
 });
 
 window.KID = {
-  'run': run
+  'run': run,
+  'stop': stop
 };

@@ -6947,7 +6947,7 @@ function speak(text) {
 /* harmony export */   "S1": function() { return /* binding */ init; },
 /* harmony export */   "KH": function() { return /* binding */ run; }
 /* harmony export */ });
-/* unused harmony exports reset, wait */
+/* unused harmony exports reset, stop, wait */
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
@@ -7204,12 +7204,18 @@ function reset() {
 
 async function run(code) {
   try {
+    window.stage.run();
     let processed = await compile(code);
     reset();
     eval(processed);
   } catch(exception) {
     console.log(exception);
   }
+}
+
+function stop() {
+  window.stage.stop();
+  reset();
 }
 
 async function wait(seconds) {
@@ -8952,6 +8958,7 @@ class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   constructor(width = window.innerWidth, height = window.innerHeight) {
+    this.running = false;
     this.frame = 0;
     this.width = width;
     this.height = height;
@@ -8988,7 +8995,6 @@ class Stage {
     // Initialize
     this.actors = [];
     this.eventListeners = {};
-    this.render();
   }
 
   /**
@@ -9040,34 +9046,51 @@ class Stage {
   }
 
   /**
+   * Start rendering
+   */
+  run() {
+    this.running = true;
+    this.render();
+  }
+
+  /**
+   * Stop rendering
+   */
+  stop() {
+    this.running = false;
+  }
+
+  /**
    * Render a single frame.
    */
   render() {
-    this.frame++;
-    this.context.clearRect(0, 0, this.width, this.height);
+    if (this.running) {
+      this.frame++;
+      this.context.clearRect(0, 0, this.width, this.height);
 
-    // Detect collisions
-    for (let i = 0; i < this.actors.length; i++) {
-      for (let j = i + 1; j < this.actors.length; j++) {
-        let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision) {
-          this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
-          this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
-          if (!(this.actors[i].anchored && this.actors[j].anchored)) {
-            (0,stage_collision/* resolveCollision */.WW)(collision);
+      // Detect collisions
+      for (let i = 0; i < this.actors.length; i++) {
+        for (let j = i + 1; j < this.actors.length; j++) {
+          let collision = this.actors[i].collidesWith(this.actors[j]);
+          if (collision) {
+            this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
+            this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
+            if (!(this.actors[i].anchored && this.actors[j].anchored)) {
+              (0,stage_collision/* resolveCollision */.WW)(collision);
+            }
           }
         }
       }
-    }
 
-    // Update actors
-    for (let actor of this.actors) {
-      actor.update();
-      actor.render(this.context);
-    }
+      // Update actors
+      for (let actor of this.actors) {
+        actor.update();
+        actor.render(this.context);
+      }
 
-    window._kidjs_.onframe();
-    requestAnimationFrame(() => this.render());
+      window._kidjs_.onframe();
+      requestAnimationFrame(() => this.render());
+    }
   }
 
   /**

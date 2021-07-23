@@ -11,6 +11,7 @@ export default class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   constructor(width = window.innerWidth, height = window.innerHeight) {
+    this.running = false;
     this.frame = 0;
     this.width = width;
     this.height = height;
@@ -47,7 +48,6 @@ export default class Stage {
     // Initialize
     this.actors = [];
     this.eventListeners = {};
-    this.render();
   }
 
   /**
@@ -99,34 +99,51 @@ export default class Stage {
   }
 
   /**
+   * Start rendering
+   */
+  run() {
+    this.running = true;
+    this.render();
+  }
+
+  /**
+   * Stop rendering
+   */
+  stop() {
+    this.running = false;
+  }
+
+  /**
    * Render a single frame.
    */
   render() {
-    this.frame++;
-    this.context.clearRect(0, 0, this.width, this.height);
+    if (this.running) {
+      this.frame++;
+      this.context.clearRect(0, 0, this.width, this.height);
 
-    // Detect collisions
-    for (let i = 0; i < this.actors.length; i++) {
-      for (let j = i + 1; j < this.actors.length; j++) {
-        let collision = this.actors[i].collidesWith(this.actors[j]);
-        if (collision) {
-          this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
-          this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
-          if (!(this.actors[i].anchored && this.actors[j].anchored)) {
-            resolveCollision(collision);
+      // Detect collisions
+      for (let i = 0; i < this.actors.length; i++) {
+        for (let j = i + 1; j < this.actors.length; j++) {
+          let collision = this.actors[i].collidesWith(this.actors[j]);
+          if (collision) {
+            this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
+            this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
+            if (!(this.actors[i].anchored && this.actors[j].anchored)) {
+              resolveCollision(collision);
+            }
           }
         }
       }
-    }
 
-    // Update actors
-    for (let actor of this.actors) {
-      actor.update();
-      actor.render(this.context);
-    }
+      // Update actors
+      for (let actor of this.actors) {
+        actor.update();
+        actor.render(this.context);
+      }
 
-    window._kidjs_.onframe();
-    requestAnimationFrame(() => this.render());
+      window._kidjs_.onframe();
+      requestAnimationFrame(() => this.render());
+    }
   }
 
   /**

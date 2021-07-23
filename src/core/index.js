@@ -236,12 +236,18 @@ export function reset() {
 
 export async function run(code) {
   try {
+    window.stage.run();
     let processed = await compile(code);
     reset();
     eval(processed);
   } catch(exception) {
     console.log(exception);
   }
+}
+
+export function stop() {
+  window.stage.stop();
+  reset();
 }
 
 export async function wait(seconds) {

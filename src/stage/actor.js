@@ -51,6 +51,7 @@ export default class Actor {
   set y(value) { this.position.y = value; }
 
   get inverseMass() {
+    if (this.anchored) return 0;
     return this.mass === 0 ? 0 : 1 / this.mass;
   }
 

@@ -6945,9 +6945,10 @@ function speak(text) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "S1": function() { return /* binding */ init; },
-/* harmony export */   "KH": function() { return /* binding */ run; }
+/* harmony export */   "KH": function() { return /* binding */ run; },
+/* harmony export */   "sT": function() { return /* binding */ stop; }
 /* harmony export */ });
-/* unused harmony exports reset, stop, wait */
+/* unused harmony exports reset, wait */
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
@@ -9176,7 +9177,8 @@ window.addEventListener('resize', function() {
 });
 
 window.KID = {
-  'run': core/* run */.KH
+  'run': core/* run */.KH,
+  'stop': core/* stop */.sT
 };
 
 }();

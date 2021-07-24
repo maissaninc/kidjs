@@ -65,6 +65,11 @@ export default class Actor {
   update() {
     this.frame++;
 
+    // Unanchor if non-zero velocity
+    if (this.velocity.x != 0 || this.velocity.y != 0) {
+      this.anchored = false;
+    }
+
     // Update position
     this.position = this.position.add(this.velocity);
     this.angle = this.angle + this.angularVelocity;

@@ -7,26 +7,25 @@
   <body>
     <script type="kidjs">
 
-      fill = 'random';
+      let ball = circle(width/2, height/2, 32, 32)
+      ball.anchored = false;
+      let player1 = rect(width/2-55, 22, 110 , 22)
+      let player2 = rect(width/2-55, height-22, 110 , 22)
+      ball.fill = 'red'
+      player1.fill = 'green'
+      player2.fill = 'blue'
 
-      let c = curve(300, 300, 350, 350, 400, 300);
+      //ball.velocity.y = 0.6
+      //ball.velocity.x = 0.1
 
-      let a = circle(100, 100, 100);
-      let b = rect(300, 100, 100, 100);
+      function keydown(key) {
+        if (key == 'a') player1.move(-5)
+        if (key == 'd') player1.move(5)
+        if (key == 'ArrowLeft') player2.move(-5)
+        if (key == 'ArrowRight') player2.move(5)
+      }
 
-      on('keydown', function(key) {
-        if (key == 'd') {
-          a.move(10, 0);
-        }
-      });
-
-      a.on('collision', function(x, y) {
-        x.fill = 'yellow';
-        y.fill = 'red';
-      });
-
-      display(10, 10, a.position.x);
-      write(10, 50, random(1, 6));
+      on('keydown', keydown)
 
     </script>
   </body>

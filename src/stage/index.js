@@ -1,5 +1,5 @@
 import { evaluateTriggers } from '../core';
-import { resolveCollision } from './collision';
+import Matter from 'matter-js';
 
 export default class Stage {
 
@@ -11,6 +11,7 @@ export default class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   constructor(width = window.innerWidth, height = window.innerHeight) {
+    this.engine = Matter.Engine.create();
     this.running = false;
     this.frame = 0;
     this.width = width;
@@ -78,6 +79,9 @@ export default class Stage {
    */
   addChild(actor) {
     this.actors.push(actor);
+    if (actor.body) {
+      Matter.Composite.add(this.engine.world, actor.body);
+    }
   }
 
   /**
@@ -123,20 +127,29 @@ export default class Stage {
       this.context.clearRect(0, 0, this.width, this.height);
 
       // Detect collisions
-      for (let i = 0; i < this.actors.length; i++) {
+      /*for (let i = 0; i < this.actors.length; i++) {
         for (let j = i + 1; j < this.actors.length; j++) {
           let collision = this.actors[i].collidesWith(this.actors[j]);
           if (collision) {
             this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
             this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
             if (!(this.actors[i].anchored && this.actors[j].anchored)) {
+              console.log(this.actors[i]);
+              console.log(this.actors[j]);
+              console.log(collision);
               resolveCollision(collision);
+              console.log(this.actors[i]);
+              console.log(this.actors[j]);
+              //KID.stop();
             }
           }
         }
-      }
+      }*/
 
-      // Update actors
+      // Update physics simulation
+      Matter.Engine.update(this.engine);
+
+      // Render actors
       for (let actor of this.actors) {
         actor.update();
         actor.render(this.context);

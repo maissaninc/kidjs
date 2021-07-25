@@ -10,8 +10,8 @@ export default class Polygon extends Shape {
    * @param {int} x - Initial x coordinate
    * @param {int} y - Initial y coordinate
    */
-  constructor(x, y) {
-    super(x, y);
+  constructor(x, y, body) {
+    super(x, y, body);
     this.points = [];
     this._boundingPolygon = [];
   }
@@ -39,7 +39,6 @@ export default class Polygon extends Shape {
     }
     this.points.push(v);
     this.updateBoundingPolygon();
-    this.updateFaceNormals();
   }
 
   /**
@@ -74,35 +73,6 @@ export default class Polygon extends Shape {
         }
         p = q;
       } while (p != leftmost)
-    }
-  }
-
-  /**
-   * Compute face normals. These are used in collision detection.
-   */
-  updateFaceNormals() {
-    this.faceNormals = [];
-    if (this._boundingPolygon.length > 2) {
-
-      // Determine if points are clockwise
-      let sum = 0;
-      for (let i = 0; i < this._boundingPolygon.length; i++) {
-        let p1 = this._boundingPolygon[i];
-        let p2 = this._boundingPolygon[(i + 1) % this._boundingPolygon.length];
-        sum = sum + (p2.x - p1.x) * (p2.y + p1.y);
-      }
-      const clockwise = (sum >= 0);
-
-      // Calculate face normal for each edge
-      for (let i = 0; i < this._boundingPolygon.length; i++) {
-        let edge = this._boundingPolygon[i].subtract(
-          this._boundingPolygon[(i + 1) % this._boundingPolygon.length]
-        );
-        let perpendicular = clockwise ?
-          new Vector(edge.y, -edge.x) :
-          new Vector(-edge.y, edge.x);
-        this.faceNormals.push(perpendicular.normalize());
-      }
     }
   }
 

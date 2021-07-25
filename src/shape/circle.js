@@ -1,8 +1,10 @@
 import Shape from './';
+import Matter from 'matter-js';
 
 export default class Circle extends Shape {
   constructor(x, y, radius) {
-    super(x, y);
+    let body = Matter.Bodies.circle(x, y, radius);
+    super(x, y, body);
     this.radius = radius;
     this.boundingRadius = radius;
   }

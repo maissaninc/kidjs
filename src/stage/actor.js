@@ -1,7 +1,6 @@
 import Circle from '../shape/circle';
-import Collision from './collision';
-import { circleCollidesWithCircle, polygonCollidesWithPolygon, circleCollidesWithPolygon } from './collision';
 import Vector from '../core/vector';
+import Matter from 'matter-js';
 
 export default class Actor {
 
@@ -11,28 +10,24 @@ export default class Actor {
    * @constructor
    * @param {int} x - Initial x coordinate
    * @param {int} y - Initial y coordinate
+   * @param {Matter.Body} [body] - Optional Matter.js body
    * @param {Stage} [stage] - Optional stage to add actor to. Defaults to stage object on window.
    */
-  constructor(x, y, stage) {
+  constructor(x, y, body, stage) {
     this.frame = 0;
     this.state = 'default';
     this.position = new Vector(x, y);
-    this.velocity = new Vector(0, 0);
-    this.acceleration = new Vector(0, 0);
     this.angle = 0;
-    this.angularVelocity = 0;
-    this.angularAcceleration = 0;
-    this.mass = 1;
-    this.friction = 0.8;
-    this.bounciness = 0.2;
-    this.anchored = true;
-
-    // Bounds
-    this.boundingRadius = 0;
-    this.faceNormals = [];
-
-    // Destination coordinates
     this.destination = new Vector(x, y);
+
+    // Body for physics simulation
+    if (body) {
+      this.body = body;
+      Matter.Body.set(this.body, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
 
     // Event listeners
     this.eventListeners = {};
@@ -45,18 +40,18 @@ export default class Actor {
     }
   }
 
-  get x() { return this.position.x; }
-  get y() { return this.position.y; }
-  set x(value) { this.position.x = value; }
-  set y(value) { this.position.y = value; }
-
-  get inverseMass() {
-    if (this.anchored) return 0;
-    return this.mass === 0 ? 0 : 1 / this.mass;
+  get x() {
+    return this.body ? this.body.position.x : this.position.x;
   }
 
-  get inertia() {
-    return this.mass * Math.pow(this.boundingRadius, 2);
+  get y() {
+    return this.body ? this.body.position.y : this.position.y;
+  }
+
+  set anchored(value) {
+    if (this.body) {
+      Matter.Body.setStatic(this.body, value);
+    }
   }
 
   /**
@@ -65,27 +60,6 @@ export default class Actor {
    */
   update() {
     this.frame++;
-
-    // Unanchor if non-zero velocity
-    if (this.velocity.x != 0 || this.velocity.y != 0) {
-      this.anchored = false;
-    }
-
-    // Update position
-    this.position = this.position.add(this.velocity);
-    this.angle = this.angle + this.angularVelocity;
-
-    // Apply gravity
-    if (!this.anchored) {
-      this.velocity.y = this.velocity.y + parseInt(window.gravity) / 2;
-      if (window.floor && this.position.y > stage.height) {
-        this.position.y = stage.height;
-      }
-    }
-
-    // Update velocity
-    this.velocity = this.velocity.add(this.acceleration);
-    this.angularVelocity = this.angularVelocity + this.angularAcceleration;
 
     // Move along vector to destination
     if (this.status == 'sliding') {
@@ -107,6 +81,9 @@ export default class Actor {
    */
   rotate(degrees) {
     this.angle = this.angle + degrees;
+    if (this.body) {
+      Matter.Body.setAngle(this.angle);
+    }
     return this;
   }
 
@@ -120,6 +97,9 @@ export default class Actor {
   move(x = 0, y = 0) {
     this.position.x = this.position.x + x;
     this.position.y = this.position.y + y;
+    if (this.body) {
+      Matter.Body.setPosition(this.body, this.position);
+    }
     return this;
   }
 
@@ -134,6 +114,9 @@ export default class Actor {
       this.status = 'sliding';
       this.destination.x = this.position.x + x;
       this.destination.y = this.position.y + y;
+      if (this.body) {
+        Matter.Body.setPosition(this.body, this.position);
+      }
   }
 
   /**
@@ -143,16 +126,18 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   spin(speed = 5) {
-    this.angularVelocity = speed;
+    if (this.body) {
+      Matter.Body.setAngularVelocity(this.body, speed);
+    }
     return this;
   }
 
   stop() {
-    this.angularVelocity = 0;
-    this.velocity.x = 0;
-    this.velocity.y = 0;
-    this.acceleration.x = 0;
-    this.acceleration.y = 0;
+    if (this.body) {
+      Matter.Body.setAngularVelocity(this.body, 0);
+      Matter.Body.setVelocity(new Vector(0, 0));
+      Matter.Body.setAcceleration(new Vector(0, 0));
+    }
     this.frame = 0;
     this.state = 'default';
   }
@@ -201,41 +186,6 @@ export default class Actor {
       let v = this.position.subtract(new Vector(x, y));
       let distance = v.length;
       return (distance < this.boundingRadius);
-    }
-  }
-
-  /**
-   * Detect if this actor collects with another actor.
-   *
-   * @param {Actor} actor - Second actor
-   * @returns {(Collision|false)} Object containing collision data, or false if no collision occured.
-   */
-  collidesWith(actor) {
-    let v = this.position.subtract(actor.position);
-    let distance = v.length;
-    let radiusSum = this.boundingRadius + actor.boundingRadius;
-
-    // Bounding circles do not collide
-    if (distance >= radiusSum) {
-      return false;
-    }
-
-    // Circle colliding with circle
-    if (this.constructor.name === 'Circle' && actor.constructor.name === 'Circle') {
-      return circleCollidesWithCircle(this, actor);
-    }
-
-    // Polygon colliding with polygon
-    if (this.isPolygon() && actor.isPolygon()) {
-      return polygonCollidesWithPolygon(this, actor);
-    }
-
-    // Circle colliding with polygon
-    if (this.constructor.name === 'Circle' && actor.isPolygon()) {
-      return circleCollidesWithPolygon(this, actor);
-    }
-    if (actor.constructor.name === 'Circle' && this.isPolygon()) {
-      return circleCollidesWithPolygon(actor, this);
     }
   }
 

@@ -48,5 +48,6 @@ export default class Curve extends Shape {
 
 export function curve(...args) {
   let shape = new Curve(args);
+  window.stage.addChild(shape);
   return shape;
 }

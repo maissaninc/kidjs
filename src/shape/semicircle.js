@@ -4,7 +4,6 @@ export default class Semicircle extends Shape {
   constructor(x, y, radius) {
     super(x, y);
     this.radius = radius;
-    this.boundingRadius = radius;
   }
 
   render(context) {
@@ -17,5 +16,6 @@ export default class Semicircle extends Shape {
 
 export function semicircle(x, y, diameter) {
   const shape = new Semicircle(x, y, diameter / 2);
+  window.stage.addChild(shape);
   return shape;
 }

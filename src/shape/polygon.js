@@ -1,5 +1,6 @@
 import Shape from './';
 import Vector from '../core/vector';
+import Matter from 'matter-js';
 
 export default class Polygon extends Shape {
 
@@ -14,6 +15,16 @@ export default class Polygon extends Shape {
     super(x, y, body);
     this.points = [];
     this._boundingPolygon = [];
+  }
+
+  get body() {
+    if (!this._body) {
+      this._body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
+    return this._body;
   }
 
   get boundingPolygon() {

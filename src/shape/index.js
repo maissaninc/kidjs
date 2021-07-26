@@ -1,8 +1,8 @@
 import Actor from '../stage/actor';
 
 export default class Shape extends Actor {
-  constructor(x, y, body) {
-    super(x, y, body);
+  constructor(x, y) {
+    super(x, y);
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;

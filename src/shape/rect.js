@@ -3,18 +3,29 @@ import Matter from 'matter-js';
 
 export default class Rect extends Polygon {
   constructor(x, y, width, height) {
-    x = x + (width / 2);
-    y = y + (height / 2);
-    let body = Matter.Bodies.rectangle(x, y, width, height);
-    super(x, y, body);
+    super(x + width / 2, y + height / 2);
+    this.width = width;
+    this.height = height;
     this.addPoint(-width / 2, -height / 2);
     this.addPoint(width / 2, -height / 2);
     this.addPoint(width / 2, height / 2);
     this.addPoint(-width / 2, height / 2)
   }
+
+  get body() {
+    if (!this._body) {
+      console.log(this.position);
+      this._body = Matter.Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
+    return this._body;
+  }
 }
 
 export function rect(x, y, width, height) {
   const shape = new Rect(x, y, width, height);
+  window.stage.addChild(shape);
   return shape;
 }

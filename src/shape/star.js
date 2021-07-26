@@ -26,5 +26,6 @@ export function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
   let innerRadius = innerDiameter !== false ? innerDiameter / 2 : outerRadius * (1 / Math.pow(goldenRatio, 2));
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
+  window.stage.addChild(shape);
   return shape;
 }

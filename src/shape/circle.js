@@ -3,10 +3,18 @@ import Matter from 'matter-js';
 
 export default class Circle extends Shape {
   constructor(x, y, radius) {
-    let body = Matter.Bodies.circle(x, y, radius);
-    super(x, y, body);
+    super(x, y);
     this.radius = radius;
-    this.boundingRadius = radius;
+  }
+
+  get body() {
+    if (!this._body) {
+      this._body =  Matter.Bodies.circle(this.position.x, this.position.y, this.radius, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
+    return this._body;
   }
 
   render(context) {
@@ -18,5 +26,6 @@ export default class Circle extends Shape {
 
 export function circle(x, y, diameter) {
   const shape = new Circle(x, y, diameter / 2);
+  window.stage.addChild(shape);
   return shape;
 }

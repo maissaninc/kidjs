@@ -18028,10 +18028,18 @@ function on(event, handler) {
 
 class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   constructor(x, y, radius) {
-    let body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(x, y, radius);
-    super(x, y, body);
+    super(x, y);
     this.radius = radius;
-    this.boundingRadius = radius;
+  }
+
+  get body() {
+    if (!this._body) {
+      this._body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
+    return this._body;
   }
 
   render(context) {
@@ -18043,6 +18051,7 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function circle(x, y, diameter) {
   const shape = new Circle(x, y, diameter / 2);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18109,6 +18118,7 @@ class Curve extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function curve(...args) {
   let shape = new Curve(args);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18126,8 +18136,8 @@ function curve(...args) {
 
 
 class Shape extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
-  constructor(x, y, body) {
-    super(x, y, body);
+  constructor(x, y) {
+    super(x, y);
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
@@ -18230,6 +18240,7 @@ class Line extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function line(x1, y1, x2, y2) {
   let shape = new Line(x1, y1, x2, y2);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18265,6 +18276,7 @@ class Oval extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function oval(x, y, width, height) {
   const shape = new Oval(x, y, width / 2, height / 2);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18279,7 +18291,10 @@ function oval(x, y, width, height) {
 /* harmony export */   "Z": function() { return /* binding */ Polygon; }
 /* harmony export */ });
 /* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
-/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(599);
+/* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(599);
+/* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(842);
+/* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 
@@ -18296,6 +18311,16 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     super(x, y, body);
     this.points = [];
     this._boundingPolygon = [];
+  }
+
+  get body() {
+    if (!this._body) {
+      this._body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
+    return this._body;
   }
 
   get boundingPolygon() {
@@ -18315,7 +18340,7 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
    * @param {int} y - Y coordinate
    */
   addPoint(x, y) {
-    let v = new _core_vector__WEBPACK_IMPORTED_MODULE_1__/* .default */ .Z(x, -y);
+    let v = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, -y);
     if (v.length > this.boundingRadius) {
       this.boundingRadius = v.length;
     }
@@ -18397,19 +18422,30 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   constructor(x, y, width, height) {
-    x = x + (width / 2);
-    y = y + (height / 2);
-    let body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(x, y, width, height);
-    super(x, y, body);
+    super(x + width / 2, y + height / 2);
+    this.width = width;
+    this.height = height;
     this.addPoint(-width / 2, -height / 2);
     this.addPoint(width / 2, -height / 2);
     this.addPoint(width / 2, height / 2);
     this.addPoint(-width / 2, height / 2)
   }
+
+  get body() {
+    if (!this._body) {
+      console.log(this.position);
+      this._body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
+        restitution: 1,
+        isStatic: true
+      });
+    }
+    return this._body;
+  }
 }
 
 function rect(x, y, width, height) {
   const shape = new Rect(x, y, width, height);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18452,31 +18488,37 @@ class RegularPolygon extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */
 
 function triangle(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 3);
+  window.stage.addChild(shape);
   return shape;
 }
 
 function square(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
+  window.stage.addChild(shape);
   return shape;
 }
 
 function pentagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 5);
+  window.stage.addChild(shape);
   return shape;
 }
 
 function hexagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 6);
+  window.stage.addChild(shape);
   return shape;
 }
 
 function heptagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 7);
+  window.stage.addChild(shape);
   return shape;
 }
 
 function octagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 8);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18498,7 +18540,6 @@ class Semicircle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   constructor(x, y, radius) {
     super(x, y);
     this.radius = radius;
-    this.boundingRadius = radius;
   }
 
   render(context) {
@@ -18511,6 +18552,7 @@ class Semicircle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function semicircle(x, y, diameter) {
   const shape = new Semicircle(x, y, diameter / 2);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18555,6 +18597,7 @@ function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
   let innerRadius = innerDiameter !== false ? innerDiameter / 2 : outerRadius * (1 / Math.pow(goldenRatio, 2));
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
+  window.stage.addChild(shape);
   return shape;
 }
 
@@ -18639,34 +18682,16 @@ class Actor {
    * @constructor
    * @param {int} x - Initial x coordinate
    * @param {int} y - Initial y coordinate
-   * @param {Matter.Body} [body] - Optional Matter.js body
-   * @param {Stage} [stage] - Optional stage to add actor to. Defaults to stage object on window.
    */
-  constructor(x, y, body, stage) {
+  constructor(x, y) {
     this.frame = 0;
     this.state = 'default';
     this.position = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
     this.angle = 0;
     this.destination = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
 
-    // Body for physics simulation
-    if (body) {
-      this.body = body;
-      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.set(this.body, {
-        restitution: 1,
-        isStatic: true
-      });
-    }
-
     // Event listeners
     this.eventListeners = {};
-
-    // Add to stage
-    if (typeof stage === 'undefined') {
-      window.stage.addChild(this);
-    } else {
-      stage.addChild(this);
-    }
   }
 
   get x() {
@@ -19093,6 +19118,7 @@ class Stage {
   addChild(actor) {
     this.actors.push(actor);
     if (actor.body) {
+      console.log('Added ', actor.body);
       matter_default().Composite.add(this.engine.world, actor.body);
     }
   }

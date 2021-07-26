@@ -19,30 +19,36 @@ export default class RegularPolygon extends Polygon {
 
 export function triangle(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 3);
+  window.stage.addChild(shape);
   return shape;
 }
 
 export function square(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
+  window.stage.addChild(shape);
   return shape;
 }
 
 export function pentagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 5);
+  window.stage.addChild(shape);
   return shape;
 }
 
 export function hexagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 6);
+  window.stage.addChild(shape);
   return shape;
 }
 
 export function heptagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 7);
+  window.stage.addChild(shape);
   return shape;
 }
 
 export function octagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 8);
+  window.stage.addChild(shape);
   return shape;
 }

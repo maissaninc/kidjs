@@ -56,5 +56,6 @@ export default class Line extends Shape {
 
 export function line(x1, y1, x2, y2) {
   let shape = new Line(x1, y1, x2, y2);
+  window.stage.addChild(shape);
   return shape;
 }

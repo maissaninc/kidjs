@@ -10,34 +10,16 @@ export default class Actor {
    * @constructor
    * @param {int} x - Initial x coordinate
    * @param {int} y - Initial y coordinate
-   * @param {Matter.Body} [body] - Optional Matter.js body
-   * @param {Stage} [stage] - Optional stage to add actor to. Defaults to stage object on window.
    */
-  constructor(x, y, body, stage) {
+  constructor(x, y) {
     this.frame = 0;
     this.state = 'default';
     this.position = new Vector(x, y);
     this.angle = 0;
     this.destination = new Vector(x, y);
 
-    // Body for physics simulation
-    if (body) {
-      this.body = body;
-      Matter.Body.set(this.body, {
-        restitution: 1,
-        isStatic: true
-      });
-    }
-
     // Event listeners
     this.eventListeners = {};
-
-    // Add to stage
-    if (typeof stage === 'undefined') {
-      window.stage.addChild(this);
-    } else {
-      stage.addChild(this);
-    }
   }
 
   get x() {

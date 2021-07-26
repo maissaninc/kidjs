@@ -18,5 +18,6 @@ export default class Oval extends Shape {
 
 export function oval(x, y, width, height) {
   const shape = new Oval(x, y, width / 2, height / 2);
+  window.stage.addChild(shape);
   return shape;
 }

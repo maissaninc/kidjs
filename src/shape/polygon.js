@@ -18,7 +18,7 @@ export default class Polygon extends Shape {
   }
 
   init() {
-    this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+    this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       friction: 0,
       frictionAir: 0,
       frictionStatic: 0,

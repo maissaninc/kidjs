@@ -11,6 +11,7 @@ export default class Circle extends Shape {
     this.body =  Matter.Bodies.circle(this.position.x, this.position.y, this.radius, {
       friction: 0,
       frictionAir: 0,
+      frictionStatic: 0,
       restitution: 1,
       isStatic: true
     });

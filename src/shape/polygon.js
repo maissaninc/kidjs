@@ -21,6 +21,7 @@ export default class Polygon extends Shape {
     this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this.points, {
       friction: 0,
       frictionAir: 0,
+      frictionStatic: 0,
       restitution: 1,
       isStatic: true
     });

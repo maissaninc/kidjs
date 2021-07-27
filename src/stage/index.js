@@ -114,15 +114,20 @@ export default class Stage {
    * Start rendering
    */
   run() {
-    this.running = true;
-    this.render();
+    if (!this.running) {
+      this.running = true;
+      this.render();
+    }
   }
 
   /**
    * Stop rendering
    */
   stop() {
-    this.running = false;
+    if (this.running) {
+      cancelAnimationFrame(this.animation);
+      this.running = false;
+    }
   }
 
   /**
@@ -164,7 +169,7 @@ export default class Stage {
       }
 
       window._kidjs_.onframe();
-      requestAnimationFrame(() => this.render());
+      this.animation = requestAnimationFrame(() => this.render());
     }
   }
 

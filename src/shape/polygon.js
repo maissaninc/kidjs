@@ -17,16 +17,13 @@ export default class Polygon extends Shape {
     this._boundingPolygon = [];
   }
 
-  get body() {
-    if (!this._body) {
-      this._body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this.points, {
-        friction: 0,
-        frictionAir: 0,
-        restitution: 1,
-        isStatic: true
-      });
-    }
-    return this._body;
+  init() {
+    this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+      friction: 0,
+      frictionAir: 0,
+      restitution: 1,
+      isStatic: true
+    });
   }
 
   get boundingPolygon() {

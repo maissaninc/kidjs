@@ -7,16 +7,13 @@ export default class Circle extends Shape {
     this.radius = radius;
   }
 
-  get body() {
-    if (!this._body) {
-      this._body =  Matter.Bodies.circle(this.position.x, this.position.y, this.radius, {
-        friction: 0,
-        frictionAir: 0,
-        restitution: 1,
-        isStatic: true
-      });
-    }
-    return this._body;
+  init() {
+    this.body =  Matter.Bodies.circle(this.position.x, this.position.y, this.radius, {
+      friction: 0,
+      frictionAir: 0,
+      restitution: 1,
+      isStatic: true
+    });
   }
 
   render(context) {
@@ -28,6 +25,7 @@ export default class Circle extends Shape {
 
 export function circle(x, y, diameter) {
   const shape = new Circle(x, y, diameter / 2);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }

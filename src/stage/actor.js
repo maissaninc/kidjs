@@ -116,12 +116,29 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   slide(x = 0, y = 0) {
-      this.status = 'sliding';
-      this.destination.x = this.position.x + x;
-      this.destination.y = this.position.y + y;
-      if (this.body) {
-        Matter.Body.setPosition(this.body, this.position);
-      }
+    this.status = 'sliding';
+    this.destination.x = this.position.x + x;
+    this.destination.y = this.position.y + y;
+    if (this.body) {
+      Matter.Body.setPosition(this.body, this.position);
+    }
+  }
+
+  /**
+   * Apply directional force.
+   *
+   * @param {int} x - Horizontal force
+   * @param {int} y - Vertical force
+   * @return {Actor} Reference to self
+   */
+  push(x = 0, y = 0) {
+    if (this.body) {
+      this.anchored = false;
+      Matter.Body.setVelocity(this.body, new Vector(
+        this.body.velocity.x + x,
+        this.body.velocity.y + y
+      ));
+    }
   }
 
   /**
@@ -137,6 +154,9 @@ export default class Actor {
     return this;
   }
 
+  /**
+   * Stop all motion.
+   */
   stop() {
     if (this.body) {
       Matter.Body.setAngularVelocity(this.body, 0);

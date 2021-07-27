@@ -18076,16 +18076,13 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     this.radius = radius;
   }
 
-  get body() {
-    if (!this._body) {
-      this._body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
-        friction: 0,
-        frictionAir: 0,
-        restitution: 1,
-        isStatic: true
-      });
-    }
-    return this._body;
+  init() {
+    this.body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
+      friction: 0,
+      frictionAir: 0,
+      restitution: 1,
+      isStatic: true
+    });
   }
 
   render(context) {
@@ -18097,6 +18094,7 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function circle(x, y, diameter) {
   const shape = new Circle(x, y, diameter / 2);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
@@ -18359,16 +18357,13 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     this._boundingPolygon = [];
   }
 
-  get body() {
-    if (!this._body) {
-      this._body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this.points, {
-        friction: 0,
-        frictionAir: 0,
-        restitution: 1,
-        isStatic: true
-      });
-    }
-    return this._body;
+  init() {
+    this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+      friction: 0,
+      frictionAir: 0,
+      restitution: 1,
+      isStatic: true
+    });
   }
 
   get boundingPolygon() {
@@ -18479,21 +18474,19 @@ class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     this.addPoint(-width / 2, height / 2)
   }
 
-  get body() {
-    if (!this._body) {
-      this._body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
-        friction: 0,
-        frictionAir: 0,
-        restitution: 1,
-        isStatic: true
-      });
-    }
-    return this._body;
+  init() {
+    this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
+      friction: 0,
+      frictionAir: 0,
+      restitution: 1,
+      isStatic: true
+    });
   }
 }
 
 function rect(x, y, width, height) {
   const shape = new Rect(x, y, width, height);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
@@ -18537,36 +18530,42 @@ class RegularPolygon extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */
 
 function triangle(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 3);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
 
 function square(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
 
 function pentagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 5);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
 
 function hexagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 6);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
 
 function heptagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 7);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
 
 function octagon(x, y, diameter) {
   let shape = new RegularPolygon(x, y, diameter / 2, 8);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
@@ -18646,6 +18645,7 @@ function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
   let innerRadius = innerDiameter !== false ? innerDiameter / 2 : outerRadius * (1 / Math.pow(goldenRatio, 2));
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }
@@ -18838,12 +18838,29 @@ class Actor {
    * @return {Actor} Reference to self
    */
   slide(x = 0, y = 0) {
-      this.status = 'sliding';
-      this.destination.x = this.position.x + x;
-      this.destination.y = this.position.y + y;
-      if (this.body) {
-        matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setPosition(this.body, this.position);
-      }
+    this.status = 'sliding';
+    this.destination.x = this.position.x + x;
+    this.destination.y = this.position.y + y;
+    if (this.body) {
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setPosition(this.body, this.position);
+    }
+  }
+
+  /**
+   * Apply directional force.
+   *
+   * @param {int} x - Horizontal force
+   * @param {int} y - Vertical force
+   * @return {Actor} Reference to self
+   */
+  push(x = 0, y = 0) {
+    if (this.body) {
+      this.anchored = false;
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setVelocity(this.body, new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(
+        this.body.velocity.x + x,
+        this.body.velocity.y + y
+      ));
+    }
   }
 
   /**
@@ -18859,6 +18876,9 @@ class Actor {
     return this;
   }
 
+  /**
+   * Stop all motion.
+   */
   stop() {
     if (this.body) {
       matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setAngularVelocity(this.body, 0);
@@ -19176,7 +19196,6 @@ class Stage {
   addChild(actor) {
     this.actors.push(actor);
     if (actor.body) {
-      console.log('Added ', actor.body);
       matter_default().Composite.add(this.engine.world, actor.body);
     }
   }

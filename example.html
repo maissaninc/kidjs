@@ -13,8 +13,7 @@
       let player1 = rect(width / 2 - 50, 20, 100, 20)
       let player2 = rect(width / 2 - 50, height - 40, 100, 20)
 
-      ball.velocity.x = random(-5, 5)
-      ball.velocity.y = 5
+      ball.push(1, 6);
 
       function keydown(key) {
         if (key == 'a') player1.move(-5)

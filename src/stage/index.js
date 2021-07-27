@@ -65,7 +65,6 @@ export default class Stage {
   addChild(actor) {
     this.actors.push(actor);
     if (actor.body) {
-      console.log('Added ', actor.body);
       Matter.Composite.add(this.engine.world, actor.body);
     }
   }

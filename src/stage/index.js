@@ -73,6 +73,7 @@ export default class Stage {
    * Clear all actors from the stage.
    */
   clear() {
+    Matter.Composite.clear(this.engine.world);
     this.actors = [];
   }
 

@@ -17472,7 +17472,7 @@ function init() {
       window.on = _events__WEBPACK_IMPORTED_MODULE_14__.on;
       window.oval = _shape_oval__WEBPACK_IMPORTED_MODULE_6__/* .oval */ .B;
       window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .pentagon */ .BR;
-      window.random = _math__WEBPACK_IMPORTED_MODULE_15__/* .random */ .M;
+      window.random = _math__WEBPACK_IMPORTED_MODULE_15__/* .random */ .MX;
       window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_7__/* .rect */ .J;
       window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_9__/* .semicircle */ .g;
       window.song = _audio__WEBPACK_IMPORTED_MODULE_13__/* .song */ .K_;
@@ -17711,7 +17711,9 @@ function end() {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "M": function() { return /* binding */ random; }
+/* harmony export */   "MX": function() { return /* binding */ random; },
+/* harmony export */   "Ht": function() { return /* binding */ degreesToRadians; },
+/* harmony export */   "vi": function() { return /* binding */ radiansToDegrees; }
 /* harmony export */ });
 /**
  * Return a random number.
@@ -17736,6 +17738,26 @@ function random(a, b) {
   return Math.round(Math.random() * (b - a) + a);
 }
 
+/**
+ * Convert degrees to radians
+ *
+ * @param {Number} deg - Angle in degrees
+ * @return {Number} Angle in radians
+ */
+function degreesToRadians(deg) {
+  return deg * (Math.PI / 180);
+}
+
+/**
+ * Convert degrees to radians
+ *
+ * @param {Number} rad - Angle in radians
+ * @return {Number} Angle in degrees
+ */
+function radiansToDegrees(rad) {
+  return rad * (180 / Math.PI);
+}
+
 
 /***/ }),
 
@@ -17748,8 +17770,30 @@ function random(a, b) {
 /* harmony export */ });
 class Vector {
   constructor(x, y) {
-    this.x = x;
-    this.y = y;
+    this._x = x;
+    this._y = y;
+  }
+
+  get x() {
+    return this._x;
+  }
+
+  get y() {
+    return this._y;
+  }
+
+  set x(value) {
+    this._x = value;
+    if (typeof this.onchange == 'function') {
+      this.onchange();
+    }
+  }
+
+  set y(value) {
+    this._y = value;
+    if (typeof this.onchange == 'function') {
+      this.onchange();
+    }
   }
 
   get length() {
@@ -18035,6 +18079,8 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   get body() {
     if (!this._body) {
       this._body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
+        friction: 0,
+        frictionAir: 0,
         restitution: 1,
         isStatic: true
       });
@@ -18316,6 +18362,8 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   get body() {
     if (!this._body) {
       this._body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+        friction: 0,
+        frictionAir: 0,
         restitution: 1,
         isStatic: true
       });
@@ -18433,8 +18481,9 @@ class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
   get body() {
     if (!this._body) {
-      console.log(this.position);
       this._body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
+        friction: 0,
+        frictionAir: 0,
         restitution: 1,
         isStatic: true
       });
@@ -18668,8 +18717,10 @@ function image(x, y, url) {
 /* harmony export */ });
 /* harmony import */ var _shape_circle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(516);
 /* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(599);
+/* harmony import */ var _core_math__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(188);
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(842);
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 
@@ -18686,9 +18737,20 @@ class Actor {
   constructor(x, y) {
     this.frame = 0;
     this.state = 'default';
-    this.position = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
-    this.angle = 0;
     this.destination = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
+
+    // Internal properties
+    this.position = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
+    this._angle = 0;
+
+    // Detect change in velocity
+    this.velocity = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(0, 0);
+    this.velocity.onchange = () => {
+      this.anchored = false;
+      if (this.body) {
+        matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setVelocity(this.body, this.velocity);
+      }
+    }
 
     // Event listeners
     this.eventListeners = {};
@@ -18700,6 +18762,17 @@ class Actor {
 
   get y() {
     return this.body ? this.body.position.y : this.position.y;
+  }
+
+  get angle() {
+    return this.body ? (0,_core_math__WEBPACK_IMPORTED_MODULE_3__/* .radiansToDegrees */ .vi)(this.body.angle) : this._angle;
+  }
+
+  set angle(value) {
+    this._angle = value;
+    if (this.body) {
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setAngle(this.body, (0,_core_math__WEBPACK_IMPORTED_MODULE_3__/* .degreesToRadians */ .Ht)(this._angle));
+    }
   }
 
   set anchored(value) {
@@ -19055,11 +19128,6 @@ class Stage {
     this.width = width;
     this.height = height;
 
-    // Stage properties
-    window.gravity = 0;
-    window.floor = true;
-    window.walls = true;
-
     // Create canvas
     let scale = window.devicePixelRatio;
     this.canvas = document.createElement('canvas');
@@ -19070,16 +19138,6 @@ class Stage {
     this.canvas.style.height = this.height + 'px';
     this.canvas.style.display = 'block';
     this.context.scale(scale, scale);
-
-    // Set initial fill and stroke
-    window.fill = 'white';
-    window.stroke = 'black';
-    window.lineWidth = 2;
-
-    // Set initial font properties
-    window.font = 'Arial';
-    window.fontColor = 'black';
-    window.fontSize = '40px';
 
     // Set global width and height
     window.width = width;
@@ -19134,11 +19192,32 @@ class Stage {
    * Clear stage and reset fill and stroke.
    */
   reset() {
+
+    // Reset fill and stroke
     window.fill = 'white';
     window.stroke = 'black';
     window.lineWidth = 2;
+
+    // Reset font properties
+    window.font = 'Arial';
+    window.fontColor = 'black';
+    window.fontSize = '40px';
+    window.fill = 'white';
+    window.stroke = 'black';
+    window.lineWidth = 2;
+
+    // Reset audio properties
     window.tempo = 60;
+
+    // Reset physics properties
+    window.gravity = 1;
+    window.floor = true;
+    window.walls = true;
+
+    // Clear stage
     this.clear();
+
+    // Clear event listeners
     this.removeAllEventListeners();
   }
 
@@ -19186,6 +19265,7 @@ class Stage {
       }*/
 
       // Update physics simulation
+      this.engine.gravity.y = window.gravity;
       matter_default().Engine.update(this.engine);
 
       // Render actors

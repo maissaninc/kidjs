@@ -7,16 +7,14 @@
   <body>
     <script type="kidjs">
 
-      let ball = rect(width/2, height/2, 32, 32)
-      ball.anchored = false;
-      let player1 = rect(width/2-55, 22, 110 , 22)
-      let player2 = rect(width/2-55, height-22, 110 , 22)
-      ball.fill = 'red'
-      player1.fill = 'green'
-      player2.fill = 'blue'
+      gravity = 0
 
-      //ball.velocity.y = 0.6
-      //ball.velocity.x = 0.1
+      let ball = circle(width / 2, height / 2, 30)
+      let player1 = rect(width / 2 - 50, 20, 100, 20)
+      let player2 = rect(width / 2 - 50, height - 40, 100, 20)
+
+      ball.velocity.x = random(-5, 5)
+      ball.velocity.y = 5
 
       function keydown(key) {
         if (key == 'a') player1.move(-5)

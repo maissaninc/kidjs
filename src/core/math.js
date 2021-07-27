@@ -20,3 +20,23 @@ export function random(a, b) {
   // Return random integer between first and second parameters
   return Math.round(Math.random() * (b - a) + a);
 }
+
+/**
+ * Convert degrees to radians
+ *
+ * @param {Number} deg - Angle in degrees
+ * @return {Number} Angle in radians
+ */
+export function degreesToRadians(deg) {
+  return deg * (Math.PI / 180);
+}
+
+/**
+ * Convert degrees to radians
+ *
+ * @param {Number} rad - Angle in radians
+ * @return {Number} Angle in degrees
+ */
+export function radiansToDegrees(rad) {
+  return rad * (180 / Math.PI);
+}

@@ -17,11 +17,6 @@ export default class Stage {
     this.width = width;
     this.height = height;
 
-    // Stage properties
-    window.gravity = 0;
-    window.floor = true;
-    window.walls = true;
-
     // Create canvas
     let scale = window.devicePixelRatio;
     this.canvas = document.createElement('canvas');
@@ -32,16 +27,6 @@ export default class Stage {
     this.canvas.style.height = this.height + 'px';
     this.canvas.style.display = 'block';
     this.context.scale(scale, scale);
-
-    // Set initial fill and stroke
-    window.fill = 'white';
-    window.stroke = 'black';
-    window.lineWidth = 2;
-
-    // Set initial font properties
-    window.font = 'Arial';
-    window.fontColor = 'black';
-    window.fontSize = '40px';
 
     // Set global width and height
     window.width = width;
@@ -96,11 +81,32 @@ export default class Stage {
    * Clear stage and reset fill and stroke.
    */
   reset() {
+
+    // Reset fill and stroke
     window.fill = 'white';
     window.stroke = 'black';
     window.lineWidth = 2;
+
+    // Reset font properties
+    window.font = 'Arial';
+    window.fontColor = 'black';
+    window.fontSize = '40px';
+    window.fill = 'white';
+    window.stroke = 'black';
+    window.lineWidth = 2;
+
+    // Reset audio properties
     window.tempo = 60;
+
+    // Reset physics properties
+    window.gravity = 1;
+    window.floor = true;
+    window.walls = true;
+
+    // Clear stage
     this.clear();
+
+    // Clear event listeners
     this.removeAllEventListeners();
   }
 
@@ -148,6 +154,7 @@ export default class Stage {
       }*/
 
       // Update physics simulation
+      this.engine.gravity.y = window.gravity;
       Matter.Engine.update(this.engine);
 
       // Render actors

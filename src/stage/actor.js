@@ -1,5 +1,6 @@
 import Circle from '../shape/circle';
 import Vector from '../core/vector';
+import { degreesToRadians, radiansToDegrees }  from '../core/math';
 import Matter from 'matter-js';
 
 export default class Actor {
@@ -14,9 +15,20 @@ export default class Actor {
   constructor(x, y) {
     this.frame = 0;
     this.state = 'default';
-    this.position = new Vector(x, y);
-    this.angle = 0;
     this.destination = new Vector(x, y);
+
+    // Internal properties
+    this.position = new Vector(x, y);
+    this._angle = 0;
+
+    // Detect change in velocity
+    this.velocity = new Vector(0, 0);
+    this.velocity.onchange = () => {
+      this.anchored = false;
+      if (this.body) {
+        Matter.Body.setVelocity(this.body, this.velocity);
+      }
+    }
 
     // Event listeners
     this.eventListeners = {};
@@ -28,6 +40,17 @@ export default class Actor {
 
   get y() {
     return this.body ? this.body.position.y : this.position.y;
+  }
+
+  get angle() {
+    return this.body ? radiansToDegrees(this.body.angle) : this._angle;
+  }
+
+  set angle(value) {
+    this._angle = value;
+    if (this.body) {
+      Matter.Body.setAngle(this.body, degreesToRadians(this._angle));
+    }
   }
 
   set anchored(value) {

@@ -16,6 +16,9 @@ window.addEventListener('DOMContentLoaded', function() {
   // Setup events
   initEvents();
 
+  // Framework ready
+  window.dispatchEvent(new Event('KID.ready'));
+
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');
   for (let script of scripts) {

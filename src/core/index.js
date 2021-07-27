@@ -267,7 +267,3 @@ async function step(location) {
     await wait(1);
   }
 }
-
-function end() {
-  window.dispatchEvent(new Event('KID.complete'));
-}

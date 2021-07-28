@@ -42,6 +42,20 @@ export default class Actor {
     return this.body ? this.body.position.y : this.position.y;
   }
 
+  set x(value) {
+    this.position.x = value;
+    if (this.body) {
+      this.body.position.x = value;
+    }
+  }
+
+  set y(value) {
+    this.position.y = value;
+    if (this.body) {
+      this.body.position.y = value;
+    }
+  }
+
   get angle() {
     return this.body ? radiansToDegrees(this.body.angle) : this._angle;
   }

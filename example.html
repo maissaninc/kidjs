@@ -13,6 +13,14 @@
       let player1 = rect(width / 2 - 50, 20, 100, 20)
       let player2 = rect(width / 2 - 50, height - 40, 100, 20)
 
+      let r = rect(400, 100, 400, 50);
+      r.fill = 'blue';
+
+      r.on('collision', function(x, y) {
+        x.fill = 'yellow';
+        y.fill = 'red';
+      });
+
       ball.push(1, 6);
 
       function keydown(key) {

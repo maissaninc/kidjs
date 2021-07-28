@@ -11,11 +11,14 @@ export default class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   constructor(width = window.innerWidth, height = window.innerHeight) {
-    this.engine = Matter.Engine.create();
     this.running = false;
     this.frame = 0;
     this.width = width;
     this.height = height;
+
+    // Create Matter.js engine and listen for events
+    this.engine = Matter.Engine.create();
+    Matter.Events.on(this.engine, 'collisionStart', (event) => this.onCollisionStart(event));
 
     // Create canvas
     let scale = window.devicePixelRatio;
@@ -66,6 +69,20 @@ export default class Stage {
     this.actors.push(actor);
     if (actor.body) {
       Matter.Composite.add(this.engine.world, actor.body);
+    }
+  }
+
+  /**
+   * Find actor from Matter.js body.
+   *
+   * @param {Matter.Body} body - Matter.js body
+   * @return {Actor} Actor if found
+   */
+  findChildByBody(body) {
+    for (let actor of this.actors) {
+      if (actor.body && actor.body.id == body.id) {
+        return actor;
+      }
     }
   }
 
@@ -220,6 +237,22 @@ export default class Stage {
           default:
             handler.call(context);
         }
+      }
+    }
+  }
+
+  /**
+   * Respond to collision events.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  onCollisionStart(event) {
+    for (let pair of event.pairs) {
+      let a = this.findChildByBody(pair.bodyA);
+      let b = this.findChildByBody(pair.bodyB);
+      if (a && b) {
+        a.dispatchEvent(new CustomEvent('collision', { detail: b }));
+        b.dispatchEvent(new CustomEvent('collision', { detail: a }));
       }
     }
   }

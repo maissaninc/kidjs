@@ -17699,10 +17699,6 @@ async function step(location) {
   }
 }
 
-function end() {
-  window.dispatchEvent(new Event('KID.complete'));
-}
-
 
 /***/ }),
 
@@ -18080,6 +18076,7 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     this.body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
       friction: 0,
       frictionAir: 0,
+      frictionStatic: 0,
       restitution: 1,
       isStatic: true
     });
@@ -18358,9 +18355,10 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   }
 
   init() {
-    this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this.points, {
+    this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       friction: 0,
       frictionAir: 0,
+      frictionStatic: 0,
       restitution: 1,
       isStatic: true
     });
@@ -18478,6 +18476,7 @@ class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
       friction: 0,
       frictionAir: 0,
+      frictionStatic: 0,
       restitution: 1,
       isStatic: true
     });
@@ -19142,11 +19141,14 @@ class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   constructor(width = window.innerWidth, height = window.innerHeight) {
-    this.engine = matter_default().Engine.create();
     this.running = false;
     this.frame = 0;
     this.width = width;
     this.height = height;
+
+    // Create Matter.js engine and listen for events
+    this.engine = matter_default().Engine.create();
+    matter_default().Events.on(this.engine, 'collisionStart', (event) => this.onCollisionStart(event));
 
     // Create canvas
     let scale = window.devicePixelRatio;
@@ -19201,9 +19203,24 @@ class Stage {
   }
 
   /**
+   * Find actor from Matter.js body.
+   *
+   * @param {Matter.Body} body - Matter.js body
+   * @return {Actor} Actor if found
+   */
+  findChildByBody(body) {
+    for (let actor of this.actors) {
+      if (actor.body && actor.body.id == body.id) {
+        return actor;
+      }
+    }
+  }
+
+  /**
    * Clear all actors from the stage.
    */
   clear() {
+    matter_default().Composite.clear(this.engine.world);
     this.actors = [];
   }
 
@@ -19244,15 +19261,20 @@ class Stage {
    * Start rendering
    */
   run() {
-    this.running = true;
-    this.render();
+    if (!this.running) {
+      this.running = true;
+      this.render();
+    }
   }
 
   /**
    * Stop rendering
    */
   stop() {
-    this.running = false;
+    if (this.running) {
+      cancelAnimationFrame(this.animation);
+      this.running = false;
+    }
   }
 
   /**
@@ -19294,7 +19316,7 @@ class Stage {
       }
 
       window._kidjs_.onframe();
-      requestAnimationFrame(() => this.render());
+      this.animation = requestAnimationFrame(() => this.render());
     }
   }
 
@@ -19348,6 +19370,22 @@ class Stage {
       }
     }
   }
+
+  /**
+   * Respond to collision events.
+   *
+   * @param {Event} [event] - Event object.
+   */
+  onCollisionStart(event) {
+    for (let pair of event.pairs) {
+      let a = this.findChildByBody(pair.bodyA);
+      let b = this.findChildByBody(pair.bodyB);
+      if (a && b) {
+        a.dispatchEvent(new CustomEvent('collision', { detail: b }));
+        b.dispatchEvent(new CustomEvent('collision', { detail: a }));
+      }
+    }
+  }
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
@@ -19368,6 +19406,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // Setup events
   (0,events/* default */.Z)();
+
+  // Framework ready
+  window.dispatchEvent(new Event('KID.ready'));
 
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');

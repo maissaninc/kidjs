@@ -44,6 +44,8 @@ export default class Actor {
 
   set x(value) {
     this.position.x = value;
+    this.velocity.x = 0;
+    this.velocity.y = 0;
     if (this.body) {
       this.body.position.x = value;
     }
@@ -51,6 +53,8 @@ export default class Actor {
 
   set y(value) {
     this.position.y = value;
+    this.velocity.x = 0;
+    this.velocity.y = 0;
     if (this.body) {
       this.body.position.y = value;
     }

@@ -21,10 +21,12 @@ export default class Text extends Actor {
 
 export function display(x, y, text) {
   const actor = new Text(x, y, text, true);
+  window.stage.addChild(actor);
   return actor;
 }
 
 export function write(x, y, text) {
   const actor = new Text(x, y, text, false);
+  window.stage.addChild(actor);
   return actor;
 }

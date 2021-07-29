@@ -7,30 +7,11 @@
   <body>
     <script type="kidjs">
 
-      gravity = 0
-
-      let ball = circle(width / 2, height / 2, 30)
-      let player1 = rect(width / 2 - 50, 20, 100, 20)
-      let player2 = rect(width / 2 - 50, height - 40, 100, 20)
-
-      let r = rect(400, 100, 400, 50);
-      r.fill = 'blue';
-
-      r.on('collision', function(x, y) {
-        x.fill = 'yellow';
-        y.fill = 'red';
-      });
-
-      ball.push(1, 6);
-
-      function keydown(key) {
-        if (key == 'a') player1.move(-5)
-        if (key == 'd') player1.move(5)
-        if (key == 'ArrowLeft') player2.move(-5)
-        if (key == 'ArrowRight') player2.move(5)
-      }
-
-      on('keydown', keydown)
+      let t = 0;
+      display(10, 10, t)
+      setInterval(function() {
+        t = t + 1
+      }, 1000)
 
     </script>
   </body>

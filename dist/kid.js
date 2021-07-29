@@ -17867,6 +17867,13 @@ function onKeyUp(e) {
   window.stage.dispatchEvent(new KeyboardEvent('keyup', {
     key: e.key
   }));
+  let event = e.key.toLowerCase();
+  if (event == ' ') {
+    event = 'space';
+  }
+  window.stage.dispatchEvent(new KeyboardEvent(event, {
+    key: e.key
+  }));
 }
 
 function onAnimationFrame() {
@@ -18763,6 +18770,24 @@ class Actor {
     return this.body ? this.body.position.y : this.position.y;
   }
 
+  set x(value) {
+    this.position.x = value;
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    if (this.body) {
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setPosition(this.body, this.position);
+    }
+  }
+
+  set y(value) {
+    this.position.y = value;
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    if (this.body) {
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setPosition(this.body, this.position);
+    }
+  }
+
   get angle() {
     return this.body ? (0,_core_math__WEBPACK_IMPORTED_MODULE_3__/* .radiansToDegrees */ .vi)(this.body.angle) : this._angle;
   }
@@ -19035,11 +19060,13 @@ class Text extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 function display(x, y, text) {
   const actor = new Text(x, y, text, true);
+  window.stage.addChild(actor);
   return actor;
 }
 
 function write(x, y, text) {
   const actor = new Text(x, y, text, false);
+  window.stage.addChild(actor);
   return actor;
 }
 
@@ -19285,26 +19312,6 @@ class Stage {
       this.frame++;
       this.context.clearRect(0, 0, this.width, this.height);
 
-      // Detect collisions
-      /*for (let i = 0; i < this.actors.length; i++) {
-        for (let j = i + 1; j < this.actors.length; j++) {
-          let collision = this.actors[i].collidesWith(this.actors[j]);
-          if (collision) {
-            this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
-            this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
-            if (!(this.actors[i].anchored && this.actors[j].anchored)) {
-              console.log(this.actors[i]);
-              console.log(this.actors[j]);
-              console.log(collision);
-              resolveCollision(collision);
-              console.log(this.actors[i]);
-              console.log(this.actors[j]);
-              //KID.stop();
-            }
-          }
-        }
-      }*/
-
       // Update physics simulation
       this.engine.gravity.y = window.gravity;
       matter_default().Engine.update(this.engine);
@@ -19404,6 +19411,11 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
 
+  // Resize canvas
+  window.addEventListener('resize', function() {
+    window.stage.resize();
+  });
+
   // Setup events
   (0,events/* default */.Z)();
 
@@ -19415,10 +19427,6 @@ window.addEventListener('DOMContentLoaded', function() {
   for (let script of scripts) {
     (0,core/* run */.KH)(script.innerHTML);
   }
-});
-
-window.addEventListener('resize', function() {
-  window.stage.resize();
 });
 
 window.KID = {

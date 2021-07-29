@@ -47,7 +47,7 @@ export default class Actor {
     this.velocity.x = 0;
     this.velocity.y = 0;
     if (this.body) {
-      this.body.position.x = value;
+      Matter.Body.setPosition(this.body, this.position);
     }
   }
 
@@ -56,7 +56,7 @@ export default class Actor {
     this.velocity.x = 0;
     this.velocity.y = 0;
     if (this.body) {
-      this.body.position.y = value;
+      Matter.Body.setPosition(this.body, this.position);
     }
   }
 

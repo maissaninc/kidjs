@@ -11,6 +11,9 @@ function onKeyUp(e) {
   window.stage.dispatchEvent(new KeyboardEvent('keyup', {
     key: e.key
   }));
+  window.stage.dispatchEvent(new KeyboardEvent(e.key.toLowerCase(), {
+    key: e.key
+  }));
 }
 
 function onAnimationFrame() {

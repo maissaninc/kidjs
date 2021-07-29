@@ -155,26 +155,6 @@ export default class Stage {
       this.frame++;
       this.context.clearRect(0, 0, this.width, this.height);
 
-      // Detect collisions
-      /*for (let i = 0; i < this.actors.length; i++) {
-        for (let j = i + 1; j < this.actors.length; j++) {
-          let collision = this.actors[i].collidesWith(this.actors[j]);
-          if (collision) {
-            this.actors[i].dispatchEvent(new CustomEvent('collision', { detail: this.actors[j] }));
-            this.actors[j].dispatchEvent(new CustomEvent('collision', { detail: this.actors[i] }));
-            if (!(this.actors[i].anchored && this.actors[j].anchored)) {
-              console.log(this.actors[i]);
-              console.log(this.actors[j]);
-              console.log(collision);
-              resolveCollision(collision);
-              console.log(this.actors[i]);
-              console.log(this.actors[j]);
-              //KID.stop();
-            }
-          }
-        }
-      }*/
-
       // Update physics simulation
       this.engine.gravity.y = window.gravity;
       Matter.Engine.update(this.engine);

@@ -11,7 +11,11 @@ function onKeyUp(e) {
   window.stage.dispatchEvent(new KeyboardEvent('keyup', {
     key: e.key
   }));
-  window.stage.dispatchEvent(new KeyboardEvent(e.key.toLowerCase(), {
+  let event = e.key.toLowerCase();
+  if (event == ' ') {
+    event = 'space';
+  }
+  window.stage.dispatchEvent(new KeyboardEvent(event, {
     key: e.key
   }));
 }

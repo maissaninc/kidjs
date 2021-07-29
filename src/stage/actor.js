@@ -20,6 +20,7 @@ export default class Actor {
     // Internal properties
     this.position = new Vector(x, y);
     this._angle = 0;
+    this._angularVelocity = 0;
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -71,6 +72,20 @@ export default class Actor {
     }
   }
 
+  get angularVelocity() {
+    if (this.body && !this.body.isStatic) {
+      return radiansToDegrees(this.body.angularVelocity);
+    }
+    return this._angularVelocity;
+  }
+
+  set angularVelocity(value) {
+    this._angularVelocity = value;
+    if (this.body) {
+      Matter.Body.setAngularVelocity(this.body, degreesToRadians(this._angularVelocity));
+    }
+  }
+
   set anchored(value) {
     if (this.body) {
       Matter.Body.setStatic(this.body, value);
@@ -83,6 +98,11 @@ export default class Actor {
    */
   update() {
     this.frame++;
+
+    // Apply angular velocity
+    if (!this.body || this.body.isStatic) {
+      this.angle = this.angle + this.angularVelocity;
+    }
 
     // Move along vector to destination
     if (this.status == 'sliding') {
@@ -166,9 +186,7 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   spin(speed = 5) {
-    if (this.body) {
-      Matter.Body.setAngularVelocity(this.body, speed);
-    }
+    this.angularVelocity = speed;
     return this;
   }
 

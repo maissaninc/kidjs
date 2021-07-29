@@ -18748,6 +18748,7 @@ class Actor {
     // Internal properties
     this.position = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
     this._angle = 0;
+    this._angularVelocity = 0;
 
     // Detect change in velocity
     this.velocity = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(0, 0);
@@ -18799,6 +18800,20 @@ class Actor {
     }
   }
 
+  get angularVelocity() {
+    if (this.body && !this.body.isStatic) {
+      return (0,_core_math__WEBPACK_IMPORTED_MODULE_3__/* .radiansToDegrees */ .vi)(this.body.angularVelocity);
+    }
+    return this._angularVelocity;
+  }
+
+  set angularVelocity(value) {
+    this._angularVelocity = value;
+    if (this.body) {
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setAngularVelocity(this.body, (0,_core_math__WEBPACK_IMPORTED_MODULE_3__/* .degreesToRadians */ .Ht)(this._angularVelocity));
+    }
+  }
+
   set anchored(value) {
     if (this.body) {
       matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setStatic(this.body, value);
@@ -18811,6 +18826,11 @@ class Actor {
    */
   update() {
     this.frame++;
+
+    // Apply angular velocity
+    if (!this.body || this.body.isStatic) {
+      this.angle = this.angle + this.angularVelocity;
+    }
 
     // Move along vector to destination
     if (this.status == 'sliding') {
@@ -18894,9 +18914,7 @@ class Actor {
    * @return {Actor} Reference to self
    */
   spin(speed = 5) {
-    if (this.body) {
-      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setAngularVelocity(this.body, speed);
-    }
+    this.angularVelocity = speed;
     return this;
   }
 

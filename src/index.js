@@ -13,6 +13,11 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
 
+  // Resize canvas
+  window.addEventListener('resize', function() {
+    window.stage.resize();
+  });
+
   // Setup events
   initEvents();
 
@@ -24,10 +29,6 @@ window.addEventListener('DOMContentLoaded', function() {
   for (let script of scripts) {
     run(script.innerHTML);
   }
-});
-
-window.addEventListener('resize', function() {
-  window.stage.resize();
 });
 
 window.KID = {

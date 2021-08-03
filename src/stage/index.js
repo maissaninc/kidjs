@@ -214,6 +214,10 @@ export default class Stage {
           case 'KeyboardEvent':
             handler.call(context, event.key);
             break;
+          case 'MouseEvent':
+          case 'PointerEvent':
+            handler.call(context, event.x, event.y);
+            break;
           default:
             handler.call(context);
         }

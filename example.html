@@ -7,10 +7,14 @@
   <body>
     <script type="kidjs">
 
-      let t = triangle(200, 20, 30);
-      t.spin(1);
-      wait(5);
-      t.anchored = false;
+      function click(x, y) {
+        let t = triangle(x, y, 30);
+        t.spin(1);
+        wait(5);
+        t.anchored = false;
+      }
+
+      on('click', click);
 
     </script>
   </body>

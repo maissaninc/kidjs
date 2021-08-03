@@ -14,10 +14,7 @@ export default class Rect extends Polygon {
 
   init() {
     this.body = Matter.Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
-      friction: 0,
       frictionAir: 0,
-      frictionStatic: 0,
-      restitution: 1,
       isStatic: true
     });
   }

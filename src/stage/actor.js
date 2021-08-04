@@ -92,6 +92,36 @@ export default class Actor {
     }
   }
 
+  set bounciness(value) {
+    if (this.body) {
+      Matter.body.restitution = value;
+    }
+  }
+
+  get bounciness() {
+    return this.body ? this.body.restitution : 0;
+  }
+
+  set friction(value) {
+    if (this.body) {
+      this.body.friction = value;
+    }
+  }
+
+  get friction() {
+    return this.body ? this.body.friction : 0;
+  }
+
+  set mass(value) {
+    if (this.body) {
+      Matter.body.setMass(this.body, value);
+    }
+  }
+
+  get mass() {
+    return this.body ? this.body.mass : 0;
+  }
+
   /**
    * Update the position of Actor on stage.
    * This is called each frame.

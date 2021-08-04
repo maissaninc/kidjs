@@ -18081,9 +18081,7 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
   init() {
     this.body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
-      friction: 0,
       frictionAir: 0,
-      frictionStatic: 0,
       restitution: 1,
       isStatic: true
     });
@@ -18363,10 +18361,7 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
   init() {
     this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
-      friction: 0,
       frictionAir: 0,
-      frictionStatic: 0,
-      restitution: 1,
       isStatic: true
     });
   }
@@ -18481,10 +18476,7 @@ class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
   init() {
     this.body = matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
-      friction: 0,
       frictionAir: 0,
-      frictionStatic: 0,
-      restitution: 1,
       isStatic: true
     });
   }
@@ -18818,6 +18810,36 @@ class Actor {
     if (this.body) {
       matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setStatic(this.body, value);
     }
+  }
+
+  set bounciness(value) {
+    if (this.body) {
+      (matter_js__WEBPACK_IMPORTED_MODULE_1___default().body.restitution) = value;
+    }
+  }
+
+  get bounciness() {
+    return this.body ? this.body.restitution : 0;
+  }
+
+  set friction(value) {
+    if (this.body) {
+      this.body.friction = value;
+    }
+  }
+
+  get friction() {
+    return this.body ? this.body.friction : 0;
+  }
+
+  set mass(value) {
+    if (this.body) {
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().body.setMass(this.body, value);
+    }
+  }
+
+  get mass() {
+    return this.body ? this.body.mass : 0;
   }
 
   /**
@@ -19383,7 +19405,6 @@ class Stage {
    * @param {Event} [event] - Event object.
    */
   dispatchEvent(event, context = window) {
-    console.log(event);
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
         switch (event.constructor.name) {

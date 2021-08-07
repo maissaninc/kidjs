@@ -32,6 +32,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 window.KID = {
-  'run': run,
-  'stop': stop
+  run: run,
+  stop: stop,
+  settings: window._kidjs_.settings
 };

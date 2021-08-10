@@ -12,10 +12,24 @@ export default class Text extends Actor {
 
   render(context) {
     context.fillStyle = this.fill;
-    context.font = this.fontSize + ' ' + this.font;
+    context.font = parseFontSize(this.fontSize) + ' ' + this.font;
     context.textBaseline = 'top';
     const output = this.live ? window._kidjs_.eval(this.text) : this.text;
     context.fillText(output, this.x, this.y);
+  }
+}
+
+function parseFontSize(value) {
+  if (typeof value === 'number') {
+    return value + 'px';
+  }
+  var regex = /(\d+)(px)/i;
+  var match = regex.exec(value);
+  if (!match) {
+    return '40px';
+  }
+  if (match[2] == 'px') {
+    return parseFloat(match[1]) + 'px';
   }
 }
 

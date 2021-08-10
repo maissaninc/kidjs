@@ -18521,7 +18521,7 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
 class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   constructor(x, y, width, height) {
-    super(x + width / 2, y + height / 2);
+    super(x, y);
     this.width = width;
     this.height = height;
     this.addPoint(-width / 2, -height / 2);
@@ -19161,10 +19161,24 @@ class Text extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 
   render(context) {
     context.fillStyle = this.fill;
-    context.font = this.fontSize + ' ' + this.font;
+    context.font = parseFontSize(this.fontSize) + ' ' + this.font;
     context.textBaseline = 'top';
     const output = this.live ? window._kidjs_.eval(this.text) : this.text;
     context.fillText(output, this.x, this.y);
+  }
+}
+
+function parseFontSize(value) {
+  if (typeof value === 'number') {
+    return value + 'px';
+  }
+  var regex = /(\d+)(px)/i;
+  var match = regex.exec(value);
+  if (!match) {
+    return '40px';
+  }
+  if (match[2] == 'px') {
+    return parseFloat(match[1]) + 'px';
   }
 }
 

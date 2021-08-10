@@ -19,6 +19,8 @@ import { display, write } from '../text';
 import { random } from './math';
 
 let triggers = [];
+let timeouts = [];
+let intervals = [];
 
 export function init() {
   window._kidjs_ = {
@@ -84,6 +86,20 @@ export function init() {
       window.dispatchEvent(new CustomEvent('KID.end'));
     }
   };
+
+  // Intercept setTimeout and setInterval
+  parentSetTimeout = window.setTimeout;
+  window.setTimeout = function(callback, duration) {
+    let timeout = parentSetTimeout(callback, duration);
+    timeouts.push(timeout);
+    return timeout;
+  }
+  parentSetInterval = window.setInterval;
+  window.setInterval = function(callback, duration) {
+    let interval = parentSetInterval(callback, duration);
+    intervals.push(interval);
+    return interval;
+  }
 
   window._kidjs_.setGlobals();
 }
@@ -229,8 +245,21 @@ function createStepStatement(location) {
 }
 
 export function reset() {
+
+  // Reset event listeners
   triggers = [];
   removeAllEventListeners();
+
+  // Reset timeouts
+  for (let i = 0; i < timeouts.length; i = i + 1) {
+    clearTimeout(timeouts[i]);
+  }
+  timeouts = [];
+  for (let i = 0; i < intervals.length; i = i + 1) {
+    clearInterval(intervals[i]);
+  }
+  intervals = [];
+
   window.stage.reset();
 }
 

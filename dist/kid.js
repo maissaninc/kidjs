@@ -17450,6 +17450,8 @@ function speak(text) {
 
 
 let triggers = [];
+let timeouts = [];
+let intervals = [];
 
 function init() {
   window._kidjs_ = {
@@ -17515,6 +17517,20 @@ function init() {
       window.dispatchEvent(new CustomEvent('KID.end'));
     }
   };
+
+  // Intercept setTimeout and setInterval
+  parentSetTimeout = window.setTimeout;
+  window.setTimeout = function(callback, duration) {
+    let timeout = parentSetTimeout(callback, duration);
+    timeouts.push(timeout);
+    return timeout;
+  }
+  parentSetInterval = window.setInterval;
+  window.setInterval = function(callback, duration) {
+    let interval = parentSetInterval(callback, duration);
+    intervals.push(interval);
+    return interval;
+  }
 
   window._kidjs_.setGlobals();
 }
@@ -17660,8 +17676,21 @@ function createStepStatement(location) {
 }
 
 function reset() {
+
+  // Reset event listeners
   triggers = [];
   (0,_events__WEBPACK_IMPORTED_MODULE_14__/* .removeAllEventListeners */ .R)();
+
+  // Reset timeouts
+  for (let i = 0; i < timeouts.length; i = i + 1) {
+    clearTimeout(timeouts[i]);
+  }
+  timeouts = [];
+  for (let i = 0; i < intervals.length; i = i + 1) {
+    clearInterval(intervals[i]);
+  }
+  intervals = [];
+
   window.stage.reset();
 }
 
@@ -19474,8 +19503,9 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 window.KID = {
-  'run': core/* run */.KH,
-  'stop': core/* stop */.sT
+  run: core/* run */.KH,
+  stop: core/* stop */.sT,
+  settings: window._kidjs_.settings
 };
 
 }();

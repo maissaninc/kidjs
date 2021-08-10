@@ -17409,9 +17409,10 @@ function speak(text) {
 /* harmony export */   "S1": function() { return /* binding */ init; },
 /* harmony export */   "KH": function() { return /* binding */ run; },
 /* harmony export */   "sT": function() { return /* binding */ stop; },
+/* harmony export */   "Py": function() { return /* binding */ assetUrlFilter; },
 /* harmony export */   "hC": function() { return /* binding */ setAssetUrlFilter; }
 /* harmony export */ });
-/* unused harmony exports reset, wait, assetUrlFilter */
+/* unused harmony exports reset, wait */
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
@@ -17451,7 +17452,9 @@ function speak(text) {
 
 
 let triggers = [];
+let parentSetTimeout;
 let timeouts = [];
+let parentSetInterval;
 let intervals = [];
 let urlFilter;
 
@@ -18731,7 +18734,7 @@ class Sprite extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z 
     super(x, y);
     this.image = new Image();
     this.image.onload = () => this.loaded = true;
-    this.image.src = (0,_core__WEBPACK_IMPORTED_MODULE_1__.default)(imageUrl);
+    this.image.src = (0,_core__WEBPACK_IMPORTED_MODULE_1__/* .assetUrlFilter */ .Py)(imageUrl);
     this.scale = 1;
   }
 

@@ -1,5 +1,5 @@
 import Actor from '../stage/actor';
-import assetUrlFilter from '../core';
+import { assetUrlFilter } from '../core';
 
 export default class Sprite extends Actor {
 

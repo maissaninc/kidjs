@@ -3,7 +3,7 @@ import Matter from 'matter-js';
 
 export default class Rect extends Polygon {
   constructor(x, y, width, height) {
-    super(x + width / 2, y + height / 2);
+    super(x, y);
     this.width = width;
     this.height = height;
     this.addPoint(-width / 2, -height / 2);

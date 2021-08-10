@@ -99,6 +99,7 @@ export function init() {
   window.setInterval = function(callback, duration) {
     let interval = parentSetInterval(callback, duration);
     intervals.push(interval);
+    console.log(intervals);
     return interval;
   }
 

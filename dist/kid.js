@@ -19157,12 +19157,15 @@ class Text extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     this.fill = window.fontColor;
     this.font = window.font;
     this.fontSize = window.fontSize;
+    this.textAlign = window.textAlign;
+    this.textBaseline = window.textBaseline;
   }
 
   render(context) {
     context.fillStyle = this.fill;
     context.font = parseFontSize(this.fontSize) + ' ' + this.font;
-    context.textBaseline = 'top';
+    context.textAlign = this.textAlign;
+    context.textBaseline = this.textBaseline;
     const output = this.live ? window._kidjs_.eval(this.text) : this.text;
     context.fillText(output, this.x, this.y);
   }
@@ -19389,6 +19392,8 @@ class Stage {
     window.font = 'Arial';
     window.fontColor = 'black';
     window.fontSize = '40px';
+    window.textAlign = 'left';
+    window.textBaseline = 'top';
     window.fill = 'white';
     window.stroke = 'black';
     window.lineWidth = 2;

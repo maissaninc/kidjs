@@ -8,12 +8,15 @@ export default class Text extends Actor {
     this.fill = window.fontColor;
     this.font = window.font;
     this.fontSize = window.fontSize;
+    this.textAlign = window.textAlign;
+    this.textBaseline = window.textBaseline;
   }
 
   render(context) {
     context.fillStyle = this.fill;
     context.font = parseFontSize(this.fontSize) + ' ' + this.font;
-    context.textBaseline = 'top';
+    context.textAlign = this.textAlign;
+    context.textBaseline = this.textBaseline;
     const output = this.live ? window._kidjs_.eval(this.text) : this.text;
     context.fillText(output, this.x, this.y);
   }

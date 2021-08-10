@@ -1,4 +1,5 @@
 import Actor from '../stage/actor';
+import assetUrlFilter from '../core';
 
 export default class Sprite extends Actor {
 
@@ -14,7 +15,7 @@ export default class Sprite extends Actor {
     super(x, y);
     this.image = new Image();
     this.image.onload = () => this.loaded = true;
-    this.image.src = imageUrl;
+    this.image.src = assetUrlFilter(imageUrl);
     this.scale = 1;
   }
 

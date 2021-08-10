@@ -21,6 +21,7 @@ import { random } from './math';
 let triggers = [];
 let timeouts = [];
 let intervals = [];
+let urlFilter;
 
 export function init() {
   window._kidjs_ = {
@@ -295,4 +296,26 @@ async function step(location) {
   if (window._kidjs_.settings.slowMotion) {
     await wait(1);
   }
+}
+
+/**
+ * Modify path to image or sound asset.
+ *
+ * @param {string} url - Path to asset
+ * @return {string} Modified path to asset
+ */
+export function assetUrlFilter(url) {
+  if (typeof urlFilter == 'function') {
+    url = urlFilter(url);
+  }
+  return url;
+}
+
+/**
+ * Set function to modify path to image or sound asset.
+ *
+ * @param {function} callback - Function to modify path
+ */
+export function setAssetUrlFilter(callback) {
+  urlFilter = callback;
 }

@@ -1,4 +1,4 @@
-import { init, run, stop } from './core';
+import { init, run, stop, setAssetUrlFilter } from './core';
 import initEvents from './events';
 import Stage from './stage';
 
@@ -34,5 +34,6 @@ window.addEventListener('DOMContentLoaded', function() {
 window.KID = {
   run: run,
   stop: stop,
-  settings: window._kidjs_.settings
+  settings: window._kidjs_.settings,
+  setAssetUrlFilter: setAssetUrlFilter
 };

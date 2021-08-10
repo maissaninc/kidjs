@@ -17408,9 +17408,10 @@ function speak(text) {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "S1": function() { return /* binding */ init; },
 /* harmony export */   "KH": function() { return /* binding */ run; },
-/* harmony export */   "sT": function() { return /* binding */ stop; }
+/* harmony export */   "sT": function() { return /* binding */ stop; },
+/* harmony export */   "hC": function() { return /* binding */ setAssetUrlFilter; }
 /* harmony export */ });
-/* unused harmony exports reset, wait */
+/* unused harmony exports reset, wait, assetUrlFilter */
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
@@ -17452,6 +17453,7 @@ function speak(text) {
 let triggers = [];
 let timeouts = [];
 let intervals = [];
+let urlFilter;
 
 function init() {
   window._kidjs_ = {
@@ -17726,6 +17728,28 @@ async function step(location) {
   if (window._kidjs_.settings.slowMotion) {
     await wait(1);
   }
+}
+
+/**
+ * Modify path to image or sound asset.
+ *
+ * @param {string} url - Path to asset
+ * @return {string} Modified path to asset
+ */
+function assetUrlFilter(url) {
+  if (typeof urlFilter == 'function') {
+    url = urlFilter(url);
+  }
+  return url;
+}
+
+/**
+ * Set function to modify path to image or sound asset.
+ *
+ * @param {function} callback - Function to modify path
+ */
+function setAssetUrlFilter(callback) {
+  urlFilter = callback;
 }
 
 
@@ -18689,6 +18713,8 @@ function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
 /* harmony export */ });
 /* unused harmony export default */
 /* harmony import */ var _stage_actor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(913);
+/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(763);
+
 
 
 class Sprite extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
@@ -18705,7 +18731,7 @@ class Sprite extends _stage_actor__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z 
     super(x, y);
     this.image = new Image();
     this.image.onload = () => this.loaded = true;
-    this.image.src = imageUrl;
+    this.image.src = (0,_core__WEBPACK_IMPORTED_MODULE_1__.default)(imageUrl);
     this.scale = 1;
   }
 
@@ -19505,7 +19531,8 @@ window.addEventListener('DOMContentLoaded', function() {
 window.KID = {
   run: core/* run */.KH,
   stop: core/* stop */.sT,
-  settings: window._kidjs_.settings
+  settings: window._kidjs_.settings,
+  setAssetUrlFilter: core/* setAssetUrlFilter */.hC
 };
 
 }();

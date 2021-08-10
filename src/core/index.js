@@ -19,7 +19,9 @@ import { display, write } from '../text';
 import { random } from './math';
 
 let triggers = [];
+let parentSetTimeout;
 let timeouts = [];
+let parentSetInterval;
 let intervals = [];
 let urlFilter;
 

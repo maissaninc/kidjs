@@ -18138,9 +18138,9 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
   init() {
     this.body =  matter_js__WEBPACK_IMPORTED_MODULE_1___default().Bodies.circle(this.position.x, this.position.y, this.radius, {
       frictionAir: 0,
-      restitution: 1,
       isStatic: true
     });
+    this.bounciness = 1;
   }
 
   render(context) {
@@ -18811,6 +18811,7 @@ class Actor {
     this.position = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(x, y);
     this._angle = 0;
     this._angularVelocity = 0;
+    this._bounciness = 0.8;
 
     // Detect change in velocity
     this.velocity = new _core_vector__WEBPACK_IMPORTED_MODULE_2__/* .default */ .Z(0, 0);
@@ -18878,13 +18879,13 @@ class Actor {
 
   set anchored(value) {
     if (this.body) {
-      let bounciness = this.body.restitution;
       matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setStatic(this.body, value);
-      this.body.restitution = bounciness;
+      this.body.restitution = this._bounciness;
     }
   }
 
   set bounciness(value) {
+    this._bounciness = value;
     if (this.body) {
       this.body.restitution = value;
     }

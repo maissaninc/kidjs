@@ -21,6 +21,7 @@ export default class Actor {
     this.position = new Vector(x, y);
     this._angle = 0;
     this._angularVelocity = 0;
+    this._bounciness = 0.8;
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -88,13 +89,13 @@ export default class Actor {
 
   set anchored(value) {
     if (this.body) {
-      let bounciness = this.body.restitution;
       Matter.Body.setStatic(this.body, value);
-      this.body.restitution = bounciness;
+      this.body.restitution = this._bounciness;
     }
   }
 
   set bounciness(value) {
+    this._bounciness = value;
     if (this.body) {
       this.body.restitution = value;
     }

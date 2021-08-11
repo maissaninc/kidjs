@@ -10,9 +10,9 @@ export default class Circle extends Shape {
   init() {
     this.body =  Matter.Bodies.circle(this.position.x, this.position.y, this.radius, {
       frictionAir: 0,
-      restitution: 1,
       isStatic: true
     });
+    this.bounciness = 1;
   }
 
   render(context) {

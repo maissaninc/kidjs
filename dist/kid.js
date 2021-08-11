@@ -18878,13 +18878,15 @@ class Actor {
 
   set anchored(value) {
     if (this.body) {
+      let bounciness = this.body.restitution;
       matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setStatic(this.body, value);
+      this.body.restitution = bounciness;
     }
   }
 
   set bounciness(value) {
     if (this.body) {
-      (matter_js__WEBPACK_IMPORTED_MODULE_1___default().body.restitution) = value;
+      this.body.restitution = value;
     }
   }
 
@@ -18904,7 +18906,7 @@ class Actor {
 
   set mass(value) {
     if (this.body) {
-      matter_js__WEBPACK_IMPORTED_MODULE_1___default().body.setMass(this.body, value);
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setMass(this.body, value);
     }
   }
 

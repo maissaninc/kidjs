@@ -88,13 +88,15 @@ export default class Actor {
 
   set anchored(value) {
     if (this.body) {
+      let bounciness = this.body.restitution;
       Matter.Body.setStatic(this.body, value);
+      this.body.restitution = bounciness;
     }
   }
 
   set bounciness(value) {
     if (this.body) {
-      Matter.body.restitution = value;
+      this.body.restitution = value;
     }
   }
 
@@ -114,7 +116,7 @@ export default class Actor {
 
   set mass(value) {
     if (this.body) {
-      Matter.body.setMass(this.body, value);
+      Matter.Body.setMass(this.body, value);
     }
   }
 

@@ -10,6 +10,7 @@ import { circle } from '../shape/circle';
 import { curve } from '../shape/curve';
 import { line } from '../shape/line';
 import { oval } from '../shape/oval';
+import { polygon } from '../shape/polygon';
 import { rect } from '../shape/rect';
 import { triangle, square, pentagon, hexagon, heptagon, octagon } from '../shape/regular';
 import { semicircle } from '../shape/semicircle';
@@ -46,8 +47,10 @@ export function init() {
       window.on = on;
       window.oval = oval;
       window.pentagon = pentagon;
+      window.polygon = polygin;
       window.random = random;
       window.rect = rect;
+      window.rectangle = rect;
       window.semicircle = semicircle;
       window.song = song;
       window.sound = sound;

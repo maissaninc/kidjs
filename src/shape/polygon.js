@@ -11,8 +11,8 @@ export default class Polygon extends Shape {
    * @param {int} x - Initial x coordinate
    * @param {int} y - Initial y coordinate
    */
-  constructor(x, y, body) {
-    super(x, y, body);
+  constructor(x, y) {
+    super(x, y);
     this.points = [];
     this._boundingPolygon = [];
   }
@@ -102,4 +102,16 @@ export default class Polygon extends Shape {
     }
     this.postrender(context);
   }
+}
+
+export function polygon(...args) {
+  if (args.length > 3) {
+    const shape = new Polygon(args[0], args[1]);
+    for (let i = 2; i < args.length - 1; i = i + 1) {
+      shape.addPoint(args[i], args[i + 1]);
+    }
+  }
+  shape.init();
+  window.stage.addChild(shape);
+  return shape;
 }

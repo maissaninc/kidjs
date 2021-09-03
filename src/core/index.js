@@ -47,7 +47,7 @@ export function init() {
       window.on = on;
       window.oval = oval;
       window.pentagon = pentagon;
-      window.polygon = polygin;
+      window.polygon = polygon;
       window.random = random;
       window.rect = rect;
       window.rectangle = rect;

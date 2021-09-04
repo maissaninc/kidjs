@@ -218,7 +218,7 @@ export default class Actor {
    * @param {float} speed - Angular velocity
    * @return {Actor} Reference to self
    */
-  spin(speed = 5) {
+  spin(speed = 1) {
     this.angularVelocity = speed;
     return this;
   }

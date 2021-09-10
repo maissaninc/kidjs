@@ -158,7 +158,7 @@ export default class Actor {
   rotate(degrees) {
     this.angle = this.angle + degrees;
     if (this.body) {
-      Matter.Body.setAngle(this.angle);
+      Matter.Body.setAngle(this.body, this.angle);
     }
     return this;
   }

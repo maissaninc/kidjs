@@ -17416,21 +17416,23 @@ function speak(text) {
 /* harmony import */ var acorn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(244);
 /* harmony import */ var acorn_walk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(608);
 /* harmony import */ var astring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(462);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(193);
-/* harmony import */ var _audio__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(820);
-/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(639);
-/* harmony import */ var _audio_speech__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(834);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(193);
+/* harmony import */ var _audio__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(820);
+/* harmony import */ var _audio_sound__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(639);
+/* harmony import */ var _audio_speech__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(834);
 /* harmony import */ var _shape_circle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(516);
 /* harmony import */ var _shape_curve__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 /* harmony import */ var _shape_line__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(898);
 /* harmony import */ var _shape_oval__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(778);
-/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(85);
-/* harmony import */ var _shape_regular__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(511);
-/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(958);
-/* harmony import */ var _sprite__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(759);
-/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(806);
-/* harmony import */ var _text__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(470);
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(188);
+/* harmony import */ var _shape_polygon__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(564);
+/* harmony import */ var _shape_rect__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(85);
+/* harmony import */ var _shape_regular__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(511);
+/* harmony import */ var _shape_semicircle__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(958);
+/* harmony import */ var _sprite__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(759);
+/* harmony import */ var _shape_star__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(806);
+/* harmony import */ var _text__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(470);
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(188);
+
 
 
 
@@ -17465,31 +17467,33 @@ function init() {
     },
 
     setGlobals: function() {
-      window.beep = _audio__WEBPACK_IMPORTED_MODULE_13__/* .beep */ .Vp;
+      window.beep = _audio__WEBPACK_IMPORTED_MODULE_14__/* .beep */ .Vp;
       window.circle = _shape_circle__WEBPACK_IMPORTED_MODULE_3__/* .circle */ .X;
       window.curve = _shape_curve__WEBPACK_IMPORTED_MODULE_4__/* .curve */ .Q;
-      window.display = _text__WEBPACK_IMPORTED_MODULE_12__/* .display */ .jf;
-      window.frequency = _audio__WEBPACK_IMPORTED_MODULE_13__/* .frequency */ .ts;
-      window.heptagon = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .heptagon */ .cE;
-      window.hexagon = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .hexagon */ .bL;
-      window.image = _sprite__WEBPACK_IMPORTED_MODULE_10__/* .image */ .B;
+      window.display = _text__WEBPACK_IMPORTED_MODULE_13__/* .display */ .jf;
+      window.frequency = _audio__WEBPACK_IMPORTED_MODULE_14__/* .frequency */ .ts;
+      window.heptagon = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .heptagon */ .cE;
+      window.hexagon = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .hexagon */ .bL;
+      window.image = _sprite__WEBPACK_IMPORTED_MODULE_11__/* .image */ .B;
       window.line = _shape_line__WEBPACK_IMPORTED_MODULE_5__/* .line */ .j;
-      window.note = _audio__WEBPACK_IMPORTED_MODULE_13__/* .note */ .JP;
-      window.octagon = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .octagon */ .ky;
-      window.on = _events__WEBPACK_IMPORTED_MODULE_14__.on;
+      window.note = _audio__WEBPACK_IMPORTED_MODULE_14__/* .note */ .JP;
+      window.octagon = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .octagon */ .ky;
+      window.on = _events__WEBPACK_IMPORTED_MODULE_15__.on;
       window.oval = _shape_oval__WEBPACK_IMPORTED_MODULE_6__/* .oval */ .B;
-      window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .pentagon */ .BR;
-      window.random = _math__WEBPACK_IMPORTED_MODULE_15__/* .random */ .MX;
-      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_7__/* .rect */ .J;
-      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_9__/* .semicircle */ .g;
-      window.song = _audio__WEBPACK_IMPORTED_MODULE_13__/* .song */ .K_;
-      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_16__/* .sound */ .e;
-      window.speak = _audio_speech__WEBPACK_IMPORTED_MODULE_17__/* .speak */ .D;
-      window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .square */ .h6;
-      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_11__/* .star */ .h;
-      window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_8__/* .triangle */ .cP;
+      window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .pentagon */ .BR;
+      window.polygon = _shape_polygon__WEBPACK_IMPORTED_MODULE_7__/* .polygon */ .y;
+      window.random = _math__WEBPACK_IMPORTED_MODULE_16__/* .random */ .MX;
+      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .rect */ .J;
+      window.rectangle = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .rect */ .J;
+      window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_10__/* .semicircle */ .g;
+      window.song = _audio__WEBPACK_IMPORTED_MODULE_14__/* .song */ .K_;
+      window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_17__/* .sound */ .e;
+      window.speak = _audio_speech__WEBPACK_IMPORTED_MODULE_18__/* .speak */ .D;
+      window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .square */ .h6;
+      window.star = _shape_star__WEBPACK_IMPORTED_MODULE_12__/* .star */ .h;
+      window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .triangle */ .cP;
       window.wait = wait;
-      window.write = _text__WEBPACK_IMPORTED_MODULE_12__/* .write */ .cW;
+      window.write = _text__WEBPACK_IMPORTED_MODULE_13__/* .write */ .cW;
     },
 
     onframe: function() {
@@ -17684,7 +17688,7 @@ function reset() {
 
   // Reset event listeners
   triggers = [];
-  (0,_events__WEBPACK_IMPORTED_MODULE_14__/* .removeAllEventListeners */ .R)();
+  (0,_events__WEBPACK_IMPORTED_MODULE_15__/* .removeAllEventListeners */ .R)();
 
   // Reset timeouts
   for (let i = 0; i < timeouts.length; i = i + 1) {
@@ -18390,7 +18394,8 @@ function oval(x, y, width, height) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": function() { return /* binding */ Polygon; }
+/* harmony export */   "Z": function() { return /* binding */ Polygon; },
+/* harmony export */   "y": function() { return /* binding */ polygon; }
 /* harmony export */ });
 /* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(238);
 /* harmony import */ var _core_vector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(599);
@@ -18409,8 +18414,8 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
    * @param {int} x - Initial x coordinate
    * @param {int} y - Initial y coordinate
    */
-  constructor(x, y, body) {
-    super(x, y, body);
+  constructor(x, y) {
+    super(x, y);
     this.points = [];
     this._boundingPolygon = [];
   }
@@ -18500,6 +18505,18 @@ class Polygon extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
     }
     this.postrender(context);
   }
+}
+
+function polygon(...args) {
+  if (args.length > 3) {
+    const shape = new Polygon(args[0], args[1]);
+    for (let i = 2; i < args.length - 1; i = i + 1) {
+      shape.addPoint(args[i], args[i + 1]);
+    }
+  }
+  shape.init();
+  window.stage.addChild(shape);
+  return shape;
 }
 
 
@@ -18948,7 +18965,7 @@ class Actor {
   rotate(degrees) {
     this.angle = this.angle + degrees;
     if (this.body) {
-      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setAngle(this.angle);
+      matter_js__WEBPACK_IMPORTED_MODULE_1___default().Body.setAngle(this.body, this.angle);
     }
     return this;
   }
@@ -19008,7 +19025,7 @@ class Actor {
    * @param {float} speed - Angular velocity
    * @return {Actor} Reference to self
    */
-  spin(speed = 5) {
+  spin(speed = 1) {
     this.angularVelocity = speed;
     return this;
   }

@@ -212,16 +212,18 @@ export default class Stage {
   dispatchEvent(event, context = window) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
-        switch (event.constructor.name) {
-          case 'KeyboardEvent':
-            handler.call(context, event.key);
-            break;
-          case 'MouseEvent':
-          case 'PointerEvent':
-            handler.call(context, event.x, event.y);
-            break;
-          default:
-            handler.call(context);
+        if (typeof handler == 'function') {
+          switch (event.constructor.name) {
+            case 'KeyboardEvent':
+              handler.call(context, event.key);
+              break;
+            case 'MouseEvent':
+            case 'PointerEvent':
+              handler.call(context, event.x, event.y);
+              break;
+            default:
+              handler.call(context);
+          }
         }
       }
     }

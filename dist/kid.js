@@ -18556,6 +18556,9 @@ class Rect extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 }
 
 function rect(x, y, width, height) {
+  if (x == null || y == null || width == null || height == null) {
+    return;
+  }
   const shape = new Rect(x, y, width, height);
   shape.init();
   window.stage.addChild(shape);

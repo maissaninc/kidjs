@@ -21,6 +21,9 @@ export default class Rect extends Polygon {
 }
 
 export function rect(x, y, width, height) {
+  if (x == null || y == null || width == null || height == null) {
+    return;
+  }
   const shape = new Rect(x, y, width, height);
   shape.init();
   window.stage.addChild(shape);

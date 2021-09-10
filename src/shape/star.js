@@ -20,6 +20,9 @@ export default class Star extends Polygon {
 }
 
 export function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
+  if (x == null || y == null || outerDiameter == null) {
+    return;
+  }
 
   let goldenRatio = (1 + Math.sqrt(5)) / 2;
   let outerRadius = outerDiameter / 2;

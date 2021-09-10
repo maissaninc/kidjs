@@ -15,6 +15,9 @@ export default class Semicircle extends Shape {
 }
 
 export function semicircle(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   const shape = new Semicircle(x, y, diameter / 2);
   window.stage.addChild(shape);
   return shape;

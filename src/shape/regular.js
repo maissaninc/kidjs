@@ -18,6 +18,9 @@ export default class RegularPolygon extends Polygon {
 }
 
 export function triangle(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 3);
   shape.init();
   window.stage.addChild(shape);
@@ -25,6 +28,9 @@ export function triangle(x, y, diameter) {
 }
 
 export function square(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
   shape.init();
   window.stage.addChild(shape);
@@ -32,6 +38,10 @@ export function square(x, y, diameter) {
 }
 
 export function pentagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
+
   let shape = new RegularPolygon(x, y, diameter / 2, 5);
   shape.init();
   window.stage.addChild(shape);
@@ -39,6 +49,9 @@ export function pentagon(x, y, diameter) {
 }
 
 export function hexagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 6);
   shape.init();
   window.stage.addChild(shape);
@@ -46,6 +59,9 @@ export function hexagon(x, y, diameter) {
 }
 
 export function heptagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 7);
   shape.init();
   window.stage.addChild(shape);
@@ -53,6 +69,9 @@ export function heptagon(x, y, diameter) {
 }
 
 export function octagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 8);
   shape.init();
   window.stage.addChild(shape);

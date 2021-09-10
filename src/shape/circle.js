@@ -23,6 +23,9 @@ export default class Circle extends Shape {
 }
 
 export function circle(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   const shape = new Circle(x, y, diameter / 2);
   shape.init();
   window.stage.addChild(shape);

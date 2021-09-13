@@ -18155,6 +18155,9 @@ class Circle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 }
 
 function circle(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   const shape = new Circle(x, y, diameter / 2);
   shape.init();
   window.stage.addChild(shape);
@@ -18345,6 +18348,9 @@ class Line extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 }
 
 function line(x1, y1, x2, y2) {
+  if (x1 == null || y1 == null || x2 == null || y2 == null) {
+    return;
+  }
   let shape = new Line(x1, y1, x2, y2);
   window.stage.addChild(shape);
   return shape;
@@ -18381,6 +18387,9 @@ class Oval extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 }
 
 function oval(x, y, width, height) {
+  if (x == null || y == null || width == null || height == null) {
+    return;
+  }
   const shape = new Oval(x, y, width / 2, height / 2);
   window.stage.addChild(shape);
   return shape;
@@ -18603,6 +18612,9 @@ class RegularPolygon extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */
 }
 
 function triangle(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 3);
   shape.init();
   window.stage.addChild(shape);
@@ -18610,6 +18622,9 @@ function triangle(x, y, diameter) {
 }
 
 function square(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 4);
   shape.init();
   window.stage.addChild(shape);
@@ -18617,6 +18632,10 @@ function square(x, y, diameter) {
 }
 
 function pentagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
+
   let shape = new RegularPolygon(x, y, diameter / 2, 5);
   shape.init();
   window.stage.addChild(shape);
@@ -18624,6 +18643,9 @@ function pentagon(x, y, diameter) {
 }
 
 function hexagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 6);
   shape.init();
   window.stage.addChild(shape);
@@ -18631,6 +18653,9 @@ function hexagon(x, y, diameter) {
 }
 
 function heptagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 7);
   shape.init();
   window.stage.addChild(shape);
@@ -18638,6 +18663,9 @@ function heptagon(x, y, diameter) {
 }
 
 function octagon(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   let shape = new RegularPolygon(x, y, diameter / 2, 8);
   shape.init();
   window.stage.addChild(shape);
@@ -18673,6 +18701,9 @@ class Semicircle extends ___WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 }
 
 function semicircle(x, y, diameter) {
+  if (x == null || y == null || diameter == null) {
+    return;
+  }
   const shape = new Semicircle(x, y, diameter / 2);
   window.stage.addChild(shape);
   return shape;
@@ -18713,6 +18744,9 @@ class Star extends _polygon__WEBPACK_IMPORTED_MODULE_0__/* .default */ .Z {
 }
 
 function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
+  if (x == null || y == null || outerDiameter == null) {
+    return;
+  }
 
   let goldenRatio = (1 + Math.sqrt(5)) / 2;
   let outerRadius = outerDiameter / 2;
@@ -19519,16 +19553,18 @@ class Stage {
   dispatchEvent(event, context = window) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let handler of this.eventListeners[event.type]) {
-        switch (event.constructor.name) {
-          case 'KeyboardEvent':
-            handler.call(context, event.key);
-            break;
-          case 'MouseEvent':
-          case 'PointerEvent':
-            handler.call(context, event.x, event.y);
-            break;
-          default:
-            handler.call(context);
+        if (typeof handler == 'function') {
+          switch (event.constructor.name) {
+            case 'KeyboardEvent':
+              handler.call(context, event.key);
+              break;
+            case 'MouseEvent':
+            case 'PointerEvent':
+              handler.call(context, event.x, event.y);
+              break;
+            default:
+              handler.call(context);
+          }
         }
       }
     }
@@ -19562,15 +19598,17 @@ class Stage {
 window.addEventListener('DOMContentLoaded', function() {
 
   // Create canvas
-  window.stage = new Stage();
+  window.stage = new Stage(window.KID.settings.width, window.KID.settings.height);
   document.body.style.margin = 0;
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
 
   // Resize canvas
-  window.addEventListener('resize', function() {
-    window.stage.resize();
-  });
+  if (!window.KID.settings.width || !window.KID.settings.height) {
+    window.addEventListener('resize', function() {
+      window.stage.resize();
+    });
+  }
 
   // Setup events
   (0,events/* default */.Z)();

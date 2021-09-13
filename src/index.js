@@ -8,15 +8,17 @@ init();
 window.addEventListener('DOMContentLoaded', function() {
 
   // Create canvas
-  window.stage = new Stage();
+  window.stage = new Stage(window.KID.settings.width, window.KID.settings.height);
   document.body.style.margin = 0;
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
 
   // Resize canvas
-  window.addEventListener('resize', function() {
-    window.stage.resize();
-  });
+  if (!window.KID.settings.width || !window.KID.settings.height) {
+    window.addEventListener('resize', function() {
+      window.stage.resize();
+    });
+  }
 
   // Setup events
   initEvents();

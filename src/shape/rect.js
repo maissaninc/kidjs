@@ -29,3 +29,13 @@ export function rect(x, y, width, height) {
   window.stage.addChild(shape);
   return shape;
 }
+
+export function square(x, y, size) {
+  if (x == null || y == null || size == null) {
+    return;
+  }
+  let shape = new Rect(x, y, size, size);
+  shape.init();
+  window.stage.addChild(shape);
+  return shape;
+}

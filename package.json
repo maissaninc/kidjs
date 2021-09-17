@@ -1,8 +1,13 @@
 {
   "name": "@maissaninc/kidjs",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "https://kidjs.org",
   "license": "MIT",
+  "author": {
+    "name": "Chris Maissan",
+    "email": "chris@maissan.net",
+    "url": "https://maissan.net"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/maissaninc/kidjs.git"
@@ -22,7 +27,8 @@
     "webpack-cli": "^4.5.0"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack --config webpack.dev.js",
     "prepare": "npm run build"
   },
   "browserslist": {

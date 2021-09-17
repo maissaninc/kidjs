@@ -1,12 +1,10 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'production',
   entry: './src/index.js',
-  optimization: {
-    minimize: false
-  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'kid.js',
+    filename: 'kid.min.js',
   },
 };

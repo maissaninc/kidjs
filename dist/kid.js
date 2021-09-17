@@ -17483,13 +17483,13 @@ function init() {
       window.pentagon = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .pentagon */ .BR;
       window.polygon = _shape_polygon__WEBPACK_IMPORTED_MODULE_7__/* .polygon */ .y;
       window.random = _math__WEBPACK_IMPORTED_MODULE_16__/* .random */ .MX;
-      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .rect */ .J;
-      window.rectangle = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .rect */ .J;
+      window.rect = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .rect */ .JA;
+      window.rectangle = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .rect */ .JA;
       window.semicircle = _shape_semicircle__WEBPACK_IMPORTED_MODULE_10__/* .semicircle */ .g;
       window.song = _audio__WEBPACK_IMPORTED_MODULE_14__/* .song */ .K_;
       window.sound = _audio_sound__WEBPACK_IMPORTED_MODULE_17__/* .sound */ .e;
       window.speak = _audio_speech__WEBPACK_IMPORTED_MODULE_18__/* .speak */ .D;
-      window.square = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .square */ .h6;
+      window.square = _shape_rect__WEBPACK_IMPORTED_MODULE_8__/* .square */ .h6;
       window.star = _shape_star__WEBPACK_IMPORTED_MODULE_12__/* .star */ .h;
       window.triangle = _shape_regular__WEBPACK_IMPORTED_MODULE_9__/* .triangle */ .cP;
       window.wait = wait;
@@ -18536,7 +18536,8 @@ function polygon(...args) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "J": function() { return /* binding */ rect; }
+/* harmony export */   "JA": function() { return /* binding */ rect; },
+/* harmony export */   "h6": function() { return /* binding */ square; }
 /* harmony export */ });
 /* unused harmony export default */
 /* harmony import */ var _polygon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(564);
@@ -18574,6 +18575,16 @@ function rect(x, y, width, height) {
   return shape;
 }
 
+function square(x, y, size) {
+  if (x == null || y == null || size == null) {
+    return;
+  }
+  let shape = new Rect(x, y, size, size);
+  shape.init();
+  window.stage.addChild(shape);
+  return shape;
+}
+
 
 /***/ }),
 
@@ -18583,7 +18594,6 @@ function rect(x, y, width, height) {
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "cP": function() { return /* binding */ triangle; },
-/* harmony export */   "h6": function() { return /* binding */ square; },
 /* harmony export */   "BR": function() { return /* binding */ pentagon; },
 /* harmony export */   "bL": function() { return /* binding */ hexagon; },
 /* harmony export */   "cE": function() { return /* binding */ heptagon; },
@@ -18616,16 +18626,6 @@ function triangle(x, y, diameter) {
     return;
   }
   let shape = new RegularPolygon(x, y, diameter / 2, 3);
-  shape.init();
-  window.stage.addChild(shape);
-  return shape;
-}
-
-function square(x, y, diameter) {
-  if (x == null || y == null || diameter == null) {
-    return;
-  }
-  let shape = new RegularPolygon(x, y, diameter / 2, 4);
   shape.init();
   window.stage.addChild(shape);
   return shape;

@@ -1,8 +1,8 @@
 # Kid.js
 
-Kid.js is a framework designed to make JavaScript more accessible for children
-and beginner programmers. It eliminates the need to first understand the DOM
-and provides helper functions that simplify many of the browser APIs.
+Kid.js is a framework designed to make JavaScript more accessible for kids and
+beginner programmers. It eliminates the need to first understand the DOM and
+provides functions to create drawings, animations and simple games.
 
 ## Usage
 
@@ -25,7 +25,7 @@ Use the following HTML template to get started. Any code written inside of
 </html>
 ```
 
-See the [Wiki](https://github.com/maissaninc/kidjs/wiki) for a comprehensive
-list of available commands and events.
+See the [documentation](https://kidjs.org) for a comprehensive list of available
+functions, properties and events.
 
 Supported by [Maissan Inc.](https://maissan.net)

@@ -122,8 +122,26 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
+        console.log(astring.generate(node.body[i]));
+        console.log(node.body[i]);
+
+        // Check if call to on() method
+        let target =  isNodeMethod('on', node.body[i]);
+        if (target) {
+
+          // Check if expression passed as event
+          if (node.body[i].expression.arguments[0].type == 'BinaryExpression') {
+            console.log('Expression as event');
+          }
+
+          // Check if expression passed as handler
+          if (['AssignmentExpression', 'FunctionExpression'].includes(node.body[i].expression.arguments[1].type)) {
+            console.log('Expression as handler');
+          }
+        }
+
         // Look for calls to on() method with an expression passed
-        if (node.body[i].type == 'ExpressionStatement' &&
+        /*if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.callee !== 'undefined' &&
           node.body[i].expression.callee.name == 'on' &&
           node.body[i].expression.arguments.length > 1 &&
@@ -157,7 +175,7 @@ async function compile(code) {
         ) {
           node.body[i].expression.arguments[1].type = 'Literal';
           node.body[i].expression.arguments[1].value = node.body[i].expression.arguments[1].name;
-        }
+        }*/
 
         // Look for calls to display() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
@@ -220,6 +238,50 @@ async function compile(code) {
   `
 }
 
+/**
+ * Determine if AST node represents a call to on() method.
+ *
+ * @param {String} name - Method name
+ * @param {Object} node - AST node
+ * @return {mixed} Object associated with "on" method, or false
+ */
+function isNodeMethod(name, node) {
+  if (node.type == 'ExpressionStatement') {
+    if (node.expression.callee.type == 'Identifier' && node.expression.callee.name == name) {
+      return window;
+    }
+    if (node.expression.callee.type == 'MemberExpression' && node.expression.callee.property.name == name) {
+      return node.expression.callee.object;
+    }
+  }
+  return false;
+}
+
+/**
+ * Create AST node containing inline function.
+ *
+ * @param {Object} node - AST node containing code of function
+ * @return {Object} AST node containing inline function
+ */
+function createInlineFunction(node) {
+  return {
+    type: 'FunctionExpression',
+    body: {
+      type: 'BlockStatement',
+      body: [{
+        type: 'ExpressionStatement',
+        expression: node
+      }]
+    }
+  }
+}
+
+/**
+ * Create AST node to call step() method.
+ *
+ * @param {Object} location - Location in code
+ * @return {Object} AST node containing call to step() method
+ */
 function createStepStatement(location) {
   return {
     type: 'ExpressionStatement',

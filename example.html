@@ -2,36 +2,14 @@
 <html>
   <head>
     <title>Hello World</title>
-    <script src="dist/kid.min.js"></script>
+    <script src="dist/kid.js"></script>
   </head>
   <body>
     <script type="kidjs">
 
-      gravity = 0
-
-      let ball = circle(width / 2, height / 2, 30, 20)
-      let player1 = rect(width / 2 - 50, 20, 100, 20)
-      let player2 = rect(width / 2 - 50, height - 40, 100, 20)
-
-      let wall1 = rect(0, height / 2, 10, height)
-      let wall2 = rect(width, height / 2, 10, height)
-
-      function start() {
-        ball.x = width / 2
-        ball.y = height / 2
-        ball.push(2, 6)
-      }
-
-      function keydown(key) {
-        if (key == 'a') player1.move(-5)
-        if (key == 'd') player1.move(5)
-        if (key == 'ArrowLeft') player2.move(-5)
-        if (key == 'ArrowRight') player2.move(5)
-      }
-
-      on('keydown', keydown)
-      on('space', start)
-
+      on('click', function() {
+        console.log('inline function');
+      });
 
     </script>
   </body>

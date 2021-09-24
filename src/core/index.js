@@ -135,8 +135,8 @@ async function compile(code) {
           }
 
           // Check if expression passed as handler
-          if (['AssignmentExpression', 'FunctionExpression'].includes(node.body[i].expression.arguments[1].type)) {
-            console.log('Expression as handler');
+          if (['AssignmentExpression', 'CallExpression'].includes(node.body[i].expression.arguments[1].type)) {
+            node.body[i].expression.arguments[1] = createInlineFunction(node.body[i].expression.arguments[1]);
           }
         }
 

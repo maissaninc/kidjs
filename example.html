@@ -11,7 +11,13 @@
         console.log('test');
       });*/
 
-      on('click', console.log('test'));
+      let t = 0;
+
+      display(100, 100, t);
+
+      on('click', t = t + 1);
+
+      on(t > 5, console.log('done'));
 
     </script>
   </body>

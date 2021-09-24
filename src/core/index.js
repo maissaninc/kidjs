@@ -129,53 +129,33 @@ async function compile(code) {
         let target =  isNodeMethod('on', node.body[i]);
         if (target) {
 
-          // Check if expression passed as event
-          if (node.body[i].expression.arguments[0].type == 'BinaryExpression') {
-            console.log('Expression as event');
-          }
-
           // Check if expression passed as handler
           if (['AssignmentExpression', 'CallExpression'].includes(node.body[i].expression.arguments[1].type)) {
             node.body[i].expression.arguments[1] = createInlineFunction(node.body[i].expression.arguments[1]);
           }
-        }
 
-        // Look for calls to on() method with an expression passed
-        /*if (node.body[i].type == 'ExpressionStatement' &&
-          typeof node.body[i].expression.callee !== 'undefined' &&
-          node.body[i].expression.callee.name == 'on' &&
-          node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[0].type == 'BinaryExpression'
-        ) {
+          // Check if expression passed as event
+          if (node.body[i].expression.arguments[0].type == 'BinaryExpression') {
 
-          // Function name passed as second parameter
-          if (node.body[i].expression.arguments[1].type == 'Identifier') {
-            triggers.push({
-              'condition': astring.generate(node.body[i].expression.arguments[0]),
-              'code': node.body[i].expression.arguments[1].name + '();'
-            });
-          }
+            // Function name passed as second parameter
+            if (node.body[i].expression.arguments[1].type == 'Identifier') {
+              triggers.push({
+                'condition': astring.generate(node.body[i].expression.arguments[0]),
+                'code': node.body[i].expression.arguments[1].name + '();',
+                'target': target
+              });
+            }
 
-          // Inline function passed as second parameter
-          if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
-            triggers.push({
-              'condition': astring.generate(node.body[i].expression.arguments[0]),
-              'code': '(' + astring.generate(node.body[i].expression.arguments[1]) + ')();'
-            });
+            // Inline function passed as second parameter
+            if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
+              triggers.push({
+                'condition': astring.generate(node.body[i].expression.arguments[0]),
+                'code': '(' + astring.generate(node.body[i].expression.arguments[1]) + ')();',
+                'target': target
+              });
+            }
           }
         }
-
-        // Look for calls to on() method of object
-        if (node.body[i].type == 'ExpressionStatement' &&
-          typeof node.body[i].expression.callee !== 'undefined' &&
-          typeof node.body[i].expression.callee.property !== 'undefined' &&
-          node.body[i].expression.callee.property.name == 'on' &&
-          node.body[i].expression.arguments.length > 1 &&
-          node.body[i].expression.arguments[1].type == 'Identifier'
-        ) {
-          node.body[i].expression.arguments[1].type = 'Literal';
-          node.body[i].expression.arguments[1].value = node.body[i].expression.arguments[1].name;
-        }*/
 
         // Look for calls to display() method with an expression passed
         if (node.body[i].type == 'ExpressionStatement' &&
@@ -246,7 +226,8 @@ async function compile(code) {
  * @return {mixed} Object associated with "on" method, or false
  */
 function isNodeMethod(name, node) {
-  if (node.type == 'ExpressionStatement') {
+  console.log(node);
+  if (node.type == 'ExpressionStatement' && node.expression.callee) {
     if (node.expression.callee.type == 'Identifier' && node.expression.callee.name == name) {
       return window;
     }
@@ -334,8 +315,8 @@ export function reset() {
 export async function run(code) {
   try {
     window.stage.run();
-    let processed = await compile(code);
     reset();
+    let processed = await compile(code);
     eval(processed);
   } catch(exception) {
     console.log(exception);

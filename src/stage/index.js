@@ -108,8 +108,8 @@ export default class Stage {
     window.font = 'Arial';
     window.fontColor = 'black';
     window.fontSize = '40px';
-    window.textAlign = 'left';
-    window.textBaseline = 'top';
+    window.textAlign = 'center';
+    window.textBaseline = 'middle';
     window.fill = 'white';
     window.stroke = 'black';
     window.lineWidth = 2;

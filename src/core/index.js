@@ -122,9 +122,6 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
-        console.log(astring.generate(node.body[i]));
-        console.log(node.body[i]);
-
         // Check if call to on() method
         let target =  isNodeMethod('on', node.body[i]);
         if (target) {
@@ -226,7 +223,6 @@ async function compile(code) {
  * @return {mixed} Object associated with "on" method, or false
  */
 function isNodeMethod(name, node) {
-  console.log(node);
   if (node.type == 'ExpressionStatement' && node.expression.callee) {
     if (node.expression.callee.type == 'Identifier' && node.expression.callee.name == name) {
       return window;

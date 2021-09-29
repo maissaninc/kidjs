@@ -66,7 +66,7 @@ export function init() {
       window.dispatchEvent(new Event('animationframe'));
       for (let i = 0; i < triggers.length; i++) {
         try {
-          if (window._kidjs_.eval(triggers[i].condition)) {
+          if ≈(triggers[i].condition)) {
             window._kidjs_.eval(triggers[i].code);
           }
         } catch(ex) {
@@ -202,7 +202,11 @@ async function compile(code) {
   return `
     (async function() {
       window._kidjs_.eval = function(key) {
-        return eval(key);
+        try {
+          return eval(key);
+        } catch {
+          // Don't die on me
+        }
       };
       window._kidjs_.get = function(key) {
         if (eval('typeof ' + key) !== 'undefined') {

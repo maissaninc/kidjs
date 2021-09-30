@@ -66,7 +66,7 @@ export function init() {
       window.dispatchEvent(new Event('animationframe'));
       for (let i = 0; i < triggers.length; i++) {
         try {
-          if ≈(triggers[i].condition)) {
+          if (window._kidjs_.eval(triggers[i].condition)) {
             window._kidjs_.eval(triggers[i].code);
           }
         } catch(ex) {

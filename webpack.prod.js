@@ -16,4 +16,16 @@ module.exports = {
   plugins: [
     new BomPlugin(true)
   ],
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+          },
+        ],
+      },
+    ],
+  },
 };

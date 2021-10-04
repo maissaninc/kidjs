@@ -100,8 +100,8 @@ export default class Stage {
   reset() {
 
     // Reset fill and stroke
-    window.fill = 'white';
-    window.stroke = 'black';
+    window.fill = 'theme';
+    window.stroke = false;
     window.lineWidth = 2;
 
     // Reset font properties
@@ -110,8 +110,6 @@ export default class Stage {
     window.fontSize = '40px';
     window.textAlign = 'center';
     window.textBaseline = 'middle';
-    window.fill = 'white';
-    window.stroke = 'black';
     window.lineWidth = 2;
 
     // Reset audio properties

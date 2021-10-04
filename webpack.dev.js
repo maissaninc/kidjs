@@ -10,4 +10,16 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'kid.js',
   },
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
+    ],
+  },
 };

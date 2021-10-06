@@ -177,6 +177,9 @@ export default class Stage {
    * @param {function} [handler] - Event handler to execute when event occurs.
    */
   addEventListener(event, handler) {
+    if (event == 'doubleclick') {
+      event = 'dblclick';
+    }
     if (this.eventListeners[event] == undefined) {
       this.eventListeners[event] = [];
     }

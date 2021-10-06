@@ -11,6 +11,7 @@ function onMouseDown(e) {
   y = e.clientY;
   t = Date.now();
   window.mouseButton = e.button == 2 ? 'right' : 'left'
+  window.stage.dispatchEvent(e);
 }
 
 function onMouseUp(e) {
@@ -39,11 +40,13 @@ function onMouseUp(e) {
   }
 
   t = false;
+  window.stage.dispatchEvent(e);
 }
 
 function onMouseMove(e) {
   window.mouseX = e.clientX;
   window.mouseY = e.clientY;
+  window.stage.dispatchEvent(e);
 }
 
 function onClick(e) {
@@ -66,4 +69,5 @@ export default function() {
     window.addEventListener('mousemove', onMouseMove);
   }
   window.addEventListener('click', onClick);
+  window.addEventListener('dblclick', onClick);
 }

@@ -58,6 +58,16 @@ function onClick(e) {
   window.stage.dispatchEvent(e);
 }
 
+function onDoubleClick(e) {
+  e.type = 'doubleclick';
+  for (let i = window.stage.actors.length - 1; i >= 0; i--) {
+    if (window.stage.actors[i].containsPoint(e.clientX, e.clientY)) {
+      window.stage.actors[i].dispatchEvent(e);
+    }
+  }
+  window.stage.dispatchEvent(e);
+}
+
 export default function() {
   if ('ontouchstart' in window) {
     window.addEventListener('touchstart', onMouseDown);
@@ -69,5 +79,5 @@ export default function() {
     window.addEventListener('mousemove', onMouseMove);
   }
   window.addEventListener('click', onClick);
-  window.addEventListener('dblclick', onClick);
+  window.addEventListener('dblclick', onDoubleClick);
 }

@@ -151,6 +151,20 @@ export default class Actor {
   }
 
   /**
+   * Add animation.
+   *
+   * @param {object} properties - Properties to animate
+   * @param {int} duration - Duration to animation properties over
+   * @param {string} tween - Easing function
+   * @return void
+   */
+  addAnimation(properties, duration, tween) {
+    this.animations.push(
+      new Animation(this, properties, duration, tween)
+    );
+  }
+
+  /**
    * Rotate specified number of degrees.
    *
    * @param {float} angle - Number of degrees to rotate
@@ -174,12 +188,10 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   moveTo(x, y, duration = 1, tween = 'easeInOut') {
-    this.animations.push(
-      new Animation(this, {
-        x: x,
-        y: y
-      }, duration, tween)
-    );
+    this.addAnimation({
+      x: x,
+      y: y
+    }, duration, tween);
     return this;
   }
 
@@ -194,6 +206,17 @@ export default class Actor {
    */
   move(x = 0, y = 0, duration = 1, tween = 'easeInOut') {
     this.moveTo(this.x + x, this.y + y, duration, tween);
+    return this;
+  }
+
+  /**
+   * Move relative to current position.
+   *
+   * @param {int} amount - Number of pixels to grow
+   * @return {Actor} Reference to self
+   */
+  shrink(amount) {
+    this.grow(-amount);
     return this;
   }
 

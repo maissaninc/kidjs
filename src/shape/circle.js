@@ -20,6 +20,13 @@ export default class Circle extends Shape {
     context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     this.postrender(context);
   }
+
+  grow(amount, duration = 1, tween = 'easeInOut') {
+    this.addAnimation({
+      radius: this.radius + (amount / 2)
+    }, duration, tween)
+    return this;
+  }
 }
 
 export function circle(x, y, diameter) {

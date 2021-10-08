@@ -1,3 +1,4 @@
+import Animation from '../animation';
 import Circle from '../shape/circle';
 import Vector from '../core/vector';
 import { degreesToRadians, radiansToDegrees }  from '../core/math';
@@ -15,7 +16,6 @@ export default class Actor {
   constructor(x, y) {
     this.frame = 0;
     this.state = 'default';
-    this.destination = new Vector(x, y);
 
     // Internal properties
     this.position = new Vector(x, y);
@@ -32,6 +32,9 @@ export default class Actor {
       }
     }
 
+    // Animation queue
+    this.animations = [];
+
     // Event listeners
     this.eventListeners = {};
   }
@@ -46,8 +49,6 @@ export default class Actor {
 
   set x(value) {
     this.position.x = value;
-    this.velocity.x = 0;
-    this.velocity.y = 0;
     if (this.body) {
       Matter.Body.setPosition(this.body, this.position);
     }
@@ -55,8 +56,6 @@ export default class Actor {
 
   set y(value) {
     this.position.y = value;
-    this.velocity.x = 0;
-    this.velocity.y = 0;
     if (this.body) {
       Matter.Body.setPosition(this.body, this.position);
     }
@@ -89,8 +88,16 @@ export default class Actor {
 
   set anchored(value) {
     if (this.body) {
-      Matter.Body.setStatic(this.body, value);
+      Matter.Body.setStatic(this.body, this._anchored);
       this.body.restitution = this._bounciness;
+    }
+  }
+
+  get anchored() {
+    if (this.body) {
+      return this.body.isStatic;
+    } else {
+      return true;
     }
   }
 
@@ -137,15 +144,9 @@ export default class Actor {
       this.angle = this.angle + this.angularVelocity;
     }
 
-    // Move along vector to destination
-    if (this.status == 'sliding') {
-      let v = this.destination.subtract(this.position);
-      if (v.length > 0.05) {
-        this.position = this.position.add(v.scale(0.05));
-        this.status = 'default';
-      } else {
-        this.position = this.destination;
-      }
+    // Update animations
+    for (let i = 0; i < this.animations.length; i = i + 1) {
+      this.animations[i].update();
     }
   }
 
@@ -164,35 +165,36 @@ export default class Actor {
   }
 
   /**
-   * Move relative to current position.
+   * Move to a new position.
    *
-   * @param {int} x - Number of pixels to move along x axis
-   * @param {int} y - Number of pixels to move along y axis
+   * @param {int} x - Destination x coordinate
+   * @param {int} y - Destination y coorindate
+   * @param {int} duration - Length of animation in seconds
+   * @param {string} tween - Easing function
    * @return {Actor} Reference to self
    */
-  move(x = 0, y = 0) {
-    this.position.x = this.position.x + x;
-    this.position.y = this.position.y + y;
-    if (this.body) {
-      Matter.Body.setPosition(this.body, this.position);
-    }
+  moveTo(x, y, duration = 1, tween = 'easeInOut') {
+    this.animations.push(
+      new Animation(this, {
+        x: x,
+        y: y
+      }, duration, tween)
+    );
     return this;
   }
 
   /**
-   * Slide relative to current position.
+   * Move relative to current position.
    *
    * @param {int} x - Number of pixels to move along x axis
    * @param {int} y - Number of pixels to move along y axis
+   * @param {int} duration - Length of animation in seconds
+   * @param {string} tween - Easing function
    * @return {Actor} Reference to self
    */
-  slide(x = 0, y = 0) {
-    this.status = 'sliding';
-    this.destination.x = this.position.x + x;
-    this.destination.y = this.position.y + y;
-    if (this.body) {
-      Matter.Body.setPosition(this.body, this.position);
-    }
+  move(x = 0, y = 0, duration = 1, tween = 'easeInOut') {
+    this.moveTo(this.x + x, this.y + y, duration, tween);
+    return this;
   }
 
   /**

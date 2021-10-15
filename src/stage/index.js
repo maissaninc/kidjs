@@ -102,7 +102,7 @@ export default class Stage {
     // Reset fill and stroke
     window.fill = 'theme';
     window.stroke = false;
-    window.lineWidth = 5;
+    window.lineWidth = 3;
 
     // Reset font properties
     window.font = 'Arial';

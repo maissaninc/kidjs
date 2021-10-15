@@ -21,7 +21,7 @@ export default class Curve extends Shape {
     points.push(points[points.length-1]);
     context.moveTo(points[0].x, points[0].y);
     for (let i = 0; i < points.length - 3; i++) {
-      for (let t = 0; t <= 1; t += 0.1) {
+      for (let t = 0; t <= 1; t += 0.01) {
         let ax = (-points[i].x + 3 * points[i + 1].x - 3 * points[i + 2].x + points[i + 3].x) / 6;
         let ay = (-points[i].y + 3 * points[i + 1].y - 3 * points[i + 2].y + points[i + 3].y) / 6;
         let bx = (points[i].x - 2 * points[i + 1].x + points[i + 2].x) / 2;

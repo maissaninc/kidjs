@@ -1,22 +1,13 @@
 import Tween from './tween';
 
 export default class Animation {
-  constructor(actor, properties, duration, tween) {
+  constructor(actor, properties, duration, tween, queue = false) {
     this.actor = actor;
-    this.status = 'ready';
+    this.status = queue ? 'queued' : 'ready';
     this.duration = duration * 1000;
     this.to = properties;
     this.tween = tween;
-
-    // Capture initial property values
-    this.from = {};
-    for (const property in this.to) {
-      if (typeof this.actor[property] == 'number') {
-        if (this.actor[property] != this.to[property]) {
-          this.from[property] = this.actor[property];
-        }
-      }
-    }
+    this.from = {}
   }
 
   /**
@@ -24,6 +15,18 @@ export default class Animation {
    */
   update() {
     if (this.status == 'ready') {
+
+      // Capture initial property values
+      this.from = {};
+      for (const property in this.to) {
+        if (typeof this.actor[property] == 'number') {
+          if (this.actor[property] != this.to[property]) {
+            this.from[property] = this.actor[property];
+          }
+        }
+      }
+
+      // Start animation
       this.status = 'running';
       this.start = Date.now();
     }
@@ -42,5 +45,25 @@ export default class Animation {
         this.status = 'complete';
       }
     }
+  }
+
+  animate(properties, duration = 1, tween = 'easeInOut') {
+    return this.actor.animate(properties, duration, tween, true);
+  }
+
+  grow(amount, duration = 1, tween = 'easeInOut') {
+    return this.actor.grow(amount, duration, tween, true);
+  }
+
+  shrink(amount, duration = 1, tween = 'easeInOut') {
+    return this.actor.shrink(amount, duration, tween, true);
+  }
+
+  moveTo(x, y, duration = 1, tween = 'easeInOut') {
+    return this.actor.moveTo(x, y, duration, tween, true);
+  }
+
+  move(x, y, duration = 1, tween = 'easeInOut') {
+    return this.actor.move(x, y, duration, tween, true);
   }
 }

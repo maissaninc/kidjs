@@ -145,23 +145,16 @@ export default class Actor {
     }
 
     // Update animations
-    for (let i = 0; i < this.animations.length; i = i + 1) {
-      this.animations[i].update();
+    if (this.animations[0].status == 'queued') {
+      this.animations[0].status = 'ready';
     }
-  }
-
-  /**
-   * Add animation.
-   *
-   * @param {object} properties - Properties to animate
-   * @param {int} duration - Duration to animation properties over
-   * @param {string} tween - Easing function
-   * @return void
-   */
-  addAnimation(properties, duration, tween) {
-    this.animations.push(
-      new Animation(this, properties, duration, tween)
-    );
+    for (let i = 0; i < this.animations.length; i = i + 1) {
+      if (this.animations[i].status == 'queued') break;
+      this.animations[i].update();
+      if (this.animations[i].status == 'complete') {
+        this.animations.splice(i, 1);
+      }
+    }
   }
 
   /**
@@ -179,20 +172,35 @@ export default class Actor {
   }
 
   /**
+   * Add animation.
+   *
+   * @param {object} properties - Properties to animate
+   * @param {int} duration - Duration to animation properties over
+   * @param {string} tween - Easing function
+   * @param {boolean} queue - Delay until active animations complete
+   * @return void
+   */
+  animate(properties, duration, tween, queue = false) {
+    let animation = new Animation(this, properties, duration, tween, queue);
+    this.animations.push(animation);
+    return animation;
+  }
+
+  /**
    * Move to a new position.
    *
    * @param {int} x - Destination x coordinate
    * @param {int} y - Destination y coorindate
    * @param {int} duration - Length of animation in seconds
    * @param {string} tween - Easing function
-   * @return {Actor} Reference to self
+   * @param {boolean} queue - Delay until active animations complete
+   * @return {Animation} Animation object
    */
-  moveTo(x, y, duration = 1, tween = 'easeInOut') {
-    this.addAnimation({
+  moveTo(x, y, duration = 1, tween = 'easeInOut', queue = false) {
+    return this.animate({
       x: x,
       y: y
-    }, duration, tween);
-    return this;
+    }, duration, tween, queue);
   }
 
   /**
@@ -202,22 +210,24 @@ export default class Actor {
    * @param {int} y - Number of pixels to move along y axis
    * @param {int} duration - Length of animation in seconds
    * @param {string} tween - Easing function
-   * @return {Actor} Reference to self
+   * @param {boolean} queue - Delay until active animations complete
+   * @return {Animation} Animation object
    */
-  move(x = 0, y = 0, duration = 1, tween = 'easeInOut') {
-    this.moveTo(this.x + x, this.y + y, duration, tween);
-    return this;
+  move(x = 0, y = 0, duration = 1, tween = 'easeInOut', queue = false) {
+    return this.moveTo(this.x + x, this.y + y, duration, tween, queue);
   }
 
   /**
    * Move relative to current position.
    *
    * @param {int} amount - Number of pixels to grow
-   * @return {Actor} Reference to self
+   * @param {int} duration - Length of animation in seconds
+   * @param {string} tween - Easing function
+   * @param {boolean} queue - Delay until active animations complete
+   * @return {Animation} Animation object
    */
-  shrink(amount) {
-    this.grow(-amount);
-    return this;
+  shrink(amount, duration = 1, tween = 'easeInOut', queue = false) {
+    return this.grow(-amount, duration, tween, queue);
   }
 
   /**

@@ -21,11 +21,10 @@ export default class Circle extends Shape {
     this.postrender(context);
   }
 
-  grow(amount, duration = 1, tween = 'easeInOut') {
-    this.addAnimation({
+  grow(amount, duration = 1, tween = 'easeInOut', queue = false) {
+    return this.animate({
       radius: this.radius + (amount / 2)
     }, duration, tween)
-    return this;
   }
 }
 

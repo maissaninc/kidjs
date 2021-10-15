@@ -9,7 +9,7 @@ export default class Semicircle extends Shape {
   render(context) {
     this.prerender(context);
     let angleRadians = this.angle * (Math.PI / 180);
-    context.arc(this.x, this.y, this.radius, angleRadians, angleRadians + Math.PI);
+    context.arc(this.x, this.y - this.radius, this.radius, angleRadians, angleRadians + Math.PI);
     this.postrender(context);
   }
 }

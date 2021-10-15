@@ -4,6 +4,9 @@ import Vector from '../core/vector';
 export default class Line extends Shape {
   constructor(x1, y1, x2, y2) {
     super(x1, y1);
+    if (!this.stroke) {
+      this.stroke = 'black';
+    }
     this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
   }
@@ -39,7 +42,7 @@ export default class Line extends Shape {
   }
 
   postrender(context) {
-    context.stroke();
+    this.style.stroke(this.stroke, this.lineWidth);
   }
 
   wiggle() {

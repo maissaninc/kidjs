@@ -4,6 +4,9 @@ import Vector from '../core/vector';
 export default class Curve extends Shape {
   constructor(args) {
     super();
+    if (!this.stroke) {
+      this.stroke = 'black';
+    }
     this.points = [];
     for (let i = 0; i < args.length - 1; i = i + 2) {
       this.points.push(new Vector(args[i], args[i+1]));
@@ -42,7 +45,7 @@ export default class Curve extends Shape {
   }
 
   postrender(context) {
-    context.stroke();
+    this.style.stroke(this.stroke, this.lineWidth);
   }
 }
 

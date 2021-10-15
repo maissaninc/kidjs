@@ -102,7 +102,7 @@ export default class Stage {
     // Reset fill and stroke
     window.fill = 'theme';
     window.stroke = false;
-    window.lineWidth = 2;
+    window.lineWidth = 5;
 
     // Reset font properties
     window.font = 'Arial';
@@ -110,7 +110,6 @@ export default class Stage {
     window.fontSize = '40px';
     window.textAlign = 'center';
     window.textBaseline = 'middle';
-    window.lineWidth = 2;
 
     // Reset audio properties
     window.tempo = 60;

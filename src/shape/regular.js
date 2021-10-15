@@ -17,16 +17,6 @@ export default class RegularPolygon extends Polygon {
   }
 }
 
-export function triangle(x, y, diameter) {
-  if (x == null || y == null || diameter == null) {
-    return;
-  }
-  let shape = new RegularPolygon(x, y, diameter / 2, 3);
-  shape.init();
-  window.stage.addChild(shape);
-  return shape;
-}
-
 export function pentagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;

@@ -67,4 +67,8 @@ export default class Animation {
   move(x, y, duration = 1, tween = 'easeInOut') {
     return this.actor.move(x, y, duration, tween, true);
   }
+
+  repeat(count = -1) {
+    this.actor.animationRepeat = count;
+  }
 }

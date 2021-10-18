@@ -34,7 +34,8 @@ export default class Actor {
 
     // Animation queue
     this.animations = [];
-    this._activeAnimation = 0;
+    this.animationActive = 0;
+    this.animationRepeat = 0;
 
     // Event listeners
     this.eventListeners = {};
@@ -146,15 +147,38 @@ export default class Actor {
     }
 
     // Update animations
-    if (this.animations[this._activeAnimation].status == 'queued') {
-      this.animations[this._activeAnimation].status = 'ready';
-    }
-    for (let i = this._activeAnimation; i < this.animations.length; i = i + 1) {
-      if (this.animations[i].status == 'queued') break;
-      this.animations[i].update();
-    }
-    if (this.animations[this._activeAnimation].status == 'complete') {
-      this._activeAnimation = this._activeAnimation + 1;
+    if (this.animations.length > 0) {
+      if (this.animations[this.animationActive].status == 'queued') {
+        this.animations[this.animationActive].status = 'ready';
+      }
+      for (let i = this.animationActive; i < this.animations.length; i = i + 1) {
+        if (this.animations[i].status == 'queued') break;
+        this.animations[i].update();
+      }
+      if (this.animations[this.animationActive].status == 'complete') {
+        this.animationActive = this.animationActive + 1;
+
+        // Queue complete
+        if (this.animationActive == this.animations.length) {
+
+          // Repeat animations
+          if (this.animationRepeat != 0) {
+            this.animationActive = 0;
+            for (let i = 0; i < this.animations.length; i = i + 1) {
+              this.animations[i].status = this.animations[i].queue ? 'queued' : 'ready';
+            }
+            if (this.animationRepeat > 0) {
+              this.animationRepeat = this.animationRepeat - 1;
+            }
+
+          // Clear queue
+          } else {
+            this.animations = [];
+            this.animationActive = 0;
+            this.animationRepeat = 0;
+          }
+        }
+      }
     }
   }
 

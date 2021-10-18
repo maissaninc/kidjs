@@ -4,6 +4,7 @@ export default class Animation {
   constructor(actor, properties, duration, tween, queue = false) {
     this.actor = actor;
     this.status = queue ? 'queued' : 'ready';
+    this.queue = queue;
     this.duration = duration * 1000;
     this.to = properties;
     this.tween = tween;

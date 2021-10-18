@@ -34,6 +34,7 @@ export default class Actor {
 
     // Animation queue
     this.animations = [];
+    this._activeAnimation = 0;
 
     // Event listeners
     this.eventListeners = {};
@@ -145,15 +146,15 @@ export default class Actor {
     }
 
     // Update animations
-    if (this.animations[0].status == 'queued') {
-      this.animations[0].status = 'ready';
+    if (this.animations[this._activeAnimation].status == 'queued') {
+      this.animations[this._activeAnimation].status = 'ready';
     }
-    for (let i = 0; i < this.animations.length; i = i + 1) {
+    for (let i = this._activeAnimation; i < this.animations.length; i = i + 1) {
       if (this.animations[i].status == 'queued') break;
       this.animations[i].update();
-      if (this.animations[i].status == 'complete') {
-        this.animations.splice(i, 1);
-      }
+    }
+    if (this.animations[this._activeAnimation].status == 'complete') {
+      this._activeAnimation = this._activeAnimation + 1;
     }
   }
 

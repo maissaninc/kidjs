@@ -205,7 +205,7 @@ export default class Actor {
    * @param {boolean} queue - Delay until active animations complete
    * @return void
    */
-  animate(properties, duration, tween, queue = false) {
+  animate(properties, duration, tween = false, queue = false) {
     let animation = new Animation(this, properties, duration, tween, queue);
     this.animations.push(animation);
     return animation;
@@ -221,7 +221,7 @@ export default class Actor {
    * @param {boolean} queue - Delay until active animations complete
    * @return {Animation} Animation object
    */
-  moveTo(x, y, duration = 1, tween = 'easeInOut', queue = false) {
+  moveTo(x, y, duration = 1, tween = false, queue = false) {
     return this.animate({
       x: x,
       y: y
@@ -238,7 +238,7 @@ export default class Actor {
    * @param {boolean} queue - Delay until active animations complete
    * @return {Animation} Animation object
    */
-  move(x = 0, y = 0, duration = 1, tween = 'easeInOut', queue = false) {
+  move(x = 0, y = 0, duration = 1, tween = false, queue = false) {
     return this.moveTo(this.x + x, this.y + y, duration, tween, queue);
   }
 
@@ -251,7 +251,7 @@ export default class Actor {
    * @param {boolean} queue - Delay until active animations complete
    * @return {Animation} Animation object
    */
-  shrink(amount, duration = 1, tween = 'easeInOut', queue = false) {
+  shrink(amount, duration = 1, tween = false, queue = false) {
     return this.grow(-amount, duration, tween, queue);
   }
 

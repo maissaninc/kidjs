@@ -1,13 +1,13 @@
 import Tween from './tween';
 
 export default class Animation {
-  constructor(actor, properties, duration, tween, queue = false) {
+  constructor(actor, properties, duration, tween = false, queue = false) {
     this.actor = actor;
     this.status = queue ? 'queued' : 'ready';
     this.queue = queue;
     this.duration = duration * 1000;
     this.to = properties;
-    this.tween = tween;
+    this.tween = tween ? tween : window.easing;
     this.from = {}
   }
 
@@ -36,9 +36,34 @@ export default class Animation {
       let t = Date.now() - this.start;
       for (const property in this.from) {
         let value;
-        switch (this.tween) {
+        switch (this.tween.toLowerCase()) {
+          case 'linear':
+            value = Tween.linear(t, this.from[property], this.to[property], this.duration);
+            break;
+
+          case 'easein':
+            value = Tween.easeInQuad(t, this.from[property], this.to[property], this.duration);
+            break;
+
+          case 'easeout':
+            value = Tween.easeOutQuad(t, this.from[property], this.to[property], this.duration);
+            break;
+
+          case 'easeinout':
+            value = Tween.easeInOutQuad(t, this.from[property], this.to[property], this.duration);
+            break;
+
+          case 'easeinelastic':
+            value = Tween.easeInQuad(t, this.from[property], this.to[property], this.duration);
+            break;
+
+          case 'easeoutelastic':
+            value = Tween.easeOutQuad(t, this.from[property], this.to[property], this.duration);
+            break;
+
+          case 'easeinoutelastic':
           default:
-            value = Tween.easeInOutElastic(t, this.from[property], this.to[property], this.duration);
+            value = Tween.easeInOutQuad(t, this.from[property], this.to[property], this.duration);
         }
         this.actor[property] = value;
       }
@@ -48,23 +73,23 @@ export default class Animation {
     }
   }
 
-  animate(properties, duration = 1, tween = 'easeInOut') {
+  animate(properties, duration = 1, tween = false) {
     return this.actor.animate(properties, duration, tween, true);
   }
 
-  grow(amount, duration = 1, tween = 'easeInOut') {
+  grow(amount, duration = 1, tween = false) {
     return this.actor.grow(amount, duration, tween, true);
   }
 
-  shrink(amount, duration = 1, tween = 'easeInOut') {
+  shrink(amount, duration = 1, tween = false) {
     return this.actor.shrink(amount, duration, tween, true);
   }
 
-  moveTo(x, y, duration = 1, tween = 'easeInOut') {
+  moveTo(x, y, duration = 1, tween = false) {
     return this.actor.moveTo(x, y, duration, tween, true);
   }
 
-  move(x, y, duration = 1, tween = 'easeInOut') {
+  move(x, y, duration = 1, tween = false) {
     return this.actor.move(x, y, duration, tween, true);
   }
 

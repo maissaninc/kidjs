@@ -111,6 +111,9 @@ export default class Stage {
     window.textAlign = 'center';
     window.textBaseline = 'middle';
 
+    // Reset animation properties
+    window.easing = 'easeInOutElastic';
+
     // Reset audio properties
     window.tempo = 60;
 

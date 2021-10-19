@@ -54,16 +54,16 @@ export default class Animation {
             break;
 
           case 'easeinelastic':
-            value = Tween.easeInQuad(t, this.from[property], this.to[property], this.duration);
+            value = Tween.easeInElastic(t, this.from[property], this.to[property], this.duration);
             break;
 
           case 'easeoutelastic':
-            value = Tween.easeOutQuad(t, this.from[property], this.to[property], this.duration);
+            value = Tween.easeOutElastic(t, this.from[property], this.to[property], this.duration);
             break;
 
           case 'easeinoutelastic':
           default:
-            value = Tween.easeInOutQuad(t, this.from[property], this.to[property], this.duration);
+            value = Tween.easeInOutElastic(t, this.from[property], this.to[property], this.duration);
         }
         this.actor[property] = value;
       }

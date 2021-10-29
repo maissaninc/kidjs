@@ -45,6 +45,11 @@ window.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Clear method
+  window.clear = function() {
+    window.stage.clear();
+  }
+
   // Setup events
   initEvents();
 

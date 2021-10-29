@@ -1,4 +1,5 @@
 import { evaluateTriggers } from '../core';
+import Rect from '../shape/rect';
 import Matter from 'matter-js';
 
 export default class Stage {
@@ -35,6 +36,20 @@ export default class Stage {
     window.width = width;
     window.height = height;
 
+    // Walls, ceiling and floor
+    this._leftWall = true;
+    this._rightWall = true;
+    this._ceiling = true;
+    this._floor = true;
+    this._leftWallBody = Matter.Bodies.rectangle(-20, height / 2, 40, height, { isStatic: true });
+    this._rightWallBody = Matter.Bodies.rectangle(width + 20, height / 2, 40, height, { isStatic: true });
+    this._ceilingBody = Matter.Bodies.rectangle(width / 2, -20, width, 40, { isStatic: true });
+    this._floorBody = Matter.Bodies.rectangle(width / 2, height + 20, width, 40, { isStatic: true });
+    Matter.Composite.add(this.engine.world, this._leftWallBody);
+    Matter.Composite.add(this.engine.world, this._rightWallBody);
+    Matter.Composite.add(this.engine.world, this._ceilingBody);
+    Matter.Composite.add(this.engine.world, this._floorBody);
+
     // Initialize
     this.actors = [];
     this.eventListeners = {};
@@ -58,6 +73,20 @@ export default class Stage {
     this.context.scale(scale, scale);
     window.width = width;
     window.height = height;
+
+    // Move walls, ceiling and floor
+    Matter.Composite.remove(this.engine.world, this._leftWallBody);
+    Matter.Composite.remove(this.engine.world, this._rightWallBody);
+    Matter.Composite.remove(this.engine.world, this._ceilingBody);
+    Matter.Composite.remove(this.engine.world, this._floorBody);
+    this._leftWallBody = Matter.Bodies.rectangle(-20, height / 2, 40, height, { isStatic: true });
+    this._rightWallBody = Matter.Bodies.rectangle(width + 20, height / 2, 40, height, { isStatic: true });
+    this._ceilingBody = Matter.Bodies.rectangle(width / 2, -20, width, 40, { isStatic: true });
+    this._floorBody = Matter.Bodies.rectangle(width / 2, height + 20, width, 40, { isStatic: true });
+    if (this._leftWall) Matter.Composite.add(this.engine.world, this._leftWallBody);
+    if (this._rightWall) Matter.Composite.add(this.engine.world, this._rightWallBody);
+    if (this._ceiling) Matter.Composite.add(this.engine.world, this._ceilingBody);
+    if (this._floor) Matter.Composite.add(this.engine.world, this._floorBody);
   }
 
   /**
@@ -90,8 +119,12 @@ export default class Stage {
    * Clear all actors from the stage.
    */
   clear() {
-    Matter.Composite.clear(this.engine.world);
     this.actors = [];
+    Matter.Composite.clear(this.engine.world);
+    if (this._leftWall) Matter.Composite.add(this.engine.world, this._leftWallBody);
+    if (this._rightWall) Matter.Composite.add(this.engine.world, this._rightWallBody);
+    if (this._ceiling) Matter.Composite.add(this.engine.world, this._ceilingBody);
+    if (this._floor) Matter.Composite.add(this.engine.world, this._floorBody);
   }
 
   /**
@@ -119,6 +152,7 @@ export default class Stage {
 
     // Reset physics properties
     window.gravity = 1;
+    window.ceiling = true;
     window.floor = true;
     window.walls = true;
 
@@ -160,6 +194,40 @@ export default class Stage {
       // Update physics simulation
       this.engine.gravity.y = window.gravity;
       Matter.Engine.update(this.engine);
+
+      // Turn on or off walls, floor and ceiling
+      if (window.walls != this._leftWall) {
+        this._leftWall = window.walls;
+        if (this._leftWall) {
+          Matter.Composite.add(this.engine.world, this._leftWallBody);
+        } else {
+          Matter.Composite.remove(this.engine.world, this._leftWallBody);
+        }
+      }
+      if (window.walls != this._rightWall) {
+        this._rightWall = window.walls;
+        if (this._rightWall) {
+          Matter.Composite.add(this.engine.world, this._rightWallBody);
+        } else {
+          Matter.Composite.remove(this.engine.world, this._rightWallBody);
+        }
+      }
+      if (window.ceiling != this._ceiling) {
+        this._ceiling = window.ceiling;
+        if (this._ceiling) {
+          Matter.Composite.add(this.engine.world, this._ceilingBody);
+        } else {
+          Matter.Composite.remove(this.engine.world, this._ceilingBody);
+        }
+      }
+      if (window.floor != this._floor) {
+        this._floor = window.floor;
+        if (this._floor) {
+          Matter.Composite.add(this.engine.world, this._floorBody);
+        } else {
+          Matter.Composite.remove(this.engine.world, this._floorBody);
+        }
+      }
 
       // Render actors
       for (let actor of this.actors) {

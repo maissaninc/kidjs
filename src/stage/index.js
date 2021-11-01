@@ -1,6 +1,7 @@
 import { evaluateTriggers } from '../core';
 import Rect from '../shape/rect';
 import Matter from 'matter-js';
+import { log } from '../debug';
 
 export default class Stage {
 
@@ -53,6 +54,7 @@ export default class Stage {
     // Initialize
     this.actors = [];
     this.eventListeners = {};
+    log('Stage created');
   }
 
   /**
@@ -119,6 +121,7 @@ export default class Stage {
    * Clear all actors from the stage.
    */
   clear() {
+    log('Stage cleared');
     this.actors = [];
     Matter.Composite.clear(this.engine.world);
     if (this._leftWall) Matter.Composite.add(this.engine.world, this._leftWallBody);
@@ -131,6 +134,7 @@ export default class Stage {
    * Clear stage and reset fill and stroke.
    */
   reset() {
+    log('Stage reset');
 
     // Reset fill and stroke
     window.fill = 'theme';
@@ -155,6 +159,10 @@ export default class Stage {
     window.ceiling = true;
     window.floor = true;
     window.walls = true;
+    this._leftWall = true;
+    this._rightWall = true;
+    this._ceiling = true;
+    this._floor = true;
 
     // Clear stage
     this.clear();
@@ -196,9 +204,8 @@ export default class Stage {
       Matter.Engine.update(this.engine);
 
       // Turn on or off walls, floor and ceiling
-      /*if (window.walls != this._leftWall) {
+      if (window.walls != this._leftWall) {
         this._leftWall = window.walls;
-        console.log(this._leftWall);
         if (this._leftWall) {
           Matter.Composite.add(this.engine.world, this._leftWallBody);
         } else {
@@ -207,7 +214,6 @@ export default class Stage {
       }
       if (window.walls != this._rightWall) {
         this._rightWall = window.walls;
-        console.log(this._rightWall);
         if (this._rightWall) {
           Matter.Composite.add(this.engine.world, this._rightWallBody);
         } else {
@@ -216,7 +222,6 @@ export default class Stage {
       }
       if (window.ceiling != this._ceiling) {
         this._ceiling = window.ceiling;
-        console.log(this._ceiling);
         if (this._ceiling) {
           Matter.Composite.add(this.engine.world, this._ceilingBody);
         } else {
@@ -225,13 +230,12 @@ export default class Stage {
       }
       if (window.floor != this._floor) {
         this._floor = window.floor;
-        console.log(this._floor);
         if (this._floor) {
           Matter.Composite.add(this.engine.world, this._floorBody);
         } else {
           Matter.Composite.remove(this.engine.world, this._floorBody);
         }
-      }*/
+      }
 
       // Render actors
       for (let actor of this.actors) {

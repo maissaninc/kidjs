@@ -19,6 +19,7 @@ import { image } from '../sprite';
 import { star } from '../shape/star';
 import { display, write } from '../text';
 import { random } from './math';
+import { log } from '../debug';
 
 let triggers = [];
 let parentSetTimeout;
@@ -295,6 +296,7 @@ function createStepStatement(location) {
 }
 
 export function reset() {
+  log('Reset');
 
   // Reset event listeners
   triggers = [];
@@ -314,10 +316,13 @@ export function reset() {
 }
 
 export async function run(code) {
+  log('Running');
   try {
     reset();
     window.stage.run();
+    log('Compilation started');
     let processed = await compile(code);
+    log('Compilation complete');
     eval(processed);
   } catch(exception) {
     console.log(exception);
@@ -325,6 +330,7 @@ export async function run(code) {
 }
 
 export function stop() {
+  log('Stop');
   window.stage.stop();
   reset();
 }

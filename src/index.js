@@ -69,3 +69,5 @@ window.KID = {
   settings: window._kidjs_.settings,
   setAssetUrlFilter: setAssetUrlFilter
 };
+
+window.debug = true;

@@ -315,8 +315,8 @@ export function reset() {
 
 export async function run(code) {
   try {
-    window.stage.run();
     reset();
+    window.stage.run();
     let processed = await compile(code);
     eval(processed);
   } catch(exception) {

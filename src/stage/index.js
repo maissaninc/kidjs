@@ -198,6 +198,7 @@ export default class Stage {
       // Turn on or off walls, floor and ceiling
       if (window.walls != this._leftWall) {
         this._leftWall = window.walls;
+        console.log(this._leftWall);
         if (this._leftWall) {
           Matter.Composite.add(this.engine.world, this._leftWallBody);
         } else {
@@ -206,6 +207,7 @@ export default class Stage {
       }
       if (window.walls != this._rightWall) {
         this._rightWall = window.walls;
+        console.log(this._rightWall);
         if (this._rightWall) {
           Matter.Composite.add(this.engine.world, this._rightWallBody);
         } else {
@@ -214,6 +216,7 @@ export default class Stage {
       }
       if (window.ceiling != this._ceiling) {
         this._ceiling = window.ceiling;
+        console.log(this._ceiling);
         if (this._ceiling) {
           Matter.Composite.add(this.engine.world, this._ceilingBody);
         } else {
@@ -222,6 +225,7 @@ export default class Stage {
       }
       if (window.floor != this._floor) {
         this._floor = window.floor;
+        console.log(this._floor);
         if (this._floor) {
           Matter.Composite.add(this.engine.world, this._floorBody);
         } else {

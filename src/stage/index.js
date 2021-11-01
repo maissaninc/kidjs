@@ -196,7 +196,7 @@ export default class Stage {
       Matter.Engine.update(this.engine);
 
       // Turn on or off walls, floor and ceiling
-      if (window.walls != this._leftWall) {
+      /*if (window.walls != this._leftWall) {
         this._leftWall = window.walls;
         console.log(this._leftWall);
         if (this._leftWall) {
@@ -231,7 +231,7 @@ export default class Stage {
         } else {
           Matter.Composite.remove(this.engine.world, this._floorBody);
         }
-      }
+      }*/
 
       // Render actors
       for (let actor of this.actors) {

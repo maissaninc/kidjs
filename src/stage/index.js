@@ -15,8 +15,8 @@ export default class Stage {
   constructor(width = window.innerWidth, height = window.innerHeight) {
     this.running = false;
     this.frame = 0;
-    this.width = width;
-    this.height = height;
+    this.width = parseInt(width);
+    this.height = parseInt(height);
 
     // Create Matter.js engine and listen for events
     this.engine = Matter.Engine.create();
@@ -34,8 +34,8 @@ export default class Stage {
     this.context.scale(scale, scale);
 
     // Set global width and height
-    window.width = width;
-    window.height = height;
+    window.width = this.width;
+    window.height = this.height;
 
     // Initialize
     this.actors = [];
@@ -52,8 +52,8 @@ export default class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   resize(width = window.innerWidth, height = window.innerHeight) {
-    this.width = width;
-    this.height = height;
+    this.width = parseInt(width);
+    this.height = parseInt(height);
     let scale = window.devicePixelRatio;
     this.canvas.width = Math.floor(this.width * scale);
     this.canvas.height = Math.floor(this.height * scale);
@@ -99,10 +99,10 @@ export default class Stage {
     Matter.Composite.clear(this.engine.world);
 
     // Add walls
-    this._leftWall = rect(-10, height / 2, 40, height);
-    this._rightWall = rect(width + 10, height / 2, 40, height);
-    this._ceiling = rect(width / 2, -10, width, 40);
-    this._floor = rect(width / 2, height + 10, width, 40);
+    this._leftWall = rect(-10, this.height / 2, 40, this.height);
+    this._rightWall = rect(this.width + 10, this.height / 2, 40, this.height);
+    this._ceiling = rect(this.width / 2, -10, this.width, 40);
+    this._floor = rect(this.width / 2, this.height + 10, this.width, 40);
   }
 
   /**
@@ -176,7 +176,7 @@ export default class Stage {
 
       // Update physics simulation
       this.engine.gravity.y = window.gravity;
-      Matter.Engine.update(this.engine);
+      //Matter.Engine.update(this.engine);
 
       // Render actors
       for (let actor of this.actors) {

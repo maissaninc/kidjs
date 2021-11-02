@@ -50,6 +50,24 @@ export default class Polygon extends Shape {
   }
 
   /**
+   * Update point to the polygon.
+   *
+   * @param {int} index - Which point
+   * @param {int} x - X coordinate
+   * @param {int} y - Y coordinate
+   */
+  updatePoint(index, x, y) {
+    if (index < this.points.length) {
+      if (typeof x == 'number') this.points[index].x = x;
+      if (typeof y == 'number') this.points[index].y = y;
+      this.updateBoundingPolygon();
+      if (this.body) {
+        Matter.Body.setVertices(this.body, this._boundingPolygon);
+      }
+    }
+  }
+
+  /**
    * Use gift wraping algorithm to determine convex hull.
    */
   updateBoundingPolygon() {

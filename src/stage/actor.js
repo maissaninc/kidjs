@@ -22,6 +22,7 @@ export default class Actor {
     this._angle = 0;
     this._angularVelocity = 0;
     this._bounciness = 0.8;
+    this._ghost = false;
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -90,7 +91,7 @@ export default class Actor {
 
   set anchored(value) {
     if (this.body) {
-      Matter.Body.setStatic(this.body, this._anchored);
+      Matter.Body.setStatic(this.body, value);
       this.body.restitution = this._bounciness;
     }
   }
@@ -122,6 +123,22 @@ export default class Actor {
 
   get friction() {
     return this.body ? this.body.friction : 0;
+  }
+
+  set ghost(value) {
+    if (value == this._ghost) return;
+    this._ghost = value;
+    if (this.body) {
+      if (value) {
+        this.body.isSensor = true;
+      } else {
+        this.body.isSensor = false;
+      }
+    }
+  }
+
+  get ghost() {
+    return this._ghost;
   }
 
   set mass(value) {

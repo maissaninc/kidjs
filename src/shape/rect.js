@@ -4,8 +4,8 @@ import Matter from 'matter-js';
 export default class Rect extends Polygon {
   constructor(x, y, width, height) {
     super(x, y);
-    this.width = width;
-    this.height = height;
+    this._width = width;
+    this._height = height;
     this.addPoint(-width / 2, -height / 2);
     this.addPoint(width / 2, -height / 2);
     this.addPoint(width / 2, height / 2);
@@ -13,10 +13,34 @@ export default class Rect extends Polygon {
   }
 
   init() {
-    this.body = Matter.Bodies.rectangle(this.position.x, this.position.y, this.width, this.height, {
+    this.body = Matter.Bodies.rectangle(this.position.x, this.position.y, this._width, this._height, {
       frictionAir: 0,
       isStatic: true
     });
+  }
+
+  set width(value) {
+    this._width = value;
+    this.updatePoint(0, -value / 2);
+    this.updatePoint(1, value / 2);
+    this.updatePoint(2, value / 2);
+    this.updatePoint(3, -value / 2);
+  }
+
+  get width() {
+    return this._width;
+  }
+
+  set height(value) {
+    this._height = value;
+    this.updatePoint(0, null, -value / 2);
+    this.updatePoint(1, null, -value / 2);
+    this.updatePoint(2, null, value / 2);
+    this.updatePoint(3, null, value / 2);
+  }
+
+  get height() {
+    return this._height;
   }
 }
 

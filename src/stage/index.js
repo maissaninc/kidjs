@@ -62,6 +62,18 @@ export default class Stage {
     this.context.scale(scale, scale);
     window.width = width;
     window.height = height;
+
+    // Resize walls
+    this._leftWall.y = height / 2;
+    this._leftWall.height = height;
+    this._rightWall.x = width + 20;
+    this._rightWall.y = height / 2;
+    this._rightWall.height = height;
+    this._ceiling.x = width / 2;
+    this._ceiling.width = width;
+    this._floor.x = width / 2;
+    this._floor.y = height + 20;
+    this._floor.width = width;
   }
 
   /**
@@ -99,10 +111,10 @@ export default class Stage {
     Matter.Composite.clear(this.engine.world);
 
     // Add walls
-    this._leftWall = rect(-10, this.height / 2, 40, this.height);
-    this._rightWall = rect(this.width + 10, this.height / 2, 40, this.height);
-    this._ceiling = rect(this.width / 2, -10, this.width, 40);
-    this._floor = rect(this.width / 2, this.height + 10, this.width, 40);
+    this._leftWall = rect(-20, this.height / 2, 40, this.height);
+    this._rightWall = rect(this.width + 20, this.height / 2, 40, this.height);
+    this._ceiling = rect(this.width / 2, -20, this.width, 40);
+    this._floor = rect(this.width / 2, this.height + 20, this.width, 40);
   }
 
   /**
@@ -134,10 +146,6 @@ export default class Stage {
     window.ceiling = true;
     window.floor = true;
     window.walls = true;
-    this._leftWall = true;
-    this._rightWall = true;
-    this._ceiling = true;
-    this._floor = true;
 
     // Clear stage
     this.clear();
@@ -175,8 +183,12 @@ export default class Stage {
       this.context.clearRect(0, 0, this.width, this.height);
 
       // Update physics simulation
+      this._leftWall.ghost = !window.walls;
+      this._rightWall.ghost = !window.walls;
+      this._ceiling.ghost = !window.ceiling;
+      this._floor.ghost = !window.floor;
       this.engine.gravity.y = window.gravity;
-      //Matter.Engine.update(this.engine);
+      Matter.Engine.update(this.engine);
 
       // Render actors
       for (let actor of this.actors) {

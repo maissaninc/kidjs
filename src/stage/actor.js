@@ -21,6 +21,7 @@ export default class Actor {
     this.position = new Vector(x, y);
     this._angle = 0;
     this._angularVelocity = 0;
+    this.spinnable = true;
     this._bounciness = 0.8;
     this._ghost = false;
 
@@ -159,8 +160,12 @@ export default class Actor {
     this.frame++;
 
     // Apply angular velocity
-    if (!this.body || this.body.isStatic) {
-      this.angle = this.angle + this.angularVelocity;
+    if (!this.spinnable) {
+      this.angularVelocity = 0;
+    } else {
+      if (!this.body || this.body.isStatic) {
+        this.angle = this.angle + this.angularVelocity;
+      }
     }
 
     // Update animations
@@ -306,8 +311,7 @@ export default class Actor {
   stop() {
     if (this.body) {
       Matter.Body.setAngularVelocity(this.body, 0);
-      Matter.Body.setVelocity(new Vector(0, 0));
-      Matter.Body.setAcceleration(new Vector(0, 0));
+      Matter.Body.setVelocity(this.body, new Vector(0, 0));
     }
     this.frame = 0;
     this.state = 'default';

@@ -7,32 +7,13 @@
   <body>
     <script type="kidjs">
 
-      gravity = 0
-      walls = false
-
-      let ball = circle(width / 2, height / 2, 50)
-
-      let player1 = rect(30, height / 2, 20, 100)
-      let player2 = rect(width - 30, height / 2, 20, 100)
-
-      function startGame() {
-        ball.stop()
-        ball.x = width / 2
-        ball.y = height / 2
-        let pushX = (random(0, 1) - 0.5) * 20
-        let pushY = random(-4, 4)
-        ball.push(pushX, pushY)
+      function placeDomino() {
+        let domino = rect(100, 300, 30, 80)
+        domino.anchored = false
+        domino.bounciness = 0
       }
 
-      function keyPressed(key) {
-        if (key == 'w') player1.y = player1.y - 5
-        if (key == 's') player1.y = player1.y + 5
-        if (key == 'ArrowUp') player2.y = player2.y - 5
-        if (key == 'ArrowDown') player2.y = player2.y + 5
-      }
-
-      on('space', startGame)
-      on('keydown', keyPressed)
+      placeDomino()
 
     </script>
   </body>

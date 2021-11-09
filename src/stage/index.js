@@ -89,6 +89,17 @@ export default class Stage {
   }
 
   /**
+   * Remove actor from stage.
+   *
+   * @param {Actor} actor - Actor to remove from the stage.
+   */
+  removeChild(actor) {
+    this.actors = this.actors.filter((item) => {
+      return item != actor;
+    });
+  }
+
+  /**
    * Find actor from Matter.js body.
    *
    * @param {Matter.Body} body - Matter.js body

@@ -11,10 +11,18 @@ export default class Line extends Shape {
     this.u = this.v.normalize();
   }
 
+  get x1() {
+    return this.x;
+  }
+
   set x1(value) {
     let x2 = this.x + this.v.x;
     this.x = value;
     this.v.x = x2 - value;
+  }
+
+  get y1() {
+    return this.y;
   }
 
   set y1(value) {
@@ -23,8 +31,16 @@ export default class Line extends Shape {
     this.v.y = y2 - value;
   }
 
+  get x2() {
+    return this.x + this.v.x;
+  }
+
   set x2(value) {
     this.v.x = value - this.x;
+  }
+
+  get y2() {
+    return this.y + this.v.y;
   }
 
   set y2(value) {

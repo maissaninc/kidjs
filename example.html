@@ -28,6 +28,9 @@
 
       function release() {
         dragLine.remove()
+        let ball = circle(dragLine.x2, dragLine.y2, 50)
+        ball.push(dragLine.x1 - dragLine.x2, dragLine.y1 - dragLine.y2)
+        ball.on('collision', ball.remove())
       }
 
       on('mousedown', start)

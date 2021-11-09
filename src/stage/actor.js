@@ -429,4 +429,11 @@ export default class Actor {
       }
     }
   }
+
+  /**
+   * Remove actor from stage.
+   */
+  remove() {
+    window.stage.removeChild(this);
+  }
 }

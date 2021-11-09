@@ -59,6 +59,10 @@ function onClick(e) {
 }
 
 export default function() {
+  window.mouseX = 0;
+  window.mouseY = 0;
+  window.mouseButton = 0;
+  
   if ('ontouchstart' in window) {
     window.addEventListener('touchstart', onMouseDown);
     window.addEventListener('touchend', onMouseUp);

@@ -13,6 +13,27 @@
         domino.bounciness = 0
       }
 
+      let dragLine
+
+      function start() {
+        dragLine = line(mouseX, mouseY, mouseX, mouseY)
+      }
+
+      function dragging() {
+        if (mouseButton) {
+          dragLine.x2 = mouseX
+          dragLine.y2 = mouseY
+        }
+      }
+
+      function release() {
+        dragLine.remove()
+      }
+
+      on('mousedown', start)
+      on('mousemove', dragging)
+      on('mouseup', release)
+
       placeDomino()
 
     </script>

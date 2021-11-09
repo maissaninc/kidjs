@@ -11,6 +11,26 @@ export default class Line extends Shape {
     this.u = this.v.normalize();
   }
 
+  set x1(value) {
+    let x2 = this.x + this.v.x;
+    this.x = value;
+    this.v.x = x2 - value;
+  }
+
+  set y1(value) {
+    let y2 = this.y + this.v.y;
+    this.y = value;
+    this.v.y = y2 - value;
+  }
+
+  set x2(value) {
+    this.v.x = value - this.x;
+  }
+
+  set y2(value) {
+    this.v.y = value - this.y;
+  }
+
   render(context) {
     this.prerender(context);
 

@@ -7,30 +7,35 @@
   <body>
     <script type="kidjs">
 
-      function placeDomino() {
-        let domino = rect(100, 300, 30, 80)
+      function placeDomino(x, y) {
+        let domino = rect(x, y, 20, 100)
         domino.anchored = false
         domino.bounciness = 0
       }
 
-      let dragLine
+      for (let x = 100; x < width - 100; x = x + 60) {
+        placeDomino(x, 400)
+      }
+
+      let startX;
+      let startY;
+      let marble;
 
       function start() {
-        dragLine = line(mouseX, mouseY, mouseX, mouseY)
+        startX = mouseX
+        startY = mouseY
+        marble = circle(mouseX, mouseY, 50)
       }
 
       function dragging() {
         if (mouseButton) {
-          dragLine.x2 = mouseX
-          dragLine.y2 = mouseY
+          marble.x = mouseX
+          marble.y = mouseY
         }
       }
 
       function release() {
-        dragLine.remove()
-        let ball = circle(dragLine.x2, dragLine.y2, 50)
-        ball.push(dragLine.x1 - dragLine.x2, dragLine.y1 - dragLine.y2)
-        ball.on('collision', ball.remove())
+        marble.push(startX - mouseX, startY - mouseY)
       }
 
       on('mousedown', start)

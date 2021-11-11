@@ -17,7 +17,7 @@ import { semicircle } from '../shape/semicircle';
 import { triangle } from '../shape/triangle';
 import { image } from '../sprite';
 import { star } from '../shape/star';
-import { display, write } from '../text';
+import { display, write, writeln } from '../text';
 import { random } from './math';
 import { log } from '../debug';
 
@@ -62,6 +62,7 @@ export function init() {
       window.triangle = triangle;
       window.wait = wait;
       window.write = write;
+      window.writeln = writeln;
     },
 
     onframe: function() {

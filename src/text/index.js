@@ -1,5 +1,9 @@
 import Actor from '../stage/actor';
 
+let cursorX = 5;
+let cursorY = 5;
+let lineHeight = 1.1;
+
 export default class Text extends Actor {
   constructor(x, y, text, live) {
     super(x, y);
@@ -43,7 +47,34 @@ export function display(x, y, text) {
 }
 
 export function write(x, y, text) {
-  const actor = new Text(x, y, text, false);
+  if (typeof y == 'undefined' && typeof text == 'undefined') {
+    return _write(x);
+  } else {
+    const actor = new Text(x, y, text, false);
+    window.stage.addChild(actor);
+    return actor;
+  }
+}
+
+export function writeln(text) {
+  return _write(text, true);
+}
+
+function _write(text, linebreak) {
+  const actor = new Text(cursorX, cursorY, text, false);
+  actor.textAlign = 'left';
+  actor.textBaseline = 'top';
   window.stage.addChild(actor);
+
+  // Update cursor position
+  if (linebreak) {
+    cursorX = 5;
+    cursorY = cursorY + parseInt(parseFontSize(actor.fontSize)) * lineHeight;
+  } else {
+    window.stage.context.font = parseFontSize(actor.fontSize) + ' ' + actor.font;
+    const metrics = window.stage.context.measureText(text);
+    cursorX = cursorX + metrics.width;
+  }
+
   return actor;
 }

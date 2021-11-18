@@ -1,5 +1,6 @@
 import Actor from './actor';
 import Matter from 'matter-js';
+import Vector from '../core/vector';
 
 let counter = 0;
 
@@ -40,17 +41,34 @@ export default class Group extends Actor {
       actor.body.collisionFilter.group = -this.id;
       for (const child of this.children) {
         if (child.body) {
-          for (let i = 0; i < child.anchorPoints.length; i = i + 1) {
-            for (let j = 0; j < actor.anchorPoints.length; j = j + 1) {
-              this.constraints.push(Matter.Constraint.create({
-                bodyA: child.body,
-                bodyB: actor.body,
-                pointA: child.anchorPoints[i],
-                pointB: actor.anchorPoints[j],
-                stiffness: 1
-              }));
-            }
-          }
+          this.constraints.push(Matter.Constraint.create({
+            bodyA: child.body,
+            bodyB: actor.body,
+            pointA: new Vector(-20, 20),
+            pointB: new Vector(20, 20),
+            stiffness: 1
+          }));
+          this.constraints.push(Matter.Constraint.create({
+            bodyA: child.body,
+            bodyB: actor.body,
+            pointA: new Vector(20, 20),
+            pointB: new Vector(-20, 20),
+            stiffness: 1
+          }));
+          this.constraints.push(Matter.Constraint.create({
+            bodyA: child.body,
+            bodyB: actor.body,
+            pointA: new Vector(-20, -20),
+            pointB: new Vector(20, -20),
+            stiffness: 1
+          }));
+          this.constraints.push(Matter.Constraint.create({
+            bodyA: child.body,
+            bodyB: actor.body,
+            pointA: new Vector(20, -20),
+            pointB: new Vector(-20, -20),
+            stiffness: 1
+          }));
         }
       }
     }

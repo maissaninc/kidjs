@@ -105,15 +105,6 @@ export default class Actor {
     }
   }
 
-  get anchorPoints() {
-    return [
-      new Vector(-5, -5),
-      new Vector(5, -5),
-      new Vector(-5, 5),
-      new Vector(5, 5)
-    ];
-  }
-
   set bounciness(value) {
     this._bounciness = value;
     if (this.body) {

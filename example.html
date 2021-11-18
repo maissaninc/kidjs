@@ -7,21 +7,24 @@
   <body>
     <script type="kidjs">
 
+    gravity = 0.1
+    ceiling = false
+
       let a = rect(400, 120, 140, 70)
       //let b = semicircle(400, 120, 140).rotate(180)
       let b = rect(400, 20, 240, 140)
-      //let c = semicircle(400, 210, 250)
-      let c = circle(400, 10, 250)
+      let c = semicircle(400, 210, 250)
+      //let c = circle(400, 10, 250)
       let d = triangle(340, 290, 10, 60).rotate(200)
       let e = triangle(460, 290, 10, 60).rotate(160)
 
       a.fill = 'palegreen'
       b.fill = 'palegreen'
-      c.fill = 'limegreen'
+      //c.fill = 'limegreen'
       d.fill = 'limegreen'
       e.fill = 'limegreen'
 
-      let saucer = group(a, b, d, e)
+      let saucer = group(a, b, c, d, e)
       //saucer.push(1, -1)
       saucer.anchored = false
 

@@ -40,10 +40,17 @@ export default class Group extends Actor {
       actor.body.collisionFilter.group = -this.id;
       for (const child of this.children) {
         if (child.body) {
-          this.constraints.push(Matter.Constraint.create({
-            bodyA: child.body,
-            bodyB: actor.body
-          }));
+          for (let i = 0; i < child.anchorPoints.length; i = i + 1) {
+            for (let j = 0; j < actor.anchorPoints.length; j = j + 1) {
+              this.constraints.push(Matter.Constraint.create({
+                bodyA: child.body,
+                bodyB: actor.body,
+                pointA: child.anchorPoints[i],
+                pointB: actor.anchorPoints[j],
+                stiffness: 1
+              }));
+            }
+          }
         }
       }
     }

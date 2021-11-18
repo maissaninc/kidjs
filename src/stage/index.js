@@ -3,6 +3,8 @@ import Rect from '../shape/rect';
 import Matter from 'matter-js';
 import { log } from '../debug';
 
+const WALL_DEPTH = 200;
+
 export default class Stage {
 
   /**
@@ -66,13 +68,13 @@ export default class Stage {
     // Resize walls
     this._leftWall.y = height / 2;
     this._leftWall.height = height;
-    this._rightWall.x = width + 20;
+    this._rightWall.x = width + WALL_DEPTH / 2;
     this._rightWall.y = height / 2;
     this._rightWall.height = height;
     this._ceiling.x = width / 2;
     this._ceiling.width = width;
     this._floor.x = width / 2;
-    this._floor.y = height + 20;
+    this._floor.y = height + WALL_DEPTH / 2;
     this._floor.width = width;
   }
 
@@ -127,10 +129,10 @@ export default class Stage {
     Matter.Composite.clear(this.engine.world);
 
     // Add walls
-    this._leftWall = rect(-20, this.height / 2, 40, this.height);
-    this._rightWall = rect(this.width + 20, this.height / 2, 40, this.height);
-    this._ceiling = rect(this.width / 2, -20, this.width, 40);
-    this._floor = rect(this.width / 2, this.height + 20, this.width, 40);
+    this._leftWall = rect(-WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
+    this._rightWall = rect(this.width + WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
+    this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width, WALL_DEPTH);
+    this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width, WALL_DEPTH);
   }
 
   /**

@@ -8,8 +8,10 @@
     <script type="kidjs">
 
       let a = rect(400, 120, 140, 70)
-      let b = semicircle(400, 120, 140).rotate(180)
-      let c = semicircle(400, 210, 250)
+      //let b = semicircle(400, 120, 140).rotate(180)
+      let b = rect(400, 20, 240, 140)
+      //let c = semicircle(400, 210, 250)
+      let c = circle(400, 10, 250)
       let d = triangle(340, 290, 10, 60).rotate(200)
       let e = triangle(460, 290, 10, 60).rotate(160)
 
@@ -19,8 +21,14 @@
       d.fill = 'limegreen'
       e.fill = 'limegreen'
 
-      let saucer = group(a, b, c, d, e)
-      saucer.push(4, -4)
+      let saucer = group(a, b, d, e)
+      //saucer.push(1, -1)
+      saucer.anchored = false
+
+      /*let a = triangle(400, 400, 240)
+      let b = triangle(420, 150, 270)
+      let g = group(a, b)
+      g.anchored = false*/
 
     </script>
   </body>

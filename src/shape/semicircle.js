@@ -6,20 +6,30 @@ export default class Semicircle extends Shape {
   constructor(x, y, radius) {
     super(x, y);
     this.radius = radius;
-  }
-
-  init() {
-    let points = [];
-    for (let theta = 0; theta <= Math.PI; theta = theta + 0.1) {
-      points.push(new Vector(
+    this._boundingPolygon = [];
+    for (let theta = 0; theta <= Math.PI; theta = theta + (Math.PI / 10)) {
+      this._boundingPolygon.push(new Vector(
         Math.cos(theta) * this.radius,
         Math.sin(theta) * this.radius
       ));
     }
-    this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, points, {
+  }
+
+  init() {
+    this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       frictionAir: 0,
       isStatic: true
     });
+  }
+
+  get boundingPolygon() {
+    let points = [];
+    for (let i = 0; i < this._boundingPolygon.length; i++) {
+      let p = this._boundingPolygon[i].rotate(this.angle);
+      p = p.add(this.position);
+      points.push(p);
+    }
+    return points;
   }
 
   render(context) {

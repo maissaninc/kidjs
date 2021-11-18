@@ -16,6 +16,18 @@ export default class Group extends Actor {
     this.id = counter;
     this.children = [];
     this.constraints = [];
+    this._anchored = true;
+  }
+
+  set anchored(value) {
+    this._anchored = value;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].anchored = value;
+    }
+  }
+
+  get anchored() {
+    return this._anchored;
   }
 
   /**
@@ -57,4 +69,5 @@ export function group(...actors) {
     group.addChild(actor);
   }
   window.stage.addChild(group);
+  return group;
 }

@@ -86,6 +86,11 @@ export default class Stage {
     if (actor.body) {
       Matter.Composite.add(this.engine.world, actor.body);
     }
+    if (actor.constraints) {
+      for (const constraint of actor.constraints) {
+        Matter.Composite.add(this.engine.world, constraint);
+      }
+    }
   }
 
   /**

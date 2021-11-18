@@ -1,4 +1,5 @@
 import Actor from './actor';
+import Matter from 'matter-js';
 
 let counter = 0;
 
@@ -14,6 +15,7 @@ export default class Group extends Actor {
     counter = counter + 1;
     this.id = counter;
     this.children = [];
+    this.constraints = [];
   }
 
   /**
@@ -24,6 +26,14 @@ export default class Group extends Actor {
   addChild(actor) {
     if (actor.body) {
       actor.body.collisionFilter.group = -this.id;
+      for (const child of this.children) {
+        if (child.body) {
+          this.constraints.push(Matter.Constraint.create({
+            bodyA: child.body,
+            bodyB: actor.body
+          }));
+        }
+      }
     }
     this.children.push(actor);
   }

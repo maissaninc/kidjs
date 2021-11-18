@@ -18,6 +18,7 @@ import { triangle } from '../shape/triangle';
 import { image } from '../sprite';
 import { star } from '../shape/star';
 import { display, write, writeln } from '../text';
+import { group } from '../stage/group';
 import { random } from './math';
 import { log } from '../debug';
 
@@ -44,6 +45,7 @@ export function init() {
       window.hexagon = hexagon;
       window.image = image;
       window.line = line;
+      window.group = group;
       window.note = note;
       window.octagon = octagon;
       window.on = on;

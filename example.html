@@ -7,40 +7,9 @@
   <body>
     <script type="kidjs">
 
-      function placeDomino(x, y) {
-        let domino = rect(x, y, 20, 100)
-        domino.anchored = false
-        domino.bounciness = 0
-      }
-
-      for (let x = 100; x < width - 100; x = x + 60) {
-        placeDomino(x, 400)
-      }
-
-      let startX;
-      let startY;
-      let marble;
-
-      function start() {
-        startX = mouseX
-        startY = mouseY
-        marble = circle(mouseX, mouseY, 50)
-      }
-
-      function dragging() {
-        if (mouseButton) {
-          marble.x = mouseX
-          marble.y = mouseY
-        }
-      }
-
-      function release() {
-        marble.push(startX - mouseX, startY - mouseY)
-      }
-
-      on('mousedown', start)
-      on('mousemove', dragging)
-      on('mouseup', release)
+      let a = circle(100, 100, 50);
+      let b = circle(400, 100, 50);
+      let g = group(a, b);
 
     </script>
   </body>

@@ -7,11 +7,11 @@
   <body>
     <script type="kidjs">
 
-      let a = rect(400, 120, 140, 70)
-      let b = semicircle(400, 120, 140).rotate(180)
-      let c = semicircle(400, 210, 250)
-      let d = triangle(340, 290, 10, 60).rotate(200)
-      let e = triangle(460, 290, 10, 60).rotate(160)
+      let a = rect(400, 120, 70, 50)
+      let b = semicircle(400, 90, 70).rotate(180)
+      let c = semicircle(400, 170, 120)
+      let d = triangle(360, 200, 10, 50).rotate(200)
+      let e = triangle(440, 200, 10, 50).rotate(160)
 
       a.fill = 'palegreen'
       b.fill = 'palegreen'
@@ -20,7 +20,7 @@
       e.fill = 'limegreen'
 
       let saucer = group(a, b, c, d, e)
-      saucer.push(2, -1)
+      saucer.push(0, -3)
 
     </script>
   </body>

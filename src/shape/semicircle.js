@@ -4,38 +4,33 @@ import Matter from 'matter-js';
 
 export default class Semicircle extends Shape {
   constructor(x, y, radius) {
-    super(x, y - (radius / 2));
+    super(x, y);
     this.radius = radius;
+  }
+
+  init() {
     this._boundingPolygon = [];
-    for (let theta = 0; theta <= Math.PI; theta = theta + (Math.PI / 10)) {
+    for (let theta = 0; theta <= Math.PI; theta = theta + (Math.PI / 20)) {
       this._boundingPolygon.push(new Vector(
         Math.cos(theta) * this.radius,
         Math.sin(theta) * this.radius
       ));
     }
-  }
-
-  init() {
     this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       frictionAir: 0,
       isStatic: true
     });
   }
 
-  get boundingPolygon() {
-    let points = [];
-    for (let i = 0; i < this._boundingPolygon.length; i++) {
-      let p = this._boundingPolygon[i].rotate(this.angle);
-      p = p.add(this.position);
-      points.push(p);
-    }
-    return points;
-  }
-
   render(context) {
     this.prerender(context);
     let angleRadians = this.angle * (Math.PI / 180);
-    context.arc(this.x, this.y, this.radius, angleRadians, angleRadians + Math.PI);
+    let offsetLength = (4 * this.radius) / (3 * Math.PI);
+    let offset = new Vector(
+      Math.cos(angleRadians - Math.PI / 2) * offsetLength,
+      Math.sin(angleRadians - Math.PI / 2) * offsetLength
+    );
+    context.arc(this.x + offset.x, this.y + offset.y, this.radius, angleRadians, angleRadians + Math.PI);
     this.postrender(context);
   }
 }

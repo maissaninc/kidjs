@@ -4,7 +4,7 @@ import Matter from 'matter-js';
 
 export default class Semicircle extends Shape {
   constructor(x, y, radius) {
-    super(x, y);
+    super(x, y - (radius / 2));
     this.radius = radius;
     this._boundingPolygon = [];
     for (let theta = 0; theta <= Math.PI; theta = theta + (Math.PI / 10)) {
@@ -35,7 +35,7 @@ export default class Semicircle extends Shape {
   render(context) {
     this.prerender(context);
     let angleRadians = this.angle * (Math.PI / 180);
-    context.arc(this.x, this.y - (this.radius / 2), this.radius, angleRadians, angleRadians + Math.PI);
+    context.arc(this.x, this.y, this.radius, angleRadians, angleRadians + Math.PI);
     this.postrender(context);
   }
 }

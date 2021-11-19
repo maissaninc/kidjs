@@ -81,8 +81,8 @@ export default class Group extends Actor {
    * @param {CanvasRenderingContext2D} context - Canvas drawing context.
    */
   render(context) {
-    for (const child of this.children) {
-      child.render(context);
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].render(context);
     }
   }
 }

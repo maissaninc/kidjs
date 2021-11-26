@@ -11,6 +11,33 @@ export default class Shape extends Actor {
     this.lineWidth = window.lineWidth;
   }
 
+  _rgb() {
+    window.stage.context.fillStyle = this.fill;
+    let hex = window.stage.context.fillStyle;
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : {
+      r: 0,
+      g: 0,
+      b: 0
+    };
+  }
+
+  get r() {
+    return this._rgb().r;
+  }
+
+  get g() {
+    return this._rgb().g;
+  }
+
+  get b() {
+    return this._rgb().b;
+  }
+
   prerender(context) {
 
     // Create default style

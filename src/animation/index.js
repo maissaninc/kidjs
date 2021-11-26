@@ -82,8 +82,6 @@ export default class Animation {
         // Color tween
         } else {
           let r, g, b;
-          console.log(this.from[property]);
-          console.log(this.to[property]);
           switch (this.tween.toLowerCase()) {
             case 'linear':
               r = Tween.linear(t, this.from[property].r, this.to[property].r, this.duration);

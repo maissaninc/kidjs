@@ -1,5 +1,5 @@
 export default class Tween {
-  
+
   static linear(t, b, _c, d) {
     let c = _c - b;
     return c * t / d + b;

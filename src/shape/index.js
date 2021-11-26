@@ -30,12 +30,24 @@ export default class Shape extends Actor {
     return this._rgb().r;
   }
 
+  set r(value) {
+    this.fill = `rgb(${value}, ${this.g}, ${this.b})`;
+  }
+
   get g() {
     return this._rgb().g;
   }
 
+  set g(value) {
+    this.fill = `rgb(${this.r}, ${value}, ${this.b})`;
+  }
+
   get b() {
     return this._rgb().b;
+  }
+
+  set b(value) {
+    this.fill = `rgb(${this.r}, ${this.g}, ${value})`;
   }
 
   prerender(context) {

@@ -35,6 +35,14 @@ export default class Polygon extends Shape {
   }
 
   /**
+   * Remove all points from the polygon.
+   */
+  clearPoints() {
+    this.points = [];
+    this.updateBoundingPolygon();
+  }
+
+  /**
    * Add point to the polygon.
    *
    * @param {int} x - X coordinate

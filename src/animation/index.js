@@ -47,7 +47,7 @@ export default class Animation {
         let value;
 
         // Numeric tween
-        if (typeof this.from[property] == 'numeric') {
+        if (typeof this.from[property] == 'number') {
           switch (this.tween.toLowerCase()) {
             case 'linear':
               value = Tween.linear(t, this.from[property], this.to[property], this.duration);

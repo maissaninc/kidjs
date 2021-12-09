@@ -32,6 +32,12 @@ export default class Vector {
     );
   }
 
+  set length(value) {
+    let u = this.normalize().scale(value);
+    this.x = u.x;
+    this.y = u.y;
+  }
+
   add(v) {
     return new Vector(this.x + v.x, this.y + v.y);
   }

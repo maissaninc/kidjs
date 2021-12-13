@@ -7,8 +7,11 @@
   <body>
     <script type="kidjs">
 
-      let a = octagon(width / 2, height / 2, 250)
-      a.grow(100)
+      on('deviceorientation', function(e) {
+        console.log('DO')
+      })
+
+      let test = 'deviceorientation';
 
     </script>
   </body>

@@ -20,6 +20,7 @@ import { star } from '../shape/star';
 import { display, write, writeln } from '../text';
 import { group } from '../stage/group';
 import { random } from './math';
+import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
 
 let triggers = [];
@@ -127,8 +128,11 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
+        // Check for required permissions
+        checkForRequiredPermissions(node.body[i]);
+
         // Check if call to on() method
-        let target =  isNodeMethod('on', node.body[i]);
+        let target = isNodeMethod('on', node.body[i]);
         if (target) {
 
           // Check if expression passed as handler
@@ -244,6 +248,32 @@ function isNodeMethod(name, node) {
 }
 
 /**
+ * Determine if code would require special permissions (e.g. deviceorientation)
+ *
+ * @param {String} name - Method name
+ * @param {Object} node - AST node
+ * @return {mixed} Object associated with "on" method, or false
+ */
+function checkForRequiredPermissions(node) {
+  let restrictedEvents = [
+    'deviceorientation',
+    'tiltleft',
+    'tiltright',
+    'tiltup',
+    'tiltdown'
+  ];
+
+  // Call to "on" or "addEventListener" method
+  if (node.type == 'ExpressionStatement' && node.expression.callee && node.expression.arguments) {
+    if (node.expression.callee.type == 'Identifier' && ['on', 'addEventListener'].includes(node.expression.callee.name)) {
+      if (node.expression.arguments[0].type == 'Literal' && restrictedEvents.includes(node.expression.arguments[0].value.toLowerCase())) {
+        requirePermission('deviceorientation');
+      }
+    }
+  }
+}
+
+/**
  * Create AST node containing inline function.
  *
  * @param {Object} node - AST node containing code of function
@@ -326,6 +356,7 @@ export async function run(code) {
     log('Compilation started');
     let processed = await compile(code);
     log('Compilation complete');
+    await getPermissions();
     eval(processed);
   } catch(exception) {
     console.log(exception);

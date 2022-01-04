@@ -17,32 +17,37 @@ function getVerticalTilt(e) {
 }
 
 function onDeviceOrientation(e) {
+  window.orientationAlpha = e.alpha;
+  window.orientationBeta = e.beta;
+  window.orientationGamma = e.gamma;
 
   // Trigger "tiltleft" event
   if (getHorizontalTilt(e) < -threshold) {
-    let event = new Event('tiltleft')
-    window.dispatchEvent(event);
+    let event = new CustomEvent('tiltleft')
+    window.stage.dispatchEvent(event);
   }
 
   // Trigger "tiltright" event
   if (getHorizontalTilt(e) > threshold) {
-    let event = new Event('tiltright')
-    window.dispatchEvent(event);
+    let event = new CustomEvent('tiltright')
+    window.stage.dispatchEvent(event);
   }
 
   // Trigger "tiltup" event
   if (getVerticalTilt(e) < -threshold) {
-    let event = new Event('tiltup')
-    window.dispatchEvent(event);
+    let event = new CustomEvent('tiltup')
+    window.stage.dispatchEvent(event);
   }
 
   // Trigger "tiltdown" event
   if (getVerticalTilt(e) > threshold) {
-    let event = new Event('tiltdown')
-    window.dispatchEvent(event);
+    let event = new CustomEvent('tiltdown')
+    window.stage.dispatchEvent(event);
   }
 }
 
 export default function() {
-  window.addEventListener('deviceorientation', onDeviceOrientation);
+  if (DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', onDeviceOrientation);
+  }
 }

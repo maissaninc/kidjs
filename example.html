@@ -7,11 +7,12 @@
   <body>
     <script type="kidjs">
 
-      on('deviceorientation', function(e) {
-        console.log('DO')
-      })
-
-      let test = 'deviceorientation';
+      let t = 'Holding steady'
+      display(width / 2, height / 2, t)
+      on('tiltleft', t = 'Left')
+      on('tiltright', t = 'Right')
+      on('tiltup', t = 'Up')
+      on('tiltdown', t = 'Down')
 
     </script>
   </body>

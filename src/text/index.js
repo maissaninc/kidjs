@@ -60,6 +60,11 @@ export function writeln(text) {
   return _write(text, true);
 }
 
+export function resetCursor() {
+  cursorX = 5;
+  cursorY = 5;
+}
+
 function _write(text, linebreak) {
   const actor = new Text(cursorX, cursorY, text, false);
   actor.textAlign = 'left';

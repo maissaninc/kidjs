@@ -1,4 +1,5 @@
 import { evaluateTriggers } from '../core';
+import { resetCursor } from '../text';
 import Rect from '../shape/rect';
 import Matter from 'matter-js';
 import { log } from '../debug';
@@ -133,6 +134,9 @@ export default class Stage {
     this._rightWall = rect(this.width + WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
     this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width, WALL_DEPTH);
     this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width, WALL_DEPTH);
+
+    // Reset text cursor
+    resetCursor();
   }
 
   /**

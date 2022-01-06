@@ -83,6 +83,7 @@ export function init() {
 
     step: async function(line, column) {
       this.setGlobals();
+      console.log('STEP-core');
       window.dispatchEvent(new CustomEvent('KID.step', {
         detail: {
           line: line,
@@ -373,18 +374,6 @@ export async function wait(seconds) {
   await new Promise(function(resolve) {
     setTimeout(resolve, seconds * 1000)
   })
-}
-
-async function step(location) {
-  window.dispatchEvent(new CustomEvent('KID.step', {
-    detail: {
-      line: line,
-      column: column
-    }
-  }));
-  if (window._kidjs_.settings.slowMotion) {
-    await wait(1);
-  }
 }
 
 /**

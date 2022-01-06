@@ -5,9 +5,19 @@
     <script src="dist/kid.js"></script>
   </head>
   <body>
-    <script type="kidjs">
+    <script>
 
-      rect(100, 100, 50, 50)
+      KID.settings.slowMotion = true;
+
+      window.addEventListener('KID.step', function(event) {
+        console.log('STEP');
+      });
+
+      let code = "rect(100, 100, 50, 50)\nrect(400, 400, 50, 50)";
+      window.addEventListener('KID.ready', function() {
+        console.log('READY');
+        KID.run(code);
+      })
 
     </script>
   </body>

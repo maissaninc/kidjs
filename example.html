@@ -10,14 +10,19 @@
       KID.settings.slowMotion = true;
 
       window.addEventListener('KID.step', function(event) {
-        console.log('STEP');
+        console.log(event);
       });
 
-      let code = "rect(100, 100, 50, 50)\nrect(400, 400, 50, 50)";
-      window.addEventListener('KID.ready', function() {
-        console.log('READY');
-        KID.run(code);
-      })
+    </script>
+    <script type="kidjs">
+
+      function test() {
+        rect(300, 300, 10, 10)
+        rect(500, 500, 30, 30)
+      }
+
+      test()
+
 
     </script>
   </body>

@@ -83,7 +83,6 @@ export function init() {
 
     step: async function(line, column) {
       this.setGlobals();
-      console.log('STEP-core');
       window.dispatchEvent(new CustomEvent('KID.step', {
         detail: {
           line: line,
@@ -202,11 +201,7 @@ async function compile(code) {
   });
 
   // Insert step statements
-  for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
-    if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
-      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc));
-    }
-  }
+  insertStepStatements(ast);
 
   let processed = astring.generate(ast);
   return `
@@ -327,6 +322,29 @@ function createStepStatement(location) {
       }
     }
   };
+}
+
+/**
+ * Insert step statements.
+ *
+ * @param {Array} ast - Expression tree
+ */
+function insertStepStatements(ast) {
+  for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
+    console.log(ast.body[i]);
+
+    // Insert step statement after
+    if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
+      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc));
+    }
+
+    // Recursively insert step statements inside block
+    if (['ForStatement', 'FunctionDeclaration'].includes(ast.body[i].type)) {
+      if (typeof ast.body[i].body != undefined) {
+        insertStepStatements(ast.body[i].body);
+      }
+    }
+  }
 }
 
 export function reset() {

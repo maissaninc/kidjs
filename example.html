@@ -5,24 +5,11 @@
     <script src="dist/kid.js"></script>
   </head>
   <body>
-    <script>
-
-      KID.settings.slowMotion = true;
-
-      window.addEventListener('KID.step', function(event) {
-        console.log(event);
-      });
-
-    </script>
     <script type="kidjs">
 
-      function test() {
-        rect(300, 300, 10, 10)
-        rect(500, 500, 30, 30)
-      }
-
-      test()
-
+      rect(400, 400, 150, 150);
+      circle(400, 400, 150);
+      triangle(400, 400, 150, 150);
 
     </script>
   </body>

@@ -19,7 +19,7 @@ export function triangle(x, y, width, height) {
   }
   let shape;
   if (height == null) {
-    shape = new RegularPolygon(x, y, width / 2, 3);
+    shape = new RegularPolygon(x, y, width, 3);
   } else {
     shape = new Triangle(x, y, width, height);
   }

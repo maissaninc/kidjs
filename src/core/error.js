@@ -4,7 +4,7 @@ export class KidjsError extends Error {
     super(message);
     this.name = 'Kidjs';
     window.dispatchEvent(new CustomEvent('KID.error', {
-      details: message
+      detail: message
     }));
   }
 }

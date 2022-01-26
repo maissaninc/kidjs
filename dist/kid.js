@@ -194,7 +194,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"KidjsError\": function() { return /* binding */ KidjsError; }\n/* harmony export */ });\nclass KidjsError extends Error {\n\n  constructor(message) {\n    super(message);\n    this.name = 'Kidjs';\n    window.dispatchEvent(new CustomEvent('KID.error', {\n      details: message\n    }));\n  }\n}\n\n\n//# sourceURL=webpack://@maissaninc/kidjs/./src/core/error.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"KidjsError\": function() { return /* binding */ KidjsError; }\n/* harmony export */ });\nclass KidjsError extends Error {\n\n  constructor(message) {\n    super(message);\n    this.name = 'Kidjs';\n    window.dispatchEvent(new CustomEvent('KID.error', {\n      detail: message\n    }));\n  }\n}\n\n\n//# sourceURL=webpack://@maissaninc/kidjs/./src/core/error.js?");
 
 /***/ }),
 

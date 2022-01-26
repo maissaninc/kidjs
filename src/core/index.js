@@ -22,6 +22,7 @@ import { group } from '../stage/group';
 import { random } from './math';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
+import { KidjsError } from './error';
 
 let triggers = [];
 let parentSetTimeout;
@@ -34,6 +35,11 @@ export function init() {
   window._kidjs_ = {
     settings: {
       slowMotion: false,
+    },
+
+    stats: {
+      lastFrame: Date.now(),
+      fps: 0
     },
 
     setGlobals: function() {
@@ -83,6 +89,15 @@ export function init() {
 
     step: async function(line, column) {
       this.setGlobals();
+
+      // Watch for freeze ups
+      let lapsed = Date.now() - window._kidjs_.stats.lastFrame;
+      if (lapsed > 1000) {
+        stop();
+        throw new KidjsError('Freeze detected');
+        await wait(1);
+      }
+
       window.dispatchEvent(new CustomEvent('KID.step', {
         detail: {
           line: line,

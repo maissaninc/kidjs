@@ -219,6 +219,7 @@ export default class Stage {
       }
 
       window._kidjs_.onframe();
+      window._kidjs_.stats.lastFrame = Date.now();
       this.animation = requestAnimationFrame(() => this.render());
     }
   }

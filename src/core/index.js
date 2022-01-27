@@ -1,6 +1,7 @@
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import * as astring from 'astring';
+import seedrandom from 'seedrandom';
 
 import { on, removeAllEventListeners } from '../events';
 import { beep, frequency, note, song } from '../audio';
@@ -111,7 +112,9 @@ export function init() {
 
     end: function() {
       window.dispatchEvent(new CustomEvent('KID.end'));
-    }
+    },
+
+    seed: Date.now()
   };
 
   // Intercept setTimeout and setInterval
@@ -346,7 +349,6 @@ function createStepStatement(location) {
  */
 function insertStepStatements(ast) {
   for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
-    console.log(ast.body[i]);
 
     // Insert step statement after
     if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {

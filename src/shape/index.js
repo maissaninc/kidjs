@@ -1,8 +1,6 @@
 import Actor from '../stage/actor';
 import Style from '../style';
 
-let defaultStyle;
-
 export default class Shape extends Actor {
   constructor(x, y) {
     super(x, y);
@@ -53,11 +51,11 @@ export default class Shape extends Actor {
   prerender(context) {
 
     // Create default style
-    if (!defaultStyle) {
-      defaultStyle = new Style(context);
+    if (!window._kidjs_.defaultStyle) {
+      window._kidjs_.defaultStyle = new Style(context);
     }
     if (!this.style) {
-      this.style = defaultStyle;
+      this.style = window._kidjs_.defaultStyle;
     }
 
     // Choose random color

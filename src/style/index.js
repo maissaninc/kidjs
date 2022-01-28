@@ -10,9 +10,13 @@ export default class Style {
       '#4aa7ee', '#53b9d1', '#429488', '#67ac5b', '#97c05c', '#d0db59',
       '#fceb60', '#f6c244', '#f19c38', '#ec6237'
     ];
+    this.texture = new Texture(context, paint);
+    this.reset();
+  }
+
+  reset() {
     let random = seedrandom(window._kidjs_.seed);
     this.colorIndex = Math.floor(random() * this.colors.length);
-    this.texture = new Texture(context, paint);
   }
 
   nextColor() {

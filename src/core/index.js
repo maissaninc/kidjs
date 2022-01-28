@@ -381,6 +381,11 @@ export function reset() {
   }
   intervals = [];
 
+  // Reset default style
+  if (window._kidjs_.defaultStyle) {
+    window._kidjs_.defaultStyle.reset();
+  }
+
   window.stage.reset();
 }
 

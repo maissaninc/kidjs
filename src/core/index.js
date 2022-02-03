@@ -356,9 +356,19 @@ function insertStepStatements(ast) {
     }
 
     // Recursively insert step statements inside block
-    if (['ForStatement', 'FunctionDeclaration'].includes(ast.body[i].type)) {
+    if (['ForStatement', 'WhileStatement', 'DoWhileStatement', 'FunctionDeclaration'].includes(ast.body[i].type)) {
       if (typeof ast.body[i].body != undefined) {
         insertStepStatements(ast.body[i].body);
+      }
+    }
+
+    // Recursively insert step statements into if blocks
+    if (ast.body[i].type == 'IfStatement') {
+      if (ast.body[i].consequent) {
+        insertStepStatements(ast.body[i].consequent);
+      }
+      if (ast.body[i].alternate) {
+        insertStepStatements(ast.body[i].alternate);
       }
     }
   }

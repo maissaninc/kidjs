@@ -88,8 +88,13 @@ export function init() {
       }
     },
 
-    step: async function(line, column) {
+    step: async function(line, column, info) {
       this.setGlobals();
+
+      // Allow infinite time for blocking alert and prompt functions
+      if (info.callee && ['alert', 'prompt'].includes(info.callee)) {
+        window._kidjs_.stats.lastFrame = Date.now();
+      }
 
       // Watch for freeze ups
       let lapsed = Date.now() - window._kidjs_.stats.lastFrame;
@@ -312,7 +317,7 @@ function createInlineFunction(node) {
  * @param {Object} location - Location in code
  * @return {Object} AST node containing call to step() method
  */
-function createStepStatement(location) {
+function createStepStatement(location, info) {
   return {
     type: 'ExpressionStatement',
     expression: {
@@ -336,6 +341,9 @@ function createStepStatement(location) {
         }, {
           type: 'Literal',
           value: location.start.column
+        }, {
+          type: 'Literal',
+          value: info
         }]
       }
     }
@@ -352,7 +360,11 @@ function insertStepStatements(ast) {
 
     // Insert step statement after
     if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
-      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc));
+      let info = {};
+      if (ast.body[i].type == 'ExpressionStatement' && ast.body[i].expression.callee) {
+        info.callee = ast.body[i].expression.callee.name;
+      }
+      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc, info));
     }
 
     // Recursively insert step statements inside block

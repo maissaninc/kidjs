@@ -54,7 +54,7 @@ export default class Shape extends Actor {
 
   set color(value) {
     this.fill = value;
-  })
+  }
 
   prerender(context) {
 

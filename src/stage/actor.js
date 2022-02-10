@@ -116,6 +116,23 @@ export default class Actor {
     return this.body ? this.body.restitution : 0;
   }
 
+  set direction(value) {
+    if (this.body) {
+      Matter.Body.setVelocity(this.body, new Vector(
+        Math.cos(degreesToRadians(value)) * this.speed,
+        -Math.sin(degreesToRadians(value)) * this.speed
+      ));
+    }
+  }
+
+  get direction() {
+    if (this.body) {
+      let a = Math.atan2(-this.body.velocity.y, this.body.velocity.x)
+      if (a < 0) a = a + Math.PI * 2;
+      return radiansToDegrees(a);
+    }
+  }
+
   set friction(value) {
     if (this.body) {
       this.body.friction = value;
@@ -150,6 +167,24 @@ export default class Actor {
 
   get mass() {
     return this.body ? this.body.mass : 0;
+  }
+
+  set speed(value) {
+    if (this.body) {
+      this.anchored = false;
+      Matter.Body.setVelocity(this.body, new Vector(
+        Math.cos(degreesToRadians(this.direction)) * value,
+        Math.sin(degreesToRadians(this.direction)) * value
+      ));
+    }
+  }
+
+  get speed() {
+    if (this.body) {
+      let v = new Vector(this.body.velocity.x, this.body.velocity.y);
+      return v.length;
+    }
+    return 0;
   }
 
   /**

@@ -48,6 +48,14 @@ export default class Shape extends Actor {
     this.fill = `rgb(${this.r}, ${this.g}, ${value})`;
   }
 
+  get color() {
+    return this.fill;
+  }
+
+  set color(value) {
+    this.fill = value;
+  })
+
   prerender(context) {
 
     // Create default style

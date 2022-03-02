@@ -1,5 +1,6 @@
 import Polygon from './polygon';
 import Matter from 'matter-js';
+import { parseLength } from '../core/units';
 
 export default class Rect extends Polygon {
   constructor(x, y, width, height) {
@@ -48,7 +49,7 @@ export function rect(x, y, width, height) {
   if (x == null || y == null || width == null || height == null) {
     return;
   }
-  const shape = new Rect(x, y, width, height);
+  const shape = new Rect(x, y, parseLength(width, 'x'), parseLength(height, 'y'));
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -58,7 +59,7 @@ export function square(x, y, size) {
   if (x == null || y == null || size == null) {
     return;
   }
-  let shape = new Rect(x, y, size, size);
+  let shape = new Rect(x, y, parseLength(size, 'size'), parseLength(size, 'size'));
   shape.init();
   window.stage.addChild(shape);
   return shape;

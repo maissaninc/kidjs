@@ -1,5 +1,6 @@
 import Polygon from './polygon';
 import Vector from '../core/vector';
+import { parseLength } from '../core/units';
 
 export default class RegularPolygon extends Polygon {
   constructor(x, y, diameter, sides) {
@@ -35,7 +36,7 @@ export default class RegularPolygon extends Polygon {
    * @param {int} value - Diameter of polygon
    */
   set size(value) {
-    this.diameter = value;
+    this.diameter = parseLength(value, 'size');
     for (let i = 0; i < this.points.length; i++) {
       this.points[i].length = this.diameter / 2;
     }
@@ -53,7 +54,7 @@ export function pentagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, diameter, 5);
+  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 5);
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -70,7 +71,7 @@ export function hexagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, diameter, 6);
+  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 6);
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -87,7 +88,7 @@ export function heptagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, diameter, 7);
+  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 7);
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -104,7 +105,7 @@ export function octagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, diameter, 8);
+  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 8);
   shape.init();
   window.stage.addChild(shape);
   return shape;

@@ -1,5 +1,6 @@
 import Polygon from './polygon';
 import Vector from '../core/vector';
+import { parseLength } from '../core/units';
 
 export default class Star extends Polygon {
   constructor(x, y, outerRadius, innerRadius, points = 5) {
@@ -25,8 +26,10 @@ export function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
   }
 
   let goldenRatio = (1 + Math.sqrt(5)) / 2;
-  let outerRadius = outerDiameter / 2;
-  let innerRadius = innerDiameter !== false ? innerDiameter / 2 : outerRadius * (1 / Math.pow(goldenRatio, 2));
+  let outerRadius = parseLength(outerDiameter, 'size') / 2;
+  let innerRadius = innerDiameter !== false ?
+    parseLength(innerDiameter, 'size') / 2 :
+    parseLength(outerRadius, 'size') * (1 / Math.pow(goldenRatio, 2));
 
   let shape = new Star(x, y, outerRadius, innerRadius, points);
   shape.init();

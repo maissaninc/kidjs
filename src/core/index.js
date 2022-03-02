@@ -21,7 +21,7 @@ import { star } from '../shape/star';
 import { display, write, writeln } from '../text';
 import { group } from '../stage/group';
 import { random } from './math';
-import { replacePercentUnits } from './percent-units';
+import { replacePercentUnits } from './units';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
 import { KidjsError } from './error';
@@ -144,7 +144,6 @@ async function compile(code) {
 
   // Replace percent units with string literals
   code = replacePercentUnits(code);
-  console.log(code);
 
   // Parse code into source tree
   let ast = acorn.parse(code, {

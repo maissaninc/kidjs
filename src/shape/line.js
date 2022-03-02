@@ -1,5 +1,6 @@
 import Shape from './';
 import Vector from '../core/vector';
+import { parseLength } from '../core/units';
 
 export default class Line extends Shape {
   constructor(x1, y1, x2, y2) {
@@ -7,7 +8,10 @@ export default class Line extends Shape {
     if (!this.stroke) {
       this.stroke = 'black';
     }
-    this.v = new Vector(x2 - x1, y2 - y1);
+    this.v = new Vector(
+      parseLength(x2, 'x') - parseLength(x1, 'x'),
+      parseLength(y2, 'y') - parseLength(y1, 'y')
+    );
     this.u = this.v.normalize();
   }
 

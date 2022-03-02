@@ -1,5 +1,6 @@
 import Shape from './';
 import Matter from 'matter-js';
+import { parseLength } from '../core/units';
 
 export default class Circle extends Shape {
   constructor(x, y, radius) {
@@ -32,7 +33,7 @@ export function circle(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  const shape = new Circle(x, y, diameter / 2);
+  const shape = new Circle(x, y, parseLength(diameter, 'size') / 2);
   shape.init();
   window.stage.addChild(shape);
   return shape;

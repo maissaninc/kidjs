@@ -1,5 +1,6 @@
 import Shape from './';
 import Vector from '../core/vector';
+import { parseLength } from '../core/units';
 
 export default class Curve extends Shape {
   constructor(args) {
@@ -9,7 +10,10 @@ export default class Curve extends Shape {
     }
     this.points = [];
     for (let i = 0; i < args.length - 1; i = i + 2) {
-      this.points.push(new Vector(args[i], args[i+1]));
+      this.points.push(new Vector(
+        parseLength(args[i], 'x'),
+        parseLength(args[i + 1], 'y')
+      ));
     }
   }
 
@@ -17,8 +21,8 @@ export default class Curve extends Shape {
     let points = [...this.points];
     points.unshift(points[0]);
     points.unshift(points[0]);
-    points.push(points[points.length-1]);
-    points.push(points[points.length-1]);
+    points.push(points[points.length - 1]);
+    points.push(points[points.length - 1]);
     context.moveTo(points[0].x, points[0].y);
     for (let i = 0; i < points.length - 3; i++) {
       for (let t = 0; t <= 1; t += 0.01) {

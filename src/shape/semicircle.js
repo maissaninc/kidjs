@@ -1,6 +1,7 @@
 import Shape from './';
 import Vector from '../core/vector';
 import Matter from 'matter-js';
+import { parseLength } from '../core/units';
 
 export default class Semicircle extends Shape {
   constructor(x, y, radius) {
@@ -39,7 +40,7 @@ export function semicircle(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  const shape = new Semicircle(x, y, diameter / 2);
+  const shape = new Semicircle(x, y, parseLength(diameter, 'size') / 2);
   shape.init();
   window.stage.addChild(shape);
   return shape;

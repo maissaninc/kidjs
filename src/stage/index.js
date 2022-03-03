@@ -277,7 +277,11 @@ export default class Stage {
               handler.call(context, event.x, event.y);
               break;
             default:
-              handler.call(context);
+              if (event.type == 'tilt') {
+                handler.call(context, window.tiltX, window.tiltY);
+              } else {
+                handler.call(context);
+              }
           }
         }
       }

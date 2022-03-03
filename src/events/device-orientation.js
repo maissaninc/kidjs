@@ -20,8 +20,12 @@ function onDeviceOrientation(e) {
   window.orientationAlpha = e.alpha;
   window.orientationBeta = e.beta;
   window.orientationGamma = e.gamma;
-  window.tiltX = getHorizontalTilt(e);
-  window.tiltY = getVerticalTilt(e);
+  window.tiltX = e.tiltX = getHorizontalTilt(e);
+  window.tiltY = e.tiltY = getVerticalTilt(e);
+
+  // Trigger "tilt" event
+  let event = new CustomEvent('tilt');
+  window.stage.dispatchEvent(event);
 
   // Trigger "tiltleft" event
   if (window.tiltX < -threshold) {

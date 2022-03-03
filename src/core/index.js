@@ -152,11 +152,12 @@ async function compile(code) {
 
   // Walk entire source tree
   walk.full(ast, function(node) {
+
+    // Check for required permissions
+    checkForRequiredPermissions(node);
+
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
-
-        // Check for required permissions
-        checkForRequiredPermissions(node.body[i]);
 
         // Check if call to on() method
         let target = isNodeMethod('on', node.body[i]);
@@ -285,6 +286,11 @@ function checkForRequiredPermissions(node) {
     'tiltup',
     'tiltdown'
   ];
+
+  // Uses tiltX or tiltY variable
+  if (node.type == 'Identifier' && ['tiltX', 'tiltY'].includes(node.name)) {
+    requirePermission('deviceorientation');
+  }
 
   // Call to "on" or "addEventListener" method
   if (node.type == 'ExpressionStatement' && node.expression.callee && node.expression.arguments) {

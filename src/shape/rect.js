@@ -49,7 +49,12 @@ export function rect(x, y, width, height) {
   if (x == null || y == null || width == null || height == null) {
     return;
   }
-  const shape = new Rect(x, y, parseLength(width, 'x'), parseLength(height, 'y'));
+  const shape = new Rect(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(width, 'x'),
+    parseLength(height, 'y')
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -59,7 +64,12 @@ export function square(x, y, size) {
   if (x == null || y == null || size == null) {
     return;
   }
-  let shape = new Rect(x, y, parseLength(size, 'size'), parseLength(size, 'size'));
+  let shape = new Rect(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(size, 'size'),
+    parseLength(size, 'size')
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;

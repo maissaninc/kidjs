@@ -31,7 +31,13 @@ export function star(x, y, outerDiameter, innerDiameter = false, points = 5) {
     parseLength(innerDiameter, 'size') / 2 :
     parseLength(outerRadius, 'size') * (1 / Math.pow(goldenRatio, 2));
 
-  let shape = new Star(x, y, outerRadius, innerRadius, points);
+  let shape = new Star(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    outerRadius,
+    innerRadius,
+    points
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;

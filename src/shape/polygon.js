@@ -132,10 +132,14 @@ export default class Polygon extends Shape {
 }
 
 export function polygon(...args) {
+  for (let i = 0; i < args.length - 1; i = i + 2) {
+    args[i] = parseLength(args[i], 'x');
+    args[i + 1] = parseLength(args[i + 1], 'y');
+  }
   if (args.length > 3) {
     const shape = new Polygon(args[0], args[1]);
     for (let i = 2; i < args.length - 1; i = i + 1) {
-      shape.addPoint(parseLength(args[i], 'x'), parseLength(args[i + 1], 'y'));
+      shape.addPoint(args[i], args[i + 1]);
     }
   }
   shape.init();

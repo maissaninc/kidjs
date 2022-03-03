@@ -40,7 +40,11 @@ export function semicircle(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  const shape = new Semicircle(x, y, parseLength(diameter, 'size') / 2);
+  const shape = new Semicircle(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(diameter, 'size') / 2
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;

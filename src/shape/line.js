@@ -8,10 +8,7 @@ export default class Line extends Shape {
     if (!this.stroke) {
       this.stroke = 'black';
     }
-    this.v = new Vector(
-      parseLength(x2, 'x') - parseLength(x1, 'x'),
-      parseLength(y2, 'y') - parseLength(y1, 'y')
-    );
+    this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
   }
 
@@ -101,7 +98,12 @@ export function line(x1, y1, x2, y2) {
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     return;
   }
-  let shape = new Line(x1, y1, x2, y2);
+  let shape = new Line(
+    parseLength(x1, 'x'),
+    parseLength(y1, 'y'),
+    parseLength(x2, 'x'),
+    parseLength(y2, 'y')
+  );
   window.stage.addChild(shape);
   return shape;
 }

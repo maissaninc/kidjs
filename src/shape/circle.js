@@ -33,7 +33,10 @@ export function circle(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  const shape = new Circle(x, y, parseLength(diameter, 'size') / 2);
+  const shape = new Circle(
+    parseLength(x, 'x'), 
+    parseLength(y, 'y'),
+    parseLength(diameter, 'size') / 2);
   shape.init();
   window.stage.addChild(shape);
   return shape;

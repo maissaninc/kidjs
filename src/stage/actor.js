@@ -2,7 +2,6 @@ import Animation from '../animation';
 import Circle from '../shape/circle';
 import Vector from '../core/vector';
 import { degreesToRadians, radiansToDegrees }  from '../core/math';
-import { parseLength } from '../core/units';
 import Matter from 'matter-js';
 
 export default class Actor {
@@ -19,10 +18,7 @@ export default class Actor {
     this.state = 'default';
 
     // Internal properties
-    this.position = new Vector(
-      parseLength(x, 'x'),
-      parseLength(y, 'y')
-    );
+    this.position = new Vector(x, y);
     this._angle = 0;
     this._angularVelocity = 0;
     this.spinnable = true;

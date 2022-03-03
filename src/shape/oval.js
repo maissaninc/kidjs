@@ -21,7 +21,12 @@ export function oval(x, y, width, height) {
   if (x == null || y == null || width == null || height == null) {
     return;
   }
-  const shape = new Oval(x, y, parseLength(width, 'x') / 2, parseLength(height, 'y') / 2);
+  const shape = new Oval(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(width, 'x') / 2,
+    parseLength(height, 'y') / 2
+  );
   window.stage.addChild(shape);
   return shape;
 }

@@ -10,10 +10,7 @@ export default class Curve extends Shape {
     }
     this.points = [];
     for (let i = 0; i < args.length - 1; i = i + 2) {
-      this.points.push(new Vector(
-        parseLength(args[i], 'x'),
-        parseLength(args[i + 1], 'y')
-      ));
+      this.points.push(new Vector(args[i], args[i + 1]));
     }
   }
 
@@ -54,6 +51,10 @@ export default class Curve extends Shape {
 }
 
 export function curve(...args) {
+  for (let i = 0; i < args.length - 1; i = i + 2) {
+    args[i] = parseLength(args[i], 'x');
+    args[i + 1] = parseLength(args[i + 1], 'y');
+  }
   let shape = new Curve(args);
   window.stage.addChild(shape);
   return shape;

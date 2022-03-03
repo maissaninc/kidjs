@@ -54,7 +54,12 @@ export function pentagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 5);
+  let shape = new RegularPolygon(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(diameter, 'size'),
+    5
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -71,7 +76,12 @@ export function hexagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 6);
+  let shape = new RegularPolygon(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(diameter, 'size'),
+    6
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -88,7 +98,12 @@ export function heptagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 7);
+  let shape = new RegularPolygon(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(diameter, 'size'),
+    7
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;
@@ -105,7 +120,12 @@ export function octagon(x, y, diameter) {
   if (x == null || y == null || diameter == null) {
     return;
   }
-  let shape = new RegularPolygon(x, y, parseLength(diameter, 'size'), 8);
+  let shape = new RegularPolygon(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    parseLength(diameter, 'size'),
+    8
+  );
   shape.init();
   window.stage.addChild(shape);
   return shape;

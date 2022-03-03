@@ -20,9 +20,19 @@ export function triangle(x, y, width, height) {
   }
   let shape;
   if (height == null) {
-    shape = new RegularPolygon(x, y, parseLength(width, 'size'), 3);
+    shape = new RegularPolygon(
+      parseLength(x, 'x'),
+      parseLength(y, 'y'),
+      parseLength(width, 'size'),
+      3
+    );
   } else {
-    shape = new Triangle(x, y, parseLength(width, 'x'), parseLength(height, 'y'));
+    shape = new Triangle(
+      parseLength(x, 'x'),
+      parseLength(y, 'y'),
+      parseLength(width, 'x'),
+      parseLength(height, 'y')
+    );
   }
   shape.init();
   window.stage.addChild(shape);

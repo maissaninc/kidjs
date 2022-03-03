@@ -23,10 +23,6 @@ function onDeviceOrientation(e) {
   window.tiltX = e.tiltX = getHorizontalTilt(e);
   window.tiltY = e.tiltY = getVerticalTilt(e);
 
-  // Trigger "tilt" event
-  let event = new CustomEvent('tilt');
-  window.stage.dispatchEvent(event);
-
   // Trigger "tiltleft" event
   if (window.tiltX < -threshold) {
     let event = new CustomEvent('tiltleft')
@@ -52,8 +48,15 @@ function onDeviceOrientation(e) {
   }
 }
 
+// Trigger "tilt" event each frame
+function onAnimationFrame() {
+  let event = new CustomEvent('tilt');
+  window.stage.dispatchEvent(event);
+}
+
 export default function() {
   if (DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', onDeviceOrientation);
+    window.addEventListener('animationframe', onAnimationFrame);
   }
 }

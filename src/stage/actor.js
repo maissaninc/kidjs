@@ -54,14 +54,14 @@ export default class Actor {
   set x(value) {
     this.position.x = value;
     if (this.body) {
-      Matter.Body.setPosition(this.body, this.position);
+      setTimeout(() => Matter.Body.setPosition(this.body, this.position));
     }
   }
 
   set y(value) {
     this.position.y = value;
     if (this.body) {
-      Matter.Body.setPosition(this.body, this.position);
+      setTimeout(() => Matter.Body.setPosition(this.body, this.position));
     }
   }
 

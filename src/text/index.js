@@ -1,4 +1,5 @@
 import Actor from '../stage/actor';
+import { parseLength } from '../core/units';
 
 let cursorX = 5;
 let cursorY = 5;
@@ -41,7 +42,12 @@ function parseFontSize(value) {
 }
 
 export function display(x, y, text) {
-  const actor = new Text(x, y, text, true);
+  const actor = new Text(
+    parseLength(x, 'x'),
+    parseLength(y, 'y'),
+    text,
+    true
+  );
   window.stage.addChild(actor);
   return actor;
 }
@@ -50,7 +56,12 @@ export function write(x, y, text) {
   if (typeof y == 'undefined' && typeof text == 'undefined') {
     return _write(x);
   } else {
-    const actor = new Text(x, y, text, false);
+    const actor = new Text(
+      parseLength(x, 'x'),
+      parseLength(y, 'y'),
+      text,
+      false
+    );
     window.stage.addChild(actor);
     return actor;
   }

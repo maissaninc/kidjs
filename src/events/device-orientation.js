@@ -20,27 +20,29 @@ function onDeviceOrientation(e) {
   window.orientationAlpha = e.alpha;
   window.orientationBeta = e.beta;
   window.orientationGamma = e.gamma;
+  window.tiltX = getHorizontalTilt(e);
+  window.tiltY = getVerticalTilt(e);
 
   // Trigger "tiltleft" event
-  if (getHorizontalTilt(e) < -threshold) {
+  if (window.tiltX < -threshold) {
     let event = new CustomEvent('tiltleft')
     window.stage.dispatchEvent(event);
   }
 
   // Trigger "tiltright" event
-  if (getHorizontalTilt(e) > threshold) {
+  if (window.tiltX > threshold) {
     let event = new CustomEvent('tiltright')
     window.stage.dispatchEvent(event);
   }
 
   // Trigger "tiltup" event
-  if (getVerticalTilt(e) < -threshold) {
+  if (window.tiltY < -threshold) {
     let event = new CustomEvent('tiltup')
     window.stage.dispatchEvent(event);
   }
 
   // Trigger "tiltdown" event
-  if (getVerticalTilt(e) > threshold) {
+  if (window.tiltY > threshold) {
     let event = new CustomEvent('tiltdown')
     window.stage.dispatchEvent(event);
   }

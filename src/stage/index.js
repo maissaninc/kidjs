@@ -4,7 +4,7 @@ import Rect from '../shape/rect';
 import Matter from 'matter-js';
 import { log } from '../debug';
 
-const WALL_DEPTH = 200;
+const WALL_DEPTH = 1000;
 
 export default class Stage {
 
@@ -132,8 +132,8 @@ export default class Stage {
     // Add walls
     this._leftWall = rect(-WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
     this._rightWall = rect(this.width + WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
-    this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width, WALL_DEPTH);
-    this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width, WALL_DEPTH);
+    this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
+    this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
 
     // Reset text cursor
     resetCursor();

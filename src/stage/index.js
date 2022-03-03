@@ -67,16 +67,22 @@ export default class Stage {
     window.height = height;
 
     // Resize walls
+    this._leftWall.x = -WALL_DEPTH / 2;
     this._leftWall.y = height / 2;
-    this._leftWall.height = height;
+    this._leftWall.height = height + WALL_DEPTH * 2;
+    this._leftWall.updateBody();
     this._rightWall.x = width + WALL_DEPTH / 2;
     this._rightWall.y = height / 2;
-    this._rightWall.height = height;
+    this._rightWall.height = height + WALL_DEPTH * 2;
+    this._rightWall.updateBody();
     this._ceiling.x = width / 2;
-    this._ceiling.width = width;
+    this._ceiling.y = -WALL_DEPTH / 2;
+    this._ceiling.width = width + WALL_DEPTH * 2;
+    this._ceiling.updateBody();
     this._floor.x = width / 2;
     this._floor.y = height + WALL_DEPTH / 2;
-    this._floor.width = width;
+    this._floor.width = width + WALL_DEPTH * 2;
+    this._floor.updateBody();
   }
 
   /**
@@ -134,6 +140,7 @@ export default class Stage {
     this._rightWall = rect(this.width + WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
     this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
     this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
+    this.resize();
 
     // Reset text cursor
     resetCursor();

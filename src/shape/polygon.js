@@ -69,10 +69,17 @@ export default class Polygon extends Shape {
     if (index < this.points.length) {
       if (typeof x == 'number') this.points[index].x = x;
       if (typeof y == 'number') this.points[index].y = y;
-      this.updateBoundingPolygon();
-      if (this.body) {
-        Matter.Body.setVertices(this.body, this._boundingPolygon);
-      }
+      this.updateBody();
+    }
+  }
+
+  /**
+   * Update physics body.
+   */
+  updateBody() {
+    this.updateBoundingPolygon();
+    if (this.body) {
+      Matter.Body.setVertices(this.body, this._boundingPolygon);
     }
   }
 

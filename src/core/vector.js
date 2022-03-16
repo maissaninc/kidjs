@@ -76,4 +76,15 @@ export default class Vector {
       Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2)
     );
   }
+
+  static average(set) {
+    let v = new Vector(0, 0);
+    for (let i = 0; i < set.length; i = i + 1) {
+      v.x = v.x + set[i].x;
+      v.y = v.y + set[i].y;
+    }
+    v.x = v.x / set.length;
+    v.y = v.y / set.length;
+    return v;
+  }
 }

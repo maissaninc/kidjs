@@ -136,6 +136,46 @@ export default class Polygon extends Shape {
     }
     this.postrender(context);
   }
+
+  /**
+   * Explode this polygon into sub-polygons
+   */
+  explode() {
+    for (let i = 0; i < this.points.length; i = i + 1) {
+
+      // Determine points in fragment
+      let points = [
+        this.points[i],
+        this.points[(i + 1) % this.points.length],
+        new Vector(0, 0)
+      ];
+
+      // Determine center point of fragment
+      let cp = Vector.average(points);
+
+      // Create new polygon at center point
+      let fragment = new Polygon(
+        this.position.x + cp.x,
+        this.position.y + cp.y
+      );
+      for (let j = 0; j < points.length; j = j + 1) {
+        let v = points[j].subtract(cp);
+        fragment.addPoint(v.x, v.y);
+      }
+
+      // Add to stage
+      fragment.fill = this.fill;
+      fragment.stroke = this.stroke;
+      fragment.init();
+      window.stage.addChild(fragment);
+      this.remove();
+
+      // Push away from origin
+      let n = cp.normalize();
+      fragment.push(n.x * 5, n.y * 5);
+      fragment.angularVelocity = Math.random() * 5;
+    }
+  }
 }
 
 export function polygon(...args) {

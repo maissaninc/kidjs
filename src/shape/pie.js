@@ -14,13 +14,13 @@ export default class Pie extends Shape {
 
   init() {
     this._boundingPolygon = [];
-    for (let theta = degreesToRadians(this.startAngle); theta <= degreesToRadians(this.endAngle); theta = theta + (Math.PI / 20)) {
+    this._boundingPolygon.push(new Vector(0, 0));
+    for (let theta = this.startAngle; theta <= this.endAngle; theta = theta + (Math.PI / 20)) {
       this._boundingPolygon.push(new Vector(
         Math.cos(theta) * this.radius,
         Math.sin(theta) * this.radius
       ));
     }
-    this._boundingPolygon.push(new Vector(0, 0));
     this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       frictionAir: 0,
       isStatic: true
@@ -30,29 +30,25 @@ export default class Pie extends Shape {
   render(context) {
     this.prerender(context);
     let angleRadians = degreesToRadians(this.angle);
-    let startAngleRadians = degreesToRadians(this.startAngle);
-    let endAngleRadians = degreesToRadians(this.endAngle);
-    let middleAngle = (startAngleRadians + endAngleRadians) / 2;
-
-    // TO-DO: Average points in bounding polygon to determine new center
-    let offsetLength = (4 * this.radius) / (3 * Math.PI);
-    let offset = new Vector(
-      Math.cos(angleRadians + middleAngle) * offsetLength,
-      Math.sin(angleRadians + middleAngle) * offsetLength
-    );
+    let points = [
+      this._boundingPolygon[0],
+      this._boundingPolygon[1],
+      this._boundingPolygon[this._boundingPolygon.length - 1]
+    ];
+    let offset = Vector.average(points);
     context.arc(
-      this.x + offset.x,
-      this.y + offset.y,
+      this.x - offset.x,
+      this.y - offset.y,
       this.radius,
-      angleRadians + degreesToRadians(this.startAngle),
-      angleRadians + degreesToRadians(this.endAngle)
+      angleRadians + this.startAngle,
+      angleRadians + this.endAngle
     );
-    context.lineTo(this.x + offset.x, this.y + offset.y);
+    context.lineTo(this.x - offset.x, this.y - offset.y);
     this.postrender(context);
   }
 }
 
-export function pie(x, y, diameter, startAngle = 0, endAngle = 40) {
+export function pie(x, y, diameter, startAngle = 0, endAngle = 60) {
   if (x == null || y == null || diameter == null) {
     return;
   }
@@ -60,8 +56,8 @@ export function pie(x, y, diameter, startAngle = 0, endAngle = 40) {
     parseLength(x, 'x'),
     parseLength(y, 'y'),
     parseLength(diameter, 'size') / 2,
-    startAngle,
-    endAngle
+    degreesToRadians(startAngle),
+    degreesToRadians(endAngle)
   );
   shape.init();
   window.stage.addChild(shape);

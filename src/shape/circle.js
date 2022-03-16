@@ -1,5 +1,8 @@
 import Shape from './';
 import Matter from 'matter-js';
+import Pie from './pie';
+import Vector from '../core/vector';
+import { degreesToRadians } from '../core/math';
 import { parseLength } from '../core/units';
 
 export default class Circle extends Shape {
@@ -27,6 +30,46 @@ export default class Circle extends Shape {
       radius: this.radius + (amount / 2)
     }, duration, tween)
   }
+
+  explode() {
+
+    // Break into 6 pie pieces
+    for (let angle = 0; angle < Math.PI * 5/3; angle = angle + Math.PI * 1/3) {
+
+      // Create new fragment
+      let points = [
+        new Vector(0, 0),
+        new Vector(
+          Math.cos(angle) * this.radius,
+          Math.sin(angle) * this.radius
+        ),
+        new Vector(
+          Math.cos(angle + Math.PI * 1/3) * this.radius,
+          Math.sin(angle + Math.PI * 1/3) * this.radius
+        )
+      ];
+      let cp = Vector.average(points);
+      let fragment = new Pie(
+        this.x + cp.x,
+        this.y + cp.y,
+        this.radius,
+        angle,
+        angle + Math.PI * 1/3
+      );
+
+      // Add to stage
+      fragment.init();
+      fragment.fill = this.fill;
+      fragment.stroke = this.stroke;
+      window.stage.addChild(fragment);
+      this.remove();
+
+      // Push away from origin
+      let n = cp.normalize();
+      fragment.push(n.x * 5, n.y * 5);
+      fragment.angularVelocity = Math.random() * 5;
+    }
+  }
 }
 
 export function circle(x, y, diameter) {
@@ -34,7 +77,7 @@ export function circle(x, y, diameter) {
     return;
   }
   const shape = new Circle(
-    parseLength(x, 'x'), 
+    parseLength(x, 'x'),
     parseLength(y, 'y'),
     parseLength(diameter, 'size') / 2);
   shape.init();

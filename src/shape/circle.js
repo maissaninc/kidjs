@@ -33,7 +33,12 @@ export default class Circle extends Shape {
 
   explode() {
 
+    // Don't explode twice
+    if (this.exploded) return;
+    this.exploded = true;
+
     // Break into 6 pie pieces
+    let fragments = [];
     for (let angle = 0; angle < Math.PI * 5/3; angle = angle + Math.PI * 1/3) {
 
       // Create new fragment
@@ -62,13 +67,17 @@ export default class Circle extends Shape {
       fragment.fill = this.fill;
       fragment.stroke = this.stroke;
       window.stage.addChild(fragment);
-      this.remove();
 
       // Push away from origin
       let n = cp.normalize();
       fragment.push(n.x * 5, n.y * 5);
       fragment.angularVelocity = Math.random() * 5;
+      fragments.push(fragment);
     }
+
+    // Remove self from stage
+    this.remove();
+    this._fragments = fragments;
   }
 }
 

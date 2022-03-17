@@ -111,6 +111,14 @@ export default class Stage {
     this.actors = this.actors.filter((item) => {
       return item != actor;
     });
+    if (actor.body) {
+      Matter.Composite.remove(this.engine.world, actor.body);
+    }
+    if (actor.constraints) {
+      for (const constraint of actor.constraints) {
+        Matter.Composite.remove(this.engine.world, constraint);
+      }
+    }
   }
 
   /**

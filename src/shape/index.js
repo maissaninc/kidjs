@@ -7,6 +7,7 @@ export default class Shape extends Actor {
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
+    this._fragments = [];
   }
 
   _rgb() {
@@ -83,5 +84,16 @@ export default class Shape extends Actor {
     context.closePath();
     this.style.fill(this.fill);
     this.style.stroke(this.stroke, this.lineWidth);
+  }
+
+  /**
+   * Remove shape (and any fragments) from stage.
+   */
+  remove() {
+    super.remove();
+    for (let i = 0; i < this._fragments.length; i = i + 1) {
+      this._fragments[i].remove();
+    }
+    this._fragments = [];
   }
 }

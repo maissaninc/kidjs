@@ -141,6 +141,13 @@ export default class Polygon extends Shape {
    * Explode this polygon into sub-polygons
    */
   explode() {
+
+    // Don't explode twice
+    if (this.exploded) return;
+    this.exploded = true;
+
+    // Explode into fragments
+    let fragments = [];
     for (let i = 0; i < this.points.length; i = i + 1) {
 
       // Determine points in fragment
@@ -155,8 +162,8 @@ export default class Polygon extends Shape {
 
       // Create new polygon at center point
       let fragment = new Polygon(
-        this.position.x + cp.x,
-        this.position.y + cp.y
+        this.x + cp.x,
+        this.y + cp.y
       );
       for (let j = 0; j < points.length; j = j + 1) {
         let v = points[j].subtract(cp);
@@ -168,13 +175,17 @@ export default class Polygon extends Shape {
       fragment.stroke = this.stroke;
       fragment.init();
       window.stage.addChild(fragment);
-      this.remove();
 
       // Push away from origin
       let n = cp.normalize();
       fragment.push(n.x * 5, n.y * 5);
       fragment.angularVelocity = Math.random() * 5;
+      fragments.push(fragment);
     }
+
+    // Remove self from stage
+    this.remove();
+    this._fragments = fragments;
   }
 }
 

@@ -9,6 +9,7 @@ export default class Circle extends Shape {
   constructor(x, y, radius) {
     super(x, y);
     this.radius = radius;
+    this.boundingRadius = radius;
   }
 
   init() {

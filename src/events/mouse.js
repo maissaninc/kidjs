@@ -61,7 +61,7 @@ function onMouseUp(e) {
     if (deltaX < 10 && deltaY < 10) {
       let clickEvent = new MouseEvent('click', e);
       for (let i = window.stage.actors.length - 1; i >= 0; i--) {
-        if (window.stage.actors[i].containsPoint(e.pageX, e.pageY)) {
+        if (window.stage.actors[i].containsPoint(e.offsetX, e.offsetY)) {
           window.stage.actors[i].dispatchEvent(clickEvent);
         }
       }

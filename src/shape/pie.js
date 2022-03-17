@@ -13,6 +13,8 @@ export default class Pie extends Shape {
   }
 
   init() {
+
+    // Create bounding polygon
     this._boundingPolygon = [];
     this._boundingPolygon.push(new Vector(0, 0));
     for (let theta = this.startAngle; theta <= this.endAngle; theta = theta + (Math.PI / 20)) {
@@ -21,6 +23,21 @@ export default class Pie extends Shape {
         Math.sin(theta) * this.radius
       ));
     }
+
+    // Determine center point of pie
+    let points = [
+      this._boundingPolygon[0],
+      this._boundingPolygon[1],
+      this._boundingPolygon[this._boundingPolygon.length - 1]
+    ];
+    this._cp = Vector.average(points);
+
+    // Center bounding polygon around center points
+    for (let i = 0; i < this._boundingPolygon.length; i = i + 1) {
+      this._boundingPolygon[i] = this._boundingPolygon[i].subtract(this._cp);
+    }
+
+    // Create Matter.js body
     this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       frictionAir: 0,
       isStatic: true
@@ -29,21 +46,10 @@ export default class Pie extends Shape {
 
   render(context) {
     this.prerender(context);
-    let angleRadians = degreesToRadians(this.angle);
-    let points = [
-      this._boundingPolygon[0],
-      this._boundingPolygon[1],
-      this._boundingPolygon[this._boundingPolygon.length - 1]
-    ];
-    let offset = Vector.average(points);
-    context.arc(
-      this.x - offset.x,
-      this.y - offset.y,
-      this.radius,
-      angleRadians + this.startAngle,
-      angleRadians + this.endAngle
-    );
-    context.lineTo(this.x - offset.x, this.y - offset.y);
+    context.moveTo(this.body.vertices[0].x, this.body.vertices[0].y);
+    for (let i = 0; i < this.body.vertices.length; i = i + 1) {
+      context.lineTo(this.body.vertices[i].x, this.body.vertices[i].y);
+    }
     this.postrender(context);
   }
 }

@@ -55,7 +55,7 @@ function onAnimationFrame() {
 }
 
 export default function() {
-  if (DeviceOrientationEvent) {
+  if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', onDeviceOrientation);
     window.addEventListener('animationframe', onAnimationFrame);
   }

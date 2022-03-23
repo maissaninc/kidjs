@@ -12,6 +12,14 @@ export default class Circle extends Shape {
     this.boundingRadius = radius;
   }
 
+  get size() {
+    return this.radius * 2;
+  }
+
+  set size(value) {
+    this.radius = value / 2;
+  }
+
   init() {
     this.body =  Matter.Bodies.circle(this.position.x, this.position.y, this.radius, {
       frictionAir: 0,

@@ -1,5 +1,6 @@
 import { evaluateTriggers } from '../core';
 import { resetCursor } from '../text';
+import Grid from './grid';
 import Rect from '../shape/rect';
 import Matter from 'matter-js';
 import { log } from '../debug';
@@ -35,6 +36,10 @@ export default class Stage {
     this.canvas.style.height = this.height + 'px';
     this.canvas.style.display = 'block';
     this.context.scale(scale, scale);
+    this.context.save();
+
+    // Create grid
+    this.grid = new Grid(10);
 
     // Set global width and height
     window.width = this.width;
@@ -83,6 +88,14 @@ export default class Stage {
     this._floor.y = height + WALL_DEPTH / 2;
     this._floor.width = width + WALL_DEPTH * 2;
     this._floor.updateBody();
+
+    // Adjust pixel size
+    if (window._kidjs_.settings.pixelSize != 1) {
+      this.context.scale(
+        window._kidjs_.settings.pixelSize,
+        window._kidjs_.settings.pixelSize
+      );
+    }
   }
 
   /**

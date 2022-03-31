@@ -126,13 +126,13 @@ export default class Group extends Actor {
   }
 
   /**
-   * Render group.
-   *
-   * @param {CanvasRenderingContext2D} context - Canvas drawing context.
+   * Explode group.
    */
-  render(context) {
+  explode() {
     for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].render(context);
+      if (typeof this.children[i].explode == 'function') {
+        this.children[i].explode();
+      }
     }
   }
 }
@@ -142,6 +142,5 @@ export function group(...actors) {
   for (const actor of actors) {
     group.addChild(actor);
   }
-  window.stage.addChild(group);
   return group;
 }

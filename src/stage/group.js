@@ -31,6 +31,36 @@ export default class Group extends Actor {
     return this._anchored;
   }
 
+  set x(value) {
+    let delta = value - this.x;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].x += delta;
+    }
+  }
+
+  get x() {
+    let total = 0;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      total += this.children[i].x;
+    }
+    return total / this.children.length;
+  }
+
+  set y(value) {
+    let delta = value - this.y;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].y += delta;
+    }
+  }
+
+  get y() {
+    let total = 0;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      total += this.children[i].y;
+    }
+    return total / this.children.length;
+  }
+
   /**
    * Add an actor to the group.
    *
@@ -90,7 +120,6 @@ export default class Group extends Actor {
 export function group(...actors) {
   let group = new Group();
   for (const actor of actors) {
-    actor.remove();
     group.addChild(actor);
   }
   window.stage.addChild(group);

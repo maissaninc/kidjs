@@ -328,9 +328,9 @@ export default class Actor {
       ));
     }
     if (this.children) {
+      this.anchored = false;
       for (let i = 0; i < this.children.length; i = i + 1) {
         if (this.children[i].body) {
-          this.anchored = false;
           Matter.Body.setVelocity(this.children[i].body, new Vector(
             this.children[i].body.velocity.x + x,
             this.children[i].body.velocity.y + y

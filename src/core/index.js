@@ -38,7 +38,7 @@ export function init() {
   window._kidjs_ = {
     settings: {
       slowMotion: false,
-      grid: true,
+      grid: false,
       pixelSize: 1
     },
 

@@ -31,6 +31,26 @@ export default class Group extends Actor {
     return this._anchored;
   }
 
+  get angle() {
+    let total = 0;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      total += this.children[i].angle;
+    }
+    return total / this.children.length;
+  }
+
+  set angle(value) {
+    let cp = new Vector(this.x, this.y);
+    let delta = value - this.angle;
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].angle += delta;
+      let v = this.children[i].position.subtract(cp);
+      v = v.rotate(delta)
+      this.children[i].x = cp.x + v.x;
+      this.children[i].y = cp.y + v.y;
+    }
+  }
+
   set x(value) {
     let delta = value - this.x;
     for (let i = 0; i < this.children.length; i = i + 1) {

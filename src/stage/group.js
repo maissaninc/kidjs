@@ -126,6 +126,18 @@ export default class Group extends Actor {
   }
 
   /**
+   * Add event listener to all children.
+   *
+   * @param {string} [event] - Name of event.
+   * @param {function} [handler] - Event handler to execute when event occurs.
+   */
+  on(event, handler) {
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].on(event, handler);
+    }
+  }
+
+  /**
    * Explode group.
    */
   explode() {

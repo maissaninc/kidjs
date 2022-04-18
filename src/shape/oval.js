@@ -1,4 +1,6 @@
 import Shape from './';
+import Vector from '../core/vector';
+import Matter from 'matter-js';
 import { parseLength } from '../core/units';
 
 export default class Oval extends Shape {
@@ -6,7 +8,20 @@ export default class Oval extends Shape {
     super(x, y);
     this.radiusX = radiusX;
     this.radiusY = radiusY;
-    this.boundingRadius = Math.max(radiusX, radiusY);
+  }
+
+  init() {
+    this._boundingPolygon = [];
+    for (let theta = 0; theta <= Math.PI * 2; theta = theta + (Math.PI / 20)) {
+      this._boundingPolygon.push(new Vector(
+        Math.cos(theta) * this.radiusX,
+        Math.sin(theta) * this.radiusY
+      ));
+    }
+    this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
+      frictionAir: 0,
+      isStatic: true
+    });
   }
 
   render(context) {
@@ -27,6 +42,7 @@ export function oval(x, y, width, height) {
     parseLength(width, 'x') / 2,
     parseLength(height, 'y') / 2
   );
+  shape.init();
   window.stage.addChild(shape);
   return shape;
 }

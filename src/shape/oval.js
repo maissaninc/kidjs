@@ -1,3 +1,4 @@
+import Polygon from './polygon';
 import Shape from './';
 import Vector from '../core/vector';
 import Matter from 'matter-js';
@@ -29,6 +30,58 @@ export default class Oval extends Shape {
     let angleRadians = this.angle * (Math.PI / 180);
     context.ellipse(this.x, this.y, this.radiusX, this.radiusY, angleRadians, 0, Math.PI * 2);
     this.postrender(context);
+  }
+
+  explode() {
+
+    console.log('eplode');
+
+    // Don't explode twice
+    if (this.exploded) return;
+    this.exploded = true;
+
+    // Break into 4 pie pieces
+    let fragments = [];
+    for (let angle = 0; angle < Math.PI * 2; angle = angle + Math.PI * 1/2) {
+
+      // Create new fragment
+      let points = [
+        new Vector(0, 0)
+      ];
+      for (let theta = angle; theta <= angle + Math.PI * 1/2; theta = theta + (Math.PI / 20)) {
+        points.push(new Vector(
+          Math.cos(theta) * this.radiusX,
+          Math.sin(theta) * this.radiusY
+        ));
+      }
+      let cp = Vector.average(points);
+      let fragment = new Polygon(
+        this.x + cp.x,
+        this.y + cp.y
+      );
+      for (let i = 0; i < points.length; i = i + 1) {
+        let v = points[i].subtract(cp);
+        fragment.addPoint(v.x, v.y);
+      }
+
+      // Add to stage
+      fragment.init();
+      fragment.fill = this.fill;
+      fragment.stroke = this.stroke;
+      window.stage.addChild(fragment);
+
+      // Push away from origin
+      let n = cp.normalize();
+      fragment.push(n.x * 5, n.y * 5);
+      fragment.angularVelocity = Math.random() * 5;
+      fragments.push(fragment);
+    }
+
+    console.log(fragments);
+
+    // Remove self from stage
+    this.remove();
+    this._fragments = fragments;
   }
 }
 

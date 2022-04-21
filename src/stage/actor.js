@@ -471,5 +471,8 @@ export default class Actor {
     this.x = source.x;
     this.y = source.y;
     this.angle = source.angle;
+    for (let type in source.eventListeners) {
+      this.eventListeners[type] = [...source.eventListeners[type]];
+    }
   }
 }

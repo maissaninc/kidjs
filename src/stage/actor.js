@@ -482,4 +482,15 @@ export default class Actor {
   remove() {
     window.stage.removeChild(this);
   }
+
+  /**
+   * Assign properties of another actor to this one.
+   *
+   * @param {Actor} source
+   */
+  assign(source) {
+    this.x = source.x;
+    this.y = source.y;
+    this.angle = source.angle;
+  }
 }

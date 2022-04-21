@@ -88,6 +88,16 @@ export default class Circle extends Shape {
     this.remove();
     this._fragments = fragments;
   }
+
+  /**
+   * Assign properties of another circle to this one.
+   *
+   * @param {Circle} source
+   */
+  assign(source) {
+    super.assign(source);
+    this.radius = source.radius;
+  }
 }
 
 export function circle(x, y, diameter) {

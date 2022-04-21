@@ -187,6 +187,18 @@ export default class Polygon extends Shape {
     this.remove();
     this._fragments = fragments;
   }
+
+  /**
+   * Assign properties of another polygon to this one.
+   *
+   * @param {Circle} source
+   */
+  assign(source) {
+    super.assign(source);
+    for (let i = 0; i < source.points.length; i = i + 1) {
+      this.addPoint(source.points[i].x, -source.points[i].y);
+    }
+  }
 }
 
 export function polygon(...args) {

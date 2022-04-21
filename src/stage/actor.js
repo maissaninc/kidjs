@@ -384,29 +384,8 @@ export default class Actor {
    * @return {boolean}
    */
   containsPoint(x, y) {
-
-    // If polygon
-    if (this.isPolygon()) {
-      let inside = false;
-      for (let i = 0; i < this.boundingPolygon.length; i++) {
-        let j = (i + 1) % this.boundingPolygon.length;
-        if (
-          ((this.boundingPolygon[j].y > y) != (this.boundingPolygon[i].y > y)) &&
-          (x < (this.boundingPolygon[i].x - this.boundingPolygon[j].x) *
-          (y - this.boundingPolygon[j].y) /
-          (this.boundingPolygon[i].y - this.boundingPolygon[j].y) +
-          this.boundingPolygon[j].x)
-        ) {
-          inside = !inside;
-        }
-      }
-      return inside;
-
-    // Circle
-    } else {
-      let v = this.position.subtract(new Vector(x, y));
-      let distance = v.length;
-      return (distance < this.boundingRadius);
+    if (this.body) {
+      return Matter.Bounds.contains(this.body.bounds, new Vector(x, y));
     }
   }
 

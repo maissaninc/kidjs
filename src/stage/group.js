@@ -157,7 +157,9 @@ export default class Group extends Actor {
    */
   on(event, handler) {
     for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].on(event, handler);
+      this.children[i].on(event, function(...args) {
+        handler.apply(this, args);
+      }.bind(this));
     }
   }
 

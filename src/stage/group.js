@@ -81,6 +81,30 @@ export default class Group extends Actor {
     return total / this.children.length;
   }
 
+  get bounds() {
+    let bounds = {
+      max: new Vector(this.x, this.y),
+      min: new Vector(this.x, this.y)
+    };
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      if (this.children[i].bounds) {
+        if (this.children[i].bounds.min.x < bounds.min.x) {
+          bounds.min.x = this.children[i].bounds.min.x;
+        }
+        if (this.children[i].bounds.max.x > bounds.max.x) {
+          bounds.max.x = this.children[i].bounds.max.x;
+        }
+        if (this.children[i].bounds.min.y < bounds.min.y) {
+          bounds.min.y = this.children[i].bounds.min.y;
+        }
+        if (this.children[i].bounds.max.y > bounds.max.y) {
+          bounds.max.y = this.children[i].bounds.max.y;
+        }
+      }
+    }
+    return bounds;
+  }
+
   /**
    * Add an actor to the group.
    *
@@ -146,6 +170,39 @@ export default class Group extends Actor {
         this.children[i].explode();
       }
     }
+  }
+
+  /**
+   * Assign properties of another group to this one.
+   *
+   * @param {Group} source
+   */
+  assign(source) {
+    this.x = source.x;
+    this.y = source.y;
+    this.angle = source.angle;
+    for (let type in source.eventListeners) {
+      this.eventListeners[type] = [...source.eventListeners[type]];
+    }
+  }
+
+  /**
+   * Clone group.
+   */
+  clone() {
+    let width = this.bounds.max.x - this.bounds.min.x;
+    let group = new Group();
+    group.assign(this);
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      let copy = new this.children[i].constructor(this.children[i].x, this.children[i].y);
+      copy.assign(this.children[i]);
+      copy.x = copy.x + width + 5;
+      copy.init();
+      copy.anchored = this.children[i].anchored;
+      group.addChild(copy);
+      window.stage.addChild(copy);
+    }
+    return group;
   }
 }
 

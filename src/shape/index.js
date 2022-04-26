@@ -57,6 +57,12 @@ export default class Shape extends Actor {
     this.fill = value;
   }
 
+  get bounds() {
+    if (this.body) {
+      return this.body.bounds;
+    }
+  }
+
   prerender(context) {
 
     // Create default style
@@ -117,8 +123,7 @@ export default class Shape extends Actor {
       let width = this.body.bounds.max.x - this.body.bounds.min.x;
       let copy = new this.constructor(this.x, this.y);
       copy.assign(this);
-      this.x = this.x - width / 2;
-      copy.x = copy.x + width / 2;
+      copy.x = copy.x + width + 5; 
       copy.init();
       copy.anchored = this.anchored;
       window.stage.addChild(copy);

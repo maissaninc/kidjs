@@ -218,6 +218,12 @@ export default class Group extends Actor {
         }
       }
     }
+
+    // Initialize constraints
+    for (const constraint of group.constraints) {
+      Matter.Composite.add(window.stage.engine.world, constraint);
+    }
+
     return group;
   }
 }
@@ -226,6 +232,9 @@ export function group(...actors) {
   let group = new Group();
   for (const actor of actors) {
     group.addChild(actor);
+    for (const constraint of group.constraints) {
+      Matter.Composite.add(window.stage.engine.world, constraint);
+    }
   }
   return group;
 }

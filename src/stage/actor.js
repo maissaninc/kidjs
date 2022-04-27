@@ -402,7 +402,9 @@ export default class Actor {
     if (this.eventListeners[event] == undefined) {
       this.eventListeners[event] = [];
     }
-    this.eventListeners[event].push(handler);
+    this.eventListeners[event].push({
+      handler: handler
+    });
   }
 
   /**
@@ -432,7 +434,9 @@ export default class Actor {
    */
   removeEventListener(event, handler) {
     if (this.eventListeners[event] !== undefined) {
-      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+      this.eventListeners[event] = this.eventListeners[event].filter(
+        item => item.handler !== handler
+      );
     }
   }
 
@@ -443,13 +447,13 @@ export default class Actor {
    */
   dispatchEvent(event, context = this) {
     if (this.eventListeners[event.type] !== undefined) {
-      for (let handler of this.eventListeners[event.type]) {
+      for (let listener of this.eventListeners[event.type]) {
         switch (event.type) {
           case 'collision':
-            handler.call(context, this, event.detail);
+            listener.handler.call(context, this, event.detail);
             break;
           default:
-            handler.call(context);
+            listener.handler.call(context);
         }
       }
     }

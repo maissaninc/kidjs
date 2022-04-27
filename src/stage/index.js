@@ -265,7 +265,9 @@ export default class Stage {
     if (this.eventListeners[event] == undefined) {
       this.eventListeners[event] = [];
     }
-    this.eventListeners[event].push(handler);
+    this.eventListeners[event].push({
+      handler: handler
+    });
   }
 
   /**
@@ -276,7 +278,9 @@ export default class Stage {
    */
   removeEventListener(event, handler) {
     if (this.eventListeners[event] !== undefined) {
-      this.eventListeners[event] = this.eventListeners[event].filter(item => item !== handler);
+      this.eventListeners[event] = this.eventListeners[event].filter(
+        item => item.handler !== handler
+      );
     }
   }
 
@@ -294,21 +298,21 @@ export default class Stage {
    */
   dispatchEvent(event, context = window) {
     if (this.eventListeners[event.type] !== undefined) {
-      for (let handler of this.eventListeners[event.type]) {
-        if (typeof handler == 'function') {
+      for (let listener of this.eventListeners[event.type]) {
+        if (typeof listener.handler == 'function') {
           switch (event.constructor.name) {
             case 'KeyboardEvent':
-              handler.call(context, event.key);
+              listener.handler.call(context, event.key);
               break;
             case 'MouseEvent':
             case 'PointerEvent':
-              handler.call(context, event.x, event.y);
+              listener.handler.call(context, event.x, event.y);
               break;
             default:
               if (event.type == 'tilt') {
-                handler.call(context, window.tiltX, window.tiltY);
+                listener.handler.call(context, window.tiltX, window.tiltY);
               } else {
-                handler.call(context);
+                listener.handler.call(context);
               }
           }
         }

@@ -394,8 +394,9 @@ export default class Actor {
    *
    * @param {string} [event] - Name of event.
    * @param {function} [handler] - Event handler to execute when event occurs.
+   * @param {object} [meta] - Additional details about event handler.
    */
-  addEventListener(event, handler) {
+  addEventListener(event, handler, meta = {}) {
     if (event == 'doubleclick') {
       event = 'dblclick';
     }
@@ -403,7 +404,8 @@ export default class Actor {
       this.eventListeners[event] = [];
     }
     this.eventListeners[event].push({
-      handler: handler
+      handler: handler,
+      ...meta
     });
   }
 
@@ -476,7 +478,9 @@ export default class Actor {
     this.y = source.y;
     this.angle = source.angle;
     for (let type in source.eventListeners) {
-      this.eventListeners[type] = [...source.eventListeners[type]];
+      this.eventListeners[type] = source.eventListeners[type].filter(
+        item => !item.group
+      );
     }
   }
 }

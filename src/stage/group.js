@@ -157,9 +157,12 @@ export default class Group extends Actor {
    */
   on(event, handler) {
     for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].on(event, function(...args) {
+      this.children[i].addEventListener(event, function(...args) {
         handler.apply(this, args);
-      }.bind(this));
+      }.bind(this), {
+        canonicalHandler: handler,
+        group: this
+      });
     }
   }
 
@@ -196,6 +199,8 @@ export default class Group extends Actor {
     let group = new Group();
     group.assign(this);
     for (let i = 0; i < this.children.length; i = i + 1) {
+
+      // Copy of child
       let copy = new this.children[i].constructor(this.children[i].x, this.children[i].y);
       copy.assign(this.children[i]);
       copy.x = copy.x + width + 5;
@@ -203,6 +208,15 @@ export default class Group extends Actor {
       copy.anchored = this.children[i].anchored;
       group.addChild(copy);
       window.stage.addChild(copy);
+
+      // Copy events applied to group
+      for (let type in this.children[i].eventListeners) {
+        for (let j = 0; j < this.children[i].eventListeners[type].length; j = j + 1) {
+          if (this.children[i].eventListeners[type][j].group) {
+            group.on(type, this.children[i].eventListeners[type][j].canonicalHandler);
+          }
+        }
+      }
     }
     return group;
   }

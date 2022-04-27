@@ -26,7 +26,7 @@ Use the following HTML template to get started. Any code written inside of
 ```
 
 See the [documentation](https://kidjs.org) for a comprehensive list of available
-functions, properties and events, or ask your questions on 
-[Discord](https://discord.gg/qQeKuqyWbt).
+functions, properties and events. Or, ask your question on our
+[Discord server](https://discord.gg/qQeKuqyWbt).
 
 Supported by [Maissan Inc.](https://maissan.net)

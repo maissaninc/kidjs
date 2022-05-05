@@ -7,68 +7,40 @@
   <body>
     <script type="kidjs">
 
-    let missile1 = rect(260, 340, 5, 50)
-missile1.color = 'black'
+      function placeDomino(x, y) {
+        let domino = rect(x, y, 20, 100)
+        domino.anchored = false
+        domino.bounciness = 0
+      }
 
-let missile2 = rect(340, 340, 5, 50)
-missile2.color = 'black'
+      for (let x = 200; x < width - 200; x = x + 60) {
+        placeDomino(x, 200)
+      }
 
-let leftwing = triangle(240, 343, 30, 100)
-leftwing.angle = -100
-leftwing.color = 'lightblue'
+      let startX
+      let startY
+      let marble
 
-let rightwing = triangle(360, 343, 30, 100)
-rightwing.angle = 100
-rightwing.color = 'lightblue'
+      function start() {
+        startX = mouseX
+        startY = mouseY
+        marble = circle(startX, startY, 50)
+      }
 
-let body = triangle(300, 300, 60, 100)
-body.color = 'lightblue'
+      function dragging() {
+        if (mouseButton) {
+          marble.x = mouseX
+          marble.y = mouseY
+        }
+      }
 
-let cockpit = circle(300, 300, 20)
-cockpit.color = 'white'
+      function release() {
+        marble.push(startX - mouseX, startY - mouseY)
+      }
 
-let plane = group(missile1, missile2, leftwing, rightwing, body, cockpit)
-
-plane.x = width / 2
-plane.y = height - 100
-
-plane.clone()
-
-function kittykat(key) {
-if (key == 'ArrowLeft') {
-  plane.x = plane.x - 10
-  leftwing.color = 'gray'
-}
-if (key == 'ArrowRight') {
-  plane.x = plane.x + 10
-}
-if (key == 'ArrowUp') {
-  plane.y = plane.y - 10
-}
-if (key == 'ArrowDown') {
-  plane.y = plane.y + 10
-}
-}
-
-on('keydown', kittykat)
-
-function reset() {
-leftwing.color = 'lightblue'
-}
-
-on('keyup', reset)
-
-function fire() {
-let bullet = triangle(plane.x - 40, plane.y - 20, 20)
-bullet.push(0, -25)
-let bullet2 = triangle(plane.x + 40, plane.y - 20, 20)
-bullet2.push(0, -25)
-}
-
-on('space', fire)
-
-gravity = 0
-ceiling = false
+      on('mousedown', start)
+      on('mousemove', dragging)
+      on('mouseup', release)
 
     </script>
   </body>

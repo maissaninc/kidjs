@@ -124,13 +124,21 @@ export default class Shape extends Actor {
 
   /**
    * Clone shape.
+   *
+   * @param {int} x - Optional x coordinate
+   * @param {int} y - Optional y coordinate
    */
-  clone() {
+  clone(x = false, y = false) {
     if (this.body) {
       let width = this.body.bounds.max.x - this.body.bounds.min.x;
       let copy = new this.copy();
       copy.assign(this);
-      copy.x = copy.x + width + 5;
+      if (x !== false && y !== false) {
+        copy.x = x;
+        copy.y = y;
+      } else {
+        this.x = this.x + width + 5;
+      }
       copy.init();
       copy.angle = this.angle;
       copy.anchored = this.anchored;

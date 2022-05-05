@@ -178,23 +178,12 @@ export default class Group extends Actor {
   }
 
   /**
-   * Assign properties of another group to this one.
-   *
-   * @param {Group} source
-   */
-  assign(source) {
-    this.x = source.x;
-    this.y = source.y;
-    this.angle = source.angle;
-    for (let type in source.eventListeners) {
-      this.eventListeners[type] = [...source.eventListeners[type]];
-    }
-  }
-
-  /**
    * Clone group.
+   *
+   * @param {int} x - Optional x coordinate
+   * @param {int} y - Optional y coordinate
    */
-  clone() {
+  clone(x = false, y = false) {
     let width = this.bounds.max.x - this.bounds.min.x;
     let group = new Group();
     group.assign(this);
@@ -203,21 +192,19 @@ export default class Group extends Actor {
       // Copy of child
       let copy = this.children[i].copy();
       copy.assign(this.children[i]);
-      copy.x = copy.x + width + 5;
       copy.init();
       copy.angle = this.children[i].angle;
       copy.anchored = this.children[i].anchored;
       group.addChild(copy);
       window.stage.addChild(copy);
+    }
 
-      // Copy events applied to group
-      for (let type in this.children[i].eventListeners) {
-        for (let j = 0; j < this.children[i].eventListeners[type].length; j = j + 1) {
-          if (this.children[i].eventListeners[type][j].group) {
-            group.on(type, this.children[i].eventListeners[type][j].canonicalHandler);
-          }
-        }
-      }
+    // Position group
+    if (x !== false && y !== false) {
+      group.x = group.x - this.x + x;
+      group.y = group.y - this.y + y;
+    } else {
+      this.x = this.x + width + 5;
     }
 
     // Initialize constraints

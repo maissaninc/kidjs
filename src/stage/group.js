@@ -201,10 +201,11 @@ export default class Group extends Actor {
     for (let i = 0; i < this.children.length; i = i + 1) {
 
       // Copy of child
-      let copy = new this.children[i].constructor(this.children[i].x, this.children[i].y);
+      let copy = this.children[i].copy();
       copy.assign(this.children[i]);
       copy.x = copy.x + width + 5;
       copy.init();
+      copy.angle = this.children[i].angle;
       copy.anchored = this.children[i].anchored;
       group.addChild(copy);
       window.stage.addChild(copy);

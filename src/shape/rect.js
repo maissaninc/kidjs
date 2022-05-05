@@ -43,6 +43,10 @@ export default class Rect extends Polygon {
   get height() {
     return this._height;
   }
+
+  copy() {
+    return new Rect(this.x, this.y, this.width, this.height);
+  }
 }
 
 export function rect(x, y, width, height) {

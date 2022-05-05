@@ -104,6 +104,13 @@ export default class Shape extends Actor {
   }
 
   /**
+   * Copy shape.
+   */
+  copy() {
+    return new this.constructor(this.x, this.y);
+  }
+
+  /**
    * Assign properties of another shape to this one.
    *
    * @param {Shape} source
@@ -121,10 +128,11 @@ export default class Shape extends Actor {
   clone() {
     if (this.body) {
       let width = this.body.bounds.max.x - this.body.bounds.min.x;
-      let copy = new this.constructor(this.x, this.y);
+      let copy = new this.copy();
       copy.assign(this);
-      copy.x = copy.x + width + 5; 
+      copy.x = copy.x + width + 5;
       copy.init();
+      copy.angle = this.angle;
       copy.anchored = this.anchored;
       window.stage.addChild(copy);
       return copy;

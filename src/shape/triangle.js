@@ -12,6 +12,10 @@ export default class Triangle extends Polygon {
     this.addPoint(width / 2, -height / 2);
     this.addPoint(0, height / 2);
   }
+
+  copy() {
+    return new Triangle(this.x, this.y, this.width, this.height);
+  }
 }
 
 export function triangle(x, y, width, height) {

@@ -34,6 +34,13 @@ export default class Semicircle extends Shape {
     context.arc(this.x + offset.x, this.y + offset.y, this.radius, angleRadians, angleRadians + Math.PI);
     this.postrender(context);
   }
+
+  /**
+   * Copy shape.
+   */
+  copy() {
+    return new this.constructor(this.x, this.y, this.radius);
+  }
 }
 
 export function semicircle(x, y, diameter) {

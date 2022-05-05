@@ -90,13 +90,10 @@ export default class Circle extends Shape {
   }
 
   /**
-   * Assign properties of another circle to this one.
-   *
-   * @param {Circle} source
+   * Copy shape.
    */
-  assign(source) {
-    super.assign(source);
-    this.radius = source.radius;
+  copy() {
+    return new this.constructor(this.x, this.y, this.radius);
   }
 }
 

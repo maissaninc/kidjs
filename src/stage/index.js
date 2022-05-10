@@ -88,14 +88,6 @@ export default class Stage {
     this._floor.y = height + WALL_DEPTH / 2;
     this._floor.width = width + WALL_DEPTH * 2;
     this._floor.updateBody();
-
-    // Adjust pixel size
-    if (window._kidjs_.settings.pixelSize != 1) {
-      this.context.scale(
-        window._kidjs_.settings.pixelSize,
-        window._kidjs_.settings.pixelSize
-      );
-    }
   }
 
   /**
@@ -227,6 +219,13 @@ export default class Stage {
       this.frame++;
       this.context.clearRect(0, 0, this.width, this.height);
 
+      // Adjust for pixel size
+      this.context.save();
+      this.context.scale(
+        window._kidjs_.settings.pixelSize,
+        window._kidjs_.settings.pixelSize
+      );
+
       // Update physics simulation
       this._leftWall.ghost = !window.walls;
       this._rightWall.ghost = !window.walls;
@@ -239,6 +238,12 @@ export default class Stage {
       for (let actor of this.actors) {
         actor.update();
         actor.render(this.context);
+      }
+
+      // Draw grid
+      this.context.restore();
+      if (window._kidjs_.settings.grid) {
+        this.grid.render(this.context);
       }
 
       window._kidjs_.onframe();

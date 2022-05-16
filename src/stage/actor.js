@@ -120,14 +120,14 @@ export default class Actor {
     if (this.body) {
       Matter.Body.setVelocity(this.body, new Vector(
         Math.cos(degreesToRadians(value)) * this.speed,
-        -Math.sin(degreesToRadians(value)) * this.speed
+        Math.sin(degreesToRadians(value)) * this.speed
       ));
     }
   }
 
   get direction() {
     if (this.body) {
-      let a = Math.atan2(-this.body.velocity.y, this.body.velocity.x)
+      let a = Math.atan2(this.body.velocity.y, this.body.velocity.x)
       if (a < 0) a = a + Math.PI * 2;
       return radiansToDegrees(a);
     }

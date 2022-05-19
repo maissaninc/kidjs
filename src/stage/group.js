@@ -178,6 +178,16 @@ export default class Group extends Actor {
   }
 
   /**
+   * Remove group.
+   */
+  remove() {
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      window.stage.removeChild(this.children[i]);
+    }
+    this.children = [];
+  }
+
+  /**
    * Clone group.
    *
    * @param {int} x - Optional x coordinate

@@ -148,6 +148,10 @@ export default class Stage {
     this._rightWall = rect(this.width + WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
     this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
     this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
+    this._leftWall.invisible = true;
+    this._rightWall.invisible = true;
+    this._ceiling.invisible = true;
+    this._floor.invisible = true;
     this.resize();
 
     // Reset text cursor
@@ -237,7 +241,9 @@ export default class Stage {
       // Render actors
       for (let actor of this.actors) {
         actor.update();
-        actor.render(this.context);
+        if (!actor.invisible) {
+          actor.render(this.context);
+        }
       }
 
       // Draw grid

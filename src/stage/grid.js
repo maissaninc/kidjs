@@ -7,8 +7,7 @@ export default class Grid {
    * @param {int} size - Grid size
    * @param {string} color - Grid line color
    */
-  constructor(size = window._kidjs_.settings.pixelSize, color = '#f6f6f6') {
-    this.size = size;
+  constructor(color = '#f6f6f6') {
     this.color = color;
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
@@ -17,7 +16,7 @@ export default class Grid {
     this.canvas.style.left = 0;
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
-    this.canvas.style.display = window._kidjs_.settings.grid ? 'block' : 'none';
+    this.canvas.style.display = 'block';
   }
 
   /**
@@ -28,12 +27,13 @@ export default class Grid {
   render() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    if (window._kidjs_.settings.grid && this.size >= 5) {
-      for (let x = 0; x < this.canvas.width; x = x + this.size) {
-        for (let y = 0; y < this.canvas.height; y = y + this.size) {
+    let size = window._kidjs_.settings.pixelSize;
+    if (window._kidjs_.settings.grid && size >= 5) {
+      for (let x = 0; x < this.canvas.width; x = x + size) {
+        for (let y = 0; y < this.canvas.height; y = y + size) {
           this.context.fillStyle = this.color;
-          this.context.fillRect(x + this.size, y, 1, this.size);
-          this.context.fillRect(x, y + this.size, this.size, 1);
+          this.context.fillRect(x + size, y, 1, size);
+          this.context.fillRect(x, y + size, size, 1);
         }
       }
     }

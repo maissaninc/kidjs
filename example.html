@@ -6,68 +6,41 @@
   </head>
   <body>
     <script type="kidjs">
-    let dead = false
-    let ship = triangle(50%, 50%, 80, 100)
-    ship.on('collision', function(a, b) {
-      if (b.constructor.name == 'Circle') {
-        ship.explode()
-        dead = true
+
+      function placeDomino(x, y) {
+        let domino = rect(x, y, 20, 100)
+        domino.anchored = false
+        domino.bounciness = 0
       }
-    })
 
-    function deg2Rad(deg) {
-      return deg * Math.PI / 180
-    }
-
-    async function fire() {
-      if (!dead) {
-        let a = ship.angle - 90
-        let x = ship.x + Math.cos(await deg2Rad(a)) * 70
-        let y = ship.y + Math.sin(await deg2Rad(a)) * 70
-        let bullet = circle(x, y, 10)
-        bullet.speed = 3
-        bullet.direction = a
-        bullet.on('collision', function(a, b) {
-          if (b.constructor.name == 'Circle') {
-            b.explode()
-            setTimeout(function() {
-              b.remove()
-            }, 1000)
-          }
-          this.remove()
-        });
+      for (let x = 200; x < width - 200; x = x + 60) {
+        placeDomino(x, 200)
       }
-    }
 
-    function keydown(key) {
-      if (key == 'ArrowLeft') {
-        ship.angle = ship.angle - 2
+      let startX
+      let startY
+      let marble
+
+      function start() {
+        startX = mouseX
+        startY = mouseY
+        marble = circle(startX, startY, 50)
       }
-      if (key == 'ArrowRight') {
-        ship.angle = ship.angle + 2
+
+      function dragging() {
+        if (mouseButton) {
+          marble.x = mouseX
+          marble.y = mouseY
+        }
       }
-    }
 
-    on('keydown', keydown)
-    on('space', fire)
-
-    gravity = 0
-
-    for (let i = 0; i < 10; i = i + 1) {
-      let distance = 0
-      let x, y
-      while (distance < 140) {
-        x = random(80, width - 80)
-        y = random(80, height - 80)
-        distance = Math.sqrt(Math.pow(x - width / 2, 2) + Math.pow(y - height / 2, 2))
+      function release() {
+        marble.push(startX - mouseX, startY - mouseY)
       }
-      let size = random(60, 80)
-      let asteroid = circle(x, y, size)
-      asteroid.speed = random(1, 3)
-      asteroid.direction = random(360)
-      asteroid.angularVelocity = 0
-      asteroid.bounciness = 1
-    }
+
+      on('mousedown', start)
+      on('mousemove', dragging)
+      on('mouseup', release)
 
     </script>
   </body>

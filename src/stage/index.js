@@ -1,6 +1,5 @@
 import { evaluateTriggers } from '../core';
 import { resetCursor } from '../text';
-import Grid from './grid';
 import Rect from '../shape/rect';
 import Matter from 'matter-js';
 import { log } from '../debug';
@@ -27,20 +26,9 @@ export default class Stage {
     Matter.Events.on(this.engine, 'collisionStart', (event) => this.onCollisionStart(event));
 
     // Create canvas
-    let scale = window.devicePixelRatio;
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
-    this.canvas.width = Math.floor(this.width * scale);
-    this.canvas.height = Math.floor(this.height * scale);
-    this.canvas.style.width = this.width + 'px';
-    this.canvas.style.height = this.height + 'px';
     this.canvas.style.display = 'block';
-    this.context.scale(scale, scale);
-    this.context.save();
-
-    // Set global width and height
-    window.width = this.width;
-    window.height = this.height;
 
     // Initialize
     this.actors = [];
@@ -59,12 +47,21 @@ export default class Stage {
   resize(width = window.innerWidth, height = window.innerHeight) {
     this.width = parseInt(width);
     this.height = parseInt(height);
-    let scale = window.devicePixelRatio;
-    this.canvas.width = Math.floor(this.width * scale);
-    this.canvas.height = Math.floor(this.height * scale);
-    this.canvas.style.width = this.width + 'px';
-    this.canvas.style.height = this.height + 'px';
-    this.context.scale(scale, scale);
+    if (window._kidjs_.settings.pixelSize > 1) {
+      let scale = 1 / window._kidjs_.settings.pixelSize;
+      this.canvas.width = Math.floor(this.width * scale);
+      this.canvas.height = Math.floor(this.height * scale);
+      this.canvas.style.width = this.canvas.width * (1 / scale) + 'px';
+      this.canvas.style.height = this.canvas.height * (1 / scale) + 'px';
+      this.canvas.style.imageRendering = 'pixelated';
+    } else {
+      let scale = window.devicePixelRatio;
+      this.canvas.width = Math.floor(this.width * scale);
+      this.canvas.height = Math.floor(this.height * scale);
+      this.canvas.style.width = this.width + 'px';
+      this.canvas.style.height = this.height + 'px';
+      this.context.scale(scale, scale);
+    }
     window.width = width;
     window.height = height;
 
@@ -85,6 +82,9 @@ export default class Stage {
     this._floor.y = height + WALL_DEPTH / 2;
     this._floor.width = width + WALL_DEPTH * 2;
     this._floor.updateBody();
+
+    // Redraw grid
+    window.grid.render();
   }
 
   /**
@@ -219,13 +219,6 @@ export default class Stage {
     if (this.running) {
       this.frame++;
       this.context.clearRect(0, 0, this.width, this.height);
-
-      // Adjust for pixel size
-      /*this.context.save();
-      this.context.scale(
-        window._kidjs_.settings.pixelSize,
-        window._kidjs_.settings.pixelSize
-      );*/
 
       // Update physics simulation
       this._leftWall.ghost = !window.walls;

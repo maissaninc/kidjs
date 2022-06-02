@@ -26,6 +26,7 @@
 import { init, run, stop, setAssetUrlFilter } from './core';
 import initEvents from './events';
 import Stage from './stage';
+import Grid from './stage/grid';
 
 // Initialize framework
 init();

@@ -154,6 +154,9 @@ async function compile(code) {
     locations: true
   });
 
+  // Keep track of functions converted to async
+  let convertedFunctions = [];
+
   // Walk entire source tree
   walk.full(ast, function(node) {
 
@@ -215,7 +218,12 @@ async function compile(code) {
 
         // Convert all functions to async
         if (node.body[i].type == 'FunctionDeclaration') {
-          node.body[i].async = true;
+          if (node.body[i].async == false) {
+            node.body[i].async = true;
+            if (node.body[i].id && node.body[i].id.name) {
+              convertedFunctions.push(node.body[i].id.name);
+            }
+          }
         }
 
         // Add await to wait() calls

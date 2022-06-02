@@ -38,6 +38,10 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
 
+  // Create grid
+  window.grid = new Grid();
+  document.body.appendChild(grid.canvas);
+
   // Resize canvas
   if (!window.KID.settings.width || !window.KID.settings.height) {
     window.addEventListener('resize', function() {

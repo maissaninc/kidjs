@@ -38,9 +38,6 @@ export default class Stage {
     this.context.scale(scale, scale);
     this.context.save();
 
-    // Create grid
-    this.grid = new Grid(10);
-
     // Set global width and height
     window.width = this.width;
     window.height = this.height;
@@ -224,11 +221,11 @@ export default class Stage {
       this.context.clearRect(0, 0, this.width, this.height);
 
       // Adjust for pixel size
-      this.context.save();
+      /*this.context.save();
       this.context.scale(
         window._kidjs_.settings.pixelSize,
         window._kidjs_.settings.pixelSize
-      );
+      );*/
 
       // Update physics simulation
       this._leftWall.ghost = !window.walls;
@@ -244,12 +241,6 @@ export default class Stage {
         if (!actor.invisible) {
           actor.render(this.context);
         }
-      }
-
-      // Draw grid
-      this.context.restore();
-      if (window._kidjs_.settings.grid) {
-        this.grid.render(this.context);
       }
 
       window._kidjs_.onframe();

@@ -240,31 +240,51 @@ async function compile(code) {
     }
   });
 
-  // Add await to converted functions
-  if (convertedFunctions.length > 0) {
-    walk.full(ast, function(node) {
-      if (node.body) {
-        for (let i = node.body.length - 1; i >= 0; i = i - 1) {
-          console.log(node.body[i]);
-          if (node.body[i].type == 'ExpressionStatement' &&
-            node.body[i].expression.type == 'CallExpression' &&
-            convertedFunctions.includes(node.body[i].expression.callee.name)
-          ) {
-            node.body[i].expression = {
-              type: 'AwaitExpression',
-              argument: Object.assign({}, node.body[i].expression)
-            };
+  // Prepend await to converted functions
+  walk.ancestor(ast, {
+    CallExpression: function(node, ancestors) {
+      if (convertedFunctions.includes(node.callee.name)) {
+        let parent = ancestors[ancestors.length - 2];
+
+        if (parent.type == 'CallExpression') {
+          for (let i = 0; i < parent.arguments.length; i = i + 1) {
+            if (parent.arguments[i] == node) {
+              parent.arguments[i] = {
+                type: 'AwaitExpression',
+                argument: Object.assign({}, node)
+              };
+            }
           }
         }
+
+        if (parent.type == 'ExpressionStatement' && parent.expression == node) {
+          parent.expression = {
+            type: 'AwaitExpression',
+            argument: Object.assign({}, node)
+          };
+        }
+
+        if (parent.type == 'VariableDeclarator' && parent.init == node) {
+          parent.init = {
+            type: 'AwaitExpression',
+            argument: Object.assign({}, node)
+          };
+        }
+
+        if (parent.type == 'IfStatement' && parent.test == node) {
+          parent.test = {
+            type: 'AwaitExpression',
+            argument: Object.assign({}, node)
+          };
+        }
       }
-    });
-  }
+    }
+  });
 
   // Insert step statements
   insertStepStatements(ast);
 
   let processed = astring.generate(ast);
-  console.log(processed);
   return `
     (async function() {
       window._kidjs_.eval = function(key) {
@@ -396,7 +416,7 @@ function createStepStatement(location, info) {
 /**
  * Insert step statements.
  *
- * @param {Array} ast - Expression tree
+ * @param {Object} ast - Expression tree
  */
 function insertStepStatements(ast) {
   for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
@@ -410,7 +430,7 @@ function insertStepStatements(ast) {
       ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc, info));
     }
 
-    // Recursively insert step statements inside block
+    // Recursively insert step statements inside blocks
     if (['ForStatement', 'WhileStatement', 'DoWhileStatement', 'FunctionDeclaration'].includes(ast.body[i].type)) {
       if (typeof ast.body[i].body != undefined) {
         insertStepStatements(ast.body[i].body);

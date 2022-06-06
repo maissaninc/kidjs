@@ -240,10 +240,31 @@ async function compile(code) {
     }
   });
 
+  // Add await to converted functions
+  if (convertedFunctions.length > 0) {
+    walk.full(ast, function(node) {
+      if (node.body) {
+        for (let i = node.body.length - 1; i >= 0; i = i - 1) {
+          console.log(node.body[i]);
+          if (node.body[i].type == 'ExpressionStatement' &&
+            node.body[i].expression.type == 'CallExpression' &&
+            convertedFunctions.includes(node.body[i].expression.callee.name)
+          ) {
+            node.body[i].expression = {
+              type: 'AwaitExpression',
+              argument: Object.assign({}, node.body[i].expression)
+            };
+          }
+        }
+      }
+    });
+  }
+
   // Insert step statements
   insertStepStatements(ast);
 
   let processed = astring.generate(ast);
+  console.log(processed);
   return `
     (async function() {
       window._kidjs_.eval = function(key) {

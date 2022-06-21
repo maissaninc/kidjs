@@ -246,7 +246,7 @@ async function compile(code) {
       if (convertedFunctions.includes(node.callee.name)) {
         let parent = ancestors[ancestors.length - 2];
 
-        if (parent.type == 'CallExpression') {
+        if (parent.type == 'CallExpression' && parent.arguments) {
           for (let i = 0; i < parent.arguments.length; i = i + 1) {
             if (parent.arguments[i] == node) {
               parent.arguments[i] = {
@@ -363,14 +363,15 @@ function checkForRequiredPermissions(node) {
  */
 function createInlineFunction(node) {
   return {
-    type: 'FunctionExpression',
+    type: 'ArrowFunctionExpression',
     body: {
       type: 'BlockStatement',
       body: [{
         type: 'ExpressionStatement',
         expression: node
       }]
-    }
+    },
+    params: []
   }
 }
 

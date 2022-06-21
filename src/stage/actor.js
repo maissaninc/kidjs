@@ -34,6 +34,15 @@ export default class Actor {
       }
     }
 
+    // Detect change in acceleration
+    this.acceleration = new Vector(0, 0);
+    this.acceleration.onchange = () => {
+      this.anchored = false;
+      if (this.body) {
+        Matter.Body.setAcceleration(this.body, this.acceleration);
+      }
+    }
+
     // Animation queue
     this.animations = [];
     this.animationActive = 0;

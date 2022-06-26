@@ -124,6 +124,10 @@ export function init() {
       window.dispatchEvent(new CustomEvent('KID.end'));
     },
 
+    error: function(e) {
+      new KidjsError(e.message);
+    },
+
     seed: Date.now()
   };
 
@@ -299,7 +303,11 @@ async function compile(code) {
           return eval(key);
         }
       };
-      ${processed}
+      try {
+        ${processed}
+      } catch(e) {
+        window._kidjs_.error(e);
+      }
       window._kidjs_.end();
     })();
   `
@@ -477,17 +485,20 @@ export function reset() {
 
 export async function run(code) {
   log('Running');
-  try {
-    reset();
-    window.stage.run();
-    log('Compilation started');
-    let processed = await compile(code);
-    log('Compilation complete');
-    await getPermissions();
-    eval(processed);
-  } catch(exception) {
-    console.log(exception);
-  }
+  reset();
+  window.stage.run();
+  log('Compilation started');
+  let processed = await compile(code);
+  log('Compilation complete');
+  await getPermissions();
+  eval(processed);
+  /*} catch(exception) {
+    console.log('Error');
+    //const [, lineNumber, column] = exception.stack.match(/(\d+):(\d+)/);
+    //console.log(exception);
+    //console.log(lineNumber);
+    //throw new KidjsError(exception.message, lineNumber);
+  }*/
 }
 
 export function stop() {

@@ -7,10 +7,10 @@
   <body>
     <script type="kidjs">
 
-      function placeDomino(x, y) {
-        let domino = rect(x, y, 20, 100)
-        domino.anchored = false
-        domino.bounciness = 0
+      function placeDomino(x, y) { // Line 10
+        let domino = rect(x, y, 20, 100) // Line 11
+        domino.anchored = false // Line 12
+        domino.bounciness = 0 // Line 13
       }
 
       for (let x = 200; x < width - 200; x = x + 60) {

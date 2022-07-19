@@ -1,6 +1,7 @@
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import * as astring from 'astring';
+import { attachComments } from 'astravel';
 import seedrandom from 'seedrandom';
 
 import { on, removeAllEventListeners } from '../events';
@@ -33,6 +34,7 @@ let timeouts = [];
 let parentSetInterval;
 let intervals = [];
 let urlFilter;
+let sourceMap = [];
 
 export function init() {
   window._kidjs_ = {
@@ -153,10 +155,16 @@ async function compile(code) {
   // Replace percent units with string literals
   code = replacePercentUnits(code);
 
+  // Insert line markers
+  code = insertLineMarkers(code);
+
   // Parse code into source tree
+  let comments = [];
   let ast = acorn.parse(code, {
-    locations: true
+    locations: true,
+    onComment: comments
   });
+  attachComments(ast, comments);
 
   // Keep track of functions converted to async
   let convertedFunctions = [];
@@ -288,7 +296,12 @@ async function compile(code) {
   // Insert step statements
   insertStepStatements(ast);
 
-  let processed = astring.generate(ast);
+  // Generate updated source
+  let processed = astring.generate(ast, { comments: true });
+
+  // Generate source map
+  sourceMap = generateSourceMap(processed);
+
   return `
     (async function() {
       window._kidjs_.eval = function(key) {
@@ -456,6 +469,40 @@ function insertStepStatements(ast) {
       }
     }
   }
+}
+
+/**
+ * Insert line markers as comments.
+ *
+ * @param {String} code - Source code
+ * @return {String} Source code containling line markers
+ */
+function insertLineMarkers(code) {
+  let lines = code.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i = i + 1) {
+    lines[i] = lines[i] + '//__kidjs__beginline__' + i + '__endline__';
+  }
+  return lines.join('\n');
+}
+
+/**
+ * Generate source map.
+ *
+ * @param {String} code - Source code with markers
+ * @return {Array} Source map
+ */
+function generateSourceMap(code) {
+  let map = [];
+  let lines = code.split(/\r?\n/);
+  let lineNumber = 0;
+  for (let i = 0; i < lines.length; i = i + 1) {
+    let test = /__kidjs__beginline__(\d+)__endline__/.exec(lines[i]);
+    if (test) {
+      lineNumber = test[1];
+    }
+    map[i] = lineNumber;
+  }
+  return map;
 }
 
 export function reset() {

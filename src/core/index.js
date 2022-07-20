@@ -125,9 +125,16 @@ export function init() {
       window.dispatchEvent(new CustomEvent('KID.end'));
     },
 
-    error: function(e) {
+    error: function(e, runtime) {
+      let lineNumber = -1;
       let match = e.stack.match(/(\d+):(\d+)/);
-      let lineNumber = match ? window._kidjs_.sourceMap[match[1]] : 'Unknown';
+      if (match) {
+        if (runtime) {
+          lineNumber = window._kidjs_.sourceMap[match[1]];
+        } else {
+          lineNumber = match[1];
+        }
+      }
       console.log('Error: ' + e.message + ' at line ' + lineNumber);
       new KidjsError(e.message, lineNumber);
     },
@@ -163,10 +170,15 @@ async function compile(code) {
 
   // Parse code into source tree
   let comments = [];
-  let ast = acorn.parse(code, {
-    locations: true,
-    onComment: comments
-  });
+  try {
+    let ast = acorn.parse(code, {
+      locations: true,
+      onComment: comments
+    });
+  } catch(e) {
+    window._kidjs_.error(e);
+    return '';
+  }
   attachComments(ast, comments);
 
   // Keep track of functions converted to async
@@ -322,7 +334,7 @@ async function compile(code) {
       try {
         ${processed}
       } catch(e) {
-        window._kidjs_.error(e);
+        window._kidjs_.error(e, true);
       }
       window._kidjs_.end();
     })();

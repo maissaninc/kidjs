@@ -34,7 +34,6 @@ let timeouts = [];
 let parentSetInterval;
 let intervals = [];
 let urlFilter;
-let sourceMap = [];
 
 export function init() {
   window._kidjs_ = {
@@ -127,10 +126,14 @@ export function init() {
     },
 
     error: function(e) {
-      new KidjsError(e.message);
+      let match = e.stack.match(/(\d+):(\d+)/);
+      let lineNumber = match ? window._kidjs_.sourceMap[match[1]] : 'Unknown';
+      console.log('Error: ' + e.message + ' at line ' + lineNumber);
+      new KidjsError(e.message, lineNumber);
     },
 
-    seed: Date.now()
+    seed: Date.now(),
+    sourceMap: []
   };
 
   // Intercept setTimeout and setInterval
@@ -300,7 +303,7 @@ async function compile(code) {
   let processed = astring.generate(ast, { comments: true });
 
   // Generate source map
-  sourceMap = generateSourceMap(processed);
+  window._kidjs_.sourceMap = generateSourceMap(processed, 15);
 
   return `
     (async function() {
@@ -491,7 +494,7 @@ function insertLineMarkers(code) {
  * @param {String} code - Source code with markers
  * @return {Array} Source map
  */
-function generateSourceMap(code) {
+function generateSourceMap(code, offset) {
   let map = [];
   let lines = code.split(/\r?\n/);
   let lineNumber = 0;
@@ -500,7 +503,7 @@ function generateSourceMap(code) {
     if (test) {
       lineNumber = test[1];
     }
-    map[i] = lineNumber;
+    map[i + offset] = lineNumber;
   }
   return map;
 }
@@ -539,13 +542,6 @@ export async function run(code) {
   log('Compilation complete');
   await getPermissions();
   eval(processed);
-  /*} catch(exception) {
-    console.log('Error');
-    //const [, lineNumber, column] = exception.stack.match(/(\d+):(\d+)/);
-    //console.log(exception);
-    //console.log(lineNumber);
-    //throw new KidjsError(exception.message, lineNumber);
-  }*/
 }
 
 export function stop() {

@@ -130,7 +130,7 @@ export function init() {
       let match = e.stack.match(/(\d+):(\d+)/);
       if (match) {
         if (runtime) {
-          lineNumber = window._kidjs_.sourceMap[match[1]];
+          lineNumber = window._kidjs_.sourceMap[match[1]] + 1;
         } else {
           lineNumber = match[1];
         }

@@ -170,8 +170,9 @@ async function compile(code) {
 
   // Parse code into source tree
   let comments = [];
+  let ast;
   try {
-    let ast = acorn.parse(code, {
+    ast = acorn.parse(code, {
       locations: true,
       onComment: comments
     });

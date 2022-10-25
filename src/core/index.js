@@ -320,19 +320,19 @@ async function compile(code) {
 
   return `
     (async function() {
-      window._kidjs_.eval = function(key) {
-        try {
-          return eval(key);
-        } catch {
-          // Don't die on me
-        }
-      };
-      window._kidjs_.get = function(key) {
-        if (eval('typeof ' + key) !== 'undefined') {
-          return eval(key);
-        }
-      };
       try {
+        window._kidjs_.eval = function(key) {
+          try {
+            return eval(key);
+          } catch {
+            // Don't die on me
+          }
+        };
+        window._kidjs_.get = function(key) {
+          if (eval('typeof ' + key) !== 'undefined') {
+            return eval(key);
+          }
+        };
         ${processed}
       } catch(e) {
         window._kidjs_.error(e, true);

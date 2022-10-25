@@ -29,7 +29,6 @@
         ball.x = width / 2
         ball.y = height / 2
         let pushX = (random(0, 1) - 0.5) * random(10, 20)
-        console.log(pushX);
         let pushY = random(-5, 5)
         ball.push(pushX, pushY)
       }
@@ -117,6 +116,7 @@
 
       function endFireBall() {
         ball.speed = ball.speed / 2
+        ball.color = 'default'
       }
 
     </script>

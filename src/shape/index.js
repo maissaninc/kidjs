@@ -7,6 +7,7 @@ export default class Shape extends Actor {
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
+    this.themeColor = false;
     this._fragments = [];
   }
 
@@ -79,8 +80,11 @@ export default class Shape extends Actor {
     }
 
     // Choose next color in theme
-    if (this.fill == 'theme') {
-      this.fill = this.style.nextColor();
+    if (this.fill == 'theme' || this.fill == 'default') {
+      if (!this.themeColor) {
+        this.themeColor = this.style.nextColor();
+      }
+      this.fill = this.themeColor;
     }
 
     context.beginPath();

@@ -230,7 +230,16 @@ export default class Stage {
 
       // Render actors
       for (let actor of this.actors) {
+
+        // If non-zero velocity, fire move event
+        if (actor.body && actor.body.velocity.x != 0 && actor.body.velocity.y != 0) {
+          actor.dispatchEvent(new CustomEvent('move'));
+        }
+
+        // Update position
         actor.update();
+
+        // Render
         if (!actor.invisible) {
           actor.render(this.context);
         }

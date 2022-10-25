@@ -29,6 +29,7 @@
         ball.x = width / 2
         ball.y = height / 2
         let pushX = (random(0, 1) - 0.5) * random(10, 20)
+        console.log(pushX);
         let pushY = random(-5, 5)
         ball.push(pushX, pushY)
       }
@@ -54,9 +55,11 @@
       function checkBallPosition() {
         if (ball.x > width) {
           score1 = score1 + 1
+          startGame();
         }
         if (ball.x < 0) {
           score2 = score2 + 1
+          startGame();
         }
       }
 
@@ -84,7 +87,7 @@
         }
       }
 
-      on('ArrowRight', startPlayer2Extender)
+      on('arrowright', startPlayer2Extender)
 
       function endPlayer2Extender() {
         player2.height = 100
@@ -110,7 +113,7 @@
         }
       }
 
-      on('ArrowLeft', startPlayer2FireBall)
+      on('arrowleft', startPlayer2FireBall)
 
       function endFireBall() {
         ball.speed = ball.speed / 2

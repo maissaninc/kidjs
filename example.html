@@ -8,6 +8,7 @@
     <script type="kidjs">
 
       gravity = 0
+      friction = 0
       walls = false
 
       let ball = circle(width / 2, height / 2, 50)
@@ -79,10 +80,10 @@
       on('a', startPlayer1Extender)
 
       function startPlayer2Extender() {
-        if (player1PowerMoves > 0) {
+        if (player2PowerMoves > 0) {
           player2.height = 200
           setTimeout(endPlayer2Extender, 5000)
-          player2PowerMoves = player1PowerMoves - 1
+          player2PowerMoves = player2PowerMoves - 1
         }
       }
 

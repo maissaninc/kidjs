@@ -20,6 +20,7 @@ export default class Oval extends Shape {
       ));
     }
     this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
+      friction: window.friction,
       frictionAir: 0,
       isStatic: true
     });

@@ -184,6 +184,7 @@ export default class Stage {
     window.ceiling = true;
     window.floor = true;
     window.walls = true;
+    window.friction = 0.1;
 
     // Clear stage
     this.clear();

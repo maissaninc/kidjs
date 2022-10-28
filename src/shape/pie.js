@@ -39,6 +39,7 @@ export default class Pie extends Shape {
 
     // Create Matter.js body
     this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
+      friction: window.friction,
       frictionAir: 0,
       isStatic: true
     });

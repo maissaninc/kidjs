@@ -174,7 +174,7 @@ export default class Actor {
       this.anchored = false;
       Matter.Body.setVelocity(this.body, new Vector(
         Math.cos(degreesToRadians(this.direction)) * value,
-        -Math.sin(degreesToRadians(this.direction)) * value
+        Math.sin(degreesToRadians(this.direction)) * value
       ));
     }
   }

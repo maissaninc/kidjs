@@ -1,124 +1,46 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Pong</title>
+    <title>Dominos</title>
     <script src="dist/kid.js"></script>
   </head>
   <body>
     <script type="kidjs">
 
-      gravity = 0
-      friction = 0
-      walls = false
-
-      let ball = circle(width / 2, height / 2, 50)
-      let player1 = rect(30, height / 2, 20, 100)
-      let player2 = rect(width - 30, height / 2, 20, 100)
-
-      let score1 = 0
-      let score2 = 0
-      display(100, 50, score1)
-      display(width - 100, 50, score2)
-
-      let player1PowerMoves = 2
-      let player2PowerMoves = 2
-      display(150, 50, player1PowerMoves)
-      display(width - 150, 50, player2PowerMoves)
-
-      function startGame() {
-        ball.stop()
-        ball.x = width / 2
-        ball.y = height / 2
-        let pushX = (random(0, 1) - 0.5) * random(10, 20)
-        let pushY = random(-5, 5)
-        ball.push(pushX, pushY)
+      function placeDomino(x, y) {
+        let domino = rect(x, y, 20, 100)
+        domino.anchored = false
+        domino.bounciness = 0
       }
 
-      function movePaddle(key) {
-        if (key == 'w') {
-          player1.y = player1.y - 5
-        }
-        if (key == 's') {
-          player1.y = player1.y + 5
-        }
-        if (key == 'ArrowUp') {
-          player2.y = player2.y - 5
-        }
-        if (key == 'ArrowDown') {
-          player2.y = player2.y + 5
+      for (let x = 200; x < width - 200; x = x + 60) {
+        placeDomino(x, 200)
+      }
+
+      let startX
+      let startY
+      let marble
+
+      function start() {
+        startX = mouseX
+        startY = mouseY
+        marble = circle(startX, startY, 50)
+      }
+
+      function dragging() {
+        if (mouseButton) {
+          marble.x = mouseX
+          marble.y = mouseY
         }
       }
 
-      on('space', startGame)
-      on('keydown', movePaddle)
-
-      function checkBallPosition() {
-        if (ball.x > width) {
-          score1 = score1 + 1
-          startGame();
-        }
-        if (ball.x < 0) {
-          score2 = score2 + 1
-          startGame();
-        }
+      function release() {
+        marble.push(startX - mouseX, startY - mouseY)
       }
 
-      ball.on('move', checkBallPosition)
-
-      function startPlayer1Extender() {
-        if (player1PowerMoves > 0) {
-          player1.height = 200
-          setTimeout(endPlayer1Extender, 5000)
-          player1PowerMoves = player1PowerMoves - 1
-        }
-      }
-
-      function endPlayer1Extender() {
-        player1.height = 100
-      }
-
-      on('a', startPlayer1Extender)
-
-      function startPlayer2Extender() {
-        if (player2PowerMoves > 0) {
-          player2.height = 200
-          setTimeout(endPlayer2Extender, 5000)
-          player2PowerMoves = player2PowerMoves - 1
-        }
-      }
-
-      on('arrowright', startPlayer2Extender)
-
-      function endPlayer2Extender() {
-        player2.height = 100
-      }
-
-      function startPlayer1FireBall() {
-        if (player1PowerMoves > 0) {
-          ball.speed = ball.speed * 2
-          ball.color = 'red'
-          setTimeout(endFireBall, 2000)
-          player1PowerMoves = player1PowerMoves - 1
-        }
-      }
-
-      on('d', startPlayer1FireBall)
-
-      function startPlayer2FireBall() {
-        if (player2PowerMoves > 0) {
-          ball.speed = ball.speed * 2
-          ball.color = 'red'
-          setTimeout(endFireBall, 2000)
-          player2PowerMoves = player2PowerMoves - 1
-        }
-      }
-
-      on('arrowleft', startPlayer2FireBall)
-
-      function endFireBall() {
-        ball.speed = ball.speed / 2
-        ball.color = 'default'
-      }
+      on('mousedown', start)
+      on('mousemove', dragging)
+      on('mouseup', release)
 
     </script>
   </body>

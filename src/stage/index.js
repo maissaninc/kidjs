@@ -47,6 +47,7 @@ export default class Stage {
   resize(width = window.innerWidth, height = window.innerHeight) {
     this.width = parseInt(width);
     this.height = parseInt(height);
+    log(`Stage resized (${width} x ${height})`);
     if (window._kidjs_.settings.pixelSize > 1) {
       let scale = 1 / window._kidjs_.settings.pixelSize;
       this.canvas.width = Math.floor(this.width * scale);
@@ -149,7 +150,7 @@ export default class Stage {
     this._rightWall.invisible = true;
     this._ceiling.invisible = true;
     this._floor.invisible = true;
-    this.resize(window.KID.settings.width, window.KID.settings.height);
+    this.resize(window._kidjs_.settings.width, window._kidjs_.settings.height);
 
     // Reset text cursor
     resetCursor();

@@ -34,7 +34,7 @@ export default class Stage {
     this.actors = [];
     this.eventListeners = {};
 
-    log('Stage created');
+    log(`Stage created (${width} x ${height})`);
   }
 
   /**

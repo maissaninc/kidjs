@@ -149,7 +149,7 @@ export default class Stage {
     this._rightWall.invisible = true;
     this._ceiling.invisible = true;
     this._floor.invisible = true;
-    this.resize();
+    this.resize(window.KID.settings.width, window.KID.settings.height);
 
     // Reset text cursor
     resetCursor();

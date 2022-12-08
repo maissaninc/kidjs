@@ -249,6 +249,7 @@ export default class Stage {
 
       window._kidjs_.onframe();
       window._kidjs_.stats.lastFrame = Date.now();
+      this.dispatchEvent(new CustomEvent('animationframe'));
       this.animation = requestAnimationFrame(() => this.render());
     }
   }
@@ -262,6 +263,9 @@ export default class Stage {
   addEventListener(event, handler) {
     if (event == 'doubleclick') {
       event = 'dblclick';
+    }
+    if (event == 'frame') {
+      event = 'animationframe';
     }
     if (this.eventListeners[event] == undefined) {
       this.eventListeners[event] = [];

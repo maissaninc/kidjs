@@ -452,7 +452,7 @@ export default class Actor {
       for (let listener of this.eventListeners[event.type]) {
         switch (event.type) {
           case 'collision':
-            listener.handler.call(context, this, event.detail);
+            listener.handler.call(context, event.detail);
             break;
           default:
             listener.handler.call(context);

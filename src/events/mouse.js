@@ -87,13 +87,13 @@ export default function() {
   window.mouseY = 0;
   window.mouseButton = 0;
 
-  if ('ontouchstart' in window) {
-    window.addEventListener('touchstart', onMouseDown);
-    window.addEventListener('touchend', onMouseUp);
-    window.addEventListener('touchmove', onMouseMove);
+  if ('ontouchstart' in document) {
+    document.addEventListener('touchstart', onMouseDown);
+    document.addEventListener('touchend', onMouseUp);
+    document.addEventListener('touchmove', onMouseMove);
   } else {
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mouseup', onMouseUp);
-    window.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
   }
 }

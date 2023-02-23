@@ -34,7 +34,7 @@ export default class Stage {
     this.actors = [];
     this.eventListeners = {};
 
-    log('Stage created');
+    log(`Stage created (${width} x ${height})`);
   }
 
   /**
@@ -47,6 +47,7 @@ export default class Stage {
   resize(width = window.innerWidth, height = window.innerHeight) {
     this.width = parseInt(width);
     this.height = parseInt(height);
+    log(`Stage resized (${width} x ${height})`);
     if (window._kidjs_.settings.pixelSize > 1) {
       let scale = 1 / window._kidjs_.settings.pixelSize;
       this.canvas.width = Math.floor(this.width * scale);
@@ -62,25 +63,25 @@ export default class Stage {
       this.canvas.style.height = this.height + 'px';
       this.context.scale(scale, scale);
     }
-    window.width = width;
-    window.height = height;
+    window.width = this.width;
+    window.height = this.height;
 
     // Resize walls
     this._leftWall.x = -WALL_DEPTH / 2;
-    this._leftWall.y = height / 2;
-    this._leftWall.height = height + WALL_DEPTH * 2;
+    this._leftWall.y = this.height / 2;
+    this._leftWall.height = this.height + WALL_DEPTH * 2;
     this._leftWall.updateBody();
-    this._rightWall.x = width + WALL_DEPTH / 2;
-    this._rightWall.y = height / 2;
-    this._rightWall.height = height + WALL_DEPTH * 2;
+    this._rightWall.x = this.width + WALL_DEPTH / 2;
+    this._rightWall.y = this.height / 2;
+    this._rightWall.height = this.height + WALL_DEPTH * 2;
     this._rightWall.updateBody();
-    this._ceiling.x = width / 2;
+    this._ceiling.x = this.width / 2;
     this._ceiling.y = -WALL_DEPTH / 2;
-    this._ceiling.width = width + WALL_DEPTH * 2;
+    this._ceiling.width = this.width + WALL_DEPTH * 2;
     this._ceiling.updateBody();
-    this._floor.x = width / 2;
-    this._floor.y = height + WALL_DEPTH / 2;
-    this._floor.width = width + WALL_DEPTH * 2;
+    this._floor.x = this.width / 2;
+    this._floor.y = this.height + WALL_DEPTH / 2;
+    this._floor.width = this.width + WALL_DEPTH * 2;
     this._floor.updateBody();
 
     // Redraw grid
@@ -149,7 +150,7 @@ export default class Stage {
     this._rightWall.invisible = true;
     this._ceiling.invisible = true;
     this._floor.invisible = true;
-    this.resize();
+    this.resize(window._kidjs_.settings.width, window._kidjs_.settings.height);
 
     // Reset text cursor
     resetCursor();
@@ -248,6 +249,7 @@ export default class Stage {
 
       window._kidjs_.onframe();
       window._kidjs_.stats.lastFrame = Date.now();
+      this.dispatchEvent(new CustomEvent('animationframe'));
       this.animation = requestAnimationFrame(() => this.render());
     }
   }
@@ -261,6 +263,9 @@ export default class Stage {
   addEventListener(event, handler) {
     if (event == 'doubleclick') {
       event = 'dblclick';
+    }
+    if (event == 'frame') {
+      event = 'animationframe';
     }
     if (this.eventListeners[event] == undefined) {
       this.eventListeners[event] = [];

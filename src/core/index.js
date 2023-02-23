@@ -146,13 +146,19 @@ export function init() {
   // Intercept setTimeout and setInterval
   parentSetTimeout = window.setTimeout;
   window.setTimeout = function(callback, duration) {
-    let timeout = parentSetTimeout(callback, duration);
+    let timeout = parentSetTimeout(() => {
+      window._kidjs_.stats.lastFrame = Date.now();
+      callback();
+    }, duration);
     timeouts.push(timeout);
     return timeout;
   }
   parentSetInterval = window.setInterval;
   window.setInterval = function(callback, duration) {
-    let interval = parentSetInterval(callback, duration);
+    let interval = parentSetInterval(() => {
+      window._kidjs_.stats.lastFrame = Date.now();
+      callback();
+    }, duration);
     intervals.push(interval);
     return interval;
   }

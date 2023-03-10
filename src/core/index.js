@@ -8,6 +8,7 @@ import { on, removeAllEventListeners } from '../events';
 import { beep, frequency, note, song } from '../audio';
 import { sound } from '../audio/sound';
 import { speak } from '../audio/speech';
+import { join, send } from '../socket';
 import { circle } from '../shape/circle';
 import { curve } from '../shape/curve';
 import { line } from '../shape/line';
@@ -79,6 +80,12 @@ export function init() {
       window.wait = wait;
       window.write = write;
       window.writeln = writeln;
+
+      // Sockets
+      if (window._kidjs_.settings.sockets) {
+        window.join = join;
+        window.send = send;
+      }
     },
 
     onframe: function() {

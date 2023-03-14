@@ -305,20 +305,28 @@ export default class Stage {
     if (this.eventListeners[event.type] !== undefined) {
       for (let listener of this.eventListeners[event.type]) {
         if (typeof listener.handler == 'function') {
+
+          // Swtich on event object type
           switch (event.constructor.name) {
             case 'KeyboardEvent':
               listener.handler.call(context, event.key);
-              break;
+              return;
             case 'MouseEvent':
             case 'PointerEvent':
               listener.handler.call(context, event.x, event.y);
-              break;
+              return;
+          }
+
+          // Switch on event type property
+          switch (event.type) {
+            case 'tilt': 
+              listener.handler.call(context, window.tiltX, window.tiltY);
+              return;
+            case 'message':
+              listener.handler.call(context, event.detail.message);
+              return;
             default:
-              if (event.type == 'tilt') {
-                listener.handler.call(context, window.tiltX, window.tiltY);
-              } else {
-                listener.handler.call(context);
-              }
+              listener.handler.call(context);
           }
         }
       }

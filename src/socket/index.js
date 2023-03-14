@@ -37,6 +37,7 @@ export function send(message) {
 }
 
 window._kidjs_.settings.socketReceive = function(parameters) {
+  console.debug('Socket receive', parameters);
    
   // No message received
   if (!parameters.message) {

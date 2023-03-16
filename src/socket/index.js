@@ -10,7 +10,7 @@ export class Socket {
   static init() {
 
     // Setup receive method
-    window._kidjs_.settings.socketReceive = function(parameters) {
+    window._kidjs_.socketReceive = function(parameters) {
       console.debug('Socket receive', parameters);
       
       // No message received
@@ -39,8 +39,8 @@ export class Socket {
   }
 
   send(message) {
-    if (typeof window._kidjs_.settings.socketSend === 'function') {
-      window._kidjs_.settings.socketSend({
+    if (typeof window._kidjs_.socketSend === 'function') {
+      window._kidjs_.socketSend({
         room: this.room,
         message: message
       });

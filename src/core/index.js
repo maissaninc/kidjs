@@ -2,13 +2,12 @@ import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
 import * as astring from 'astring';
 import { attachComments } from 'astravel';
-import seedrandom from 'seedrandom';
 
 import { on, removeAllEventListeners } from '../events';
 import { beep, frequency, note, song } from '../audio';
 import { sound } from '../audio/sound';
 import { speak } from '../audio/speech';
-import { join, send } from '../socket';
+import { Socket, join, send } from '../socket';
 import { circle } from '../shape/circle';
 import { curve } from '../shape/curve';
 import { line } from '../shape/line';
@@ -169,6 +168,9 @@ export function init() {
     intervals.push(interval);
     return interval;
   }
+
+  // Initialize sockets
+  Socket.init();
 
   window._kidjs_.setGlobals();
 }

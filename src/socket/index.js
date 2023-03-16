@@ -1,10 +1,41 @@
 let rooms = {};
 
-export default class Socket {
+export class Socket {
 
   constructor(room = '') {
     this.room = room;
     this.listeners = {};
+  }
+
+  static init() {
+
+    // Setup receive method
+    window._kidjs_.settings.socketReceive = function(parameters) {
+      console.debug('Socket receive', parameters);
+      
+      // No message received
+      if (!parameters.message) {
+        return;
+      }
+  
+      // No room specified
+      if (!parameters.room) {
+        window.stage.dispatchEvent(new CustomEvent('message', {
+          detail: {
+            message: parameters.message
+          }
+        }));
+        return;
+      }
+  
+      // Room specified
+      if (rooms[parameters.room]) {
+        rooms[parameters.room].receive(
+          parameters.message, 
+          parameters.event ? parameters.event : 'message'
+        );
+      }
+    }
   }
 
   send(message) {
@@ -33,33 +64,6 @@ export function send(message) {
       room: null,
       message: message
     });
-  }
-}
-
-window._kidjs_.settings.socketReceive = function(parameters) {
-  console.debug('Socket receive', parameters);
-   
-  // No message received
-  if (!parameters.message) {
-    return;
-  }
-
-  // No room specified
-  if (!parameters.room) {
-    window.stage.dispatchEvent(new CustomEvent('message', {
-      detail: {
-        message: parameters.message
-      }
-    }));
-    return;
-  }
-
-  // Room specified
-  if (rooms[parameters.room]) {
-    rooms[parameters.room].receive(
-      parameters.message, 
-      parameters.event ? parameters.event : 'message'
-    );
   }
 }
   

@@ -59,8 +59,8 @@ export function join(room) {
 }
 
 export function send(message) {
-  if (typeof window._kidjs_.settings.socketSend === 'function') {
-    window._kidjs_.settings.socketSend({
+  if (typeof window._kidjs_.socketSend === 'function') {
+    window._kidjs_.socketSend({
       room: null,
       message: message
     });

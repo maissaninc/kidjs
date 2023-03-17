@@ -569,6 +569,7 @@ export async function run(code) {
   let processed = await compile(code);
   log('Compilation complete');
   await getPermissions();
+  this.setGlobals();
   eval(processed);
 }
 

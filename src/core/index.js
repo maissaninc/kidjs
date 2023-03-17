@@ -569,7 +569,7 @@ export async function run(code) {
   let processed = await compile(code);
   log('Compilation complete');
   await getPermissions();
-  this.setGlobals();
+  window._kidjs_.setGlobals();
   eval(processed);
 }
 

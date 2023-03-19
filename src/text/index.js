@@ -1,4 +1,5 @@
 import Actor from '../stage/actor';
+import Matter from 'matter-js';
 import { parseLength } from '../core/units';
 
 let cursorX = 5;
@@ -15,6 +16,45 @@ export default class Text extends Actor {
     this.fontSize = window.fontSize;
     this.textAlign = window.textAlign;
     this.textBaseline = window.textBaseline;
+
+    // Determine text metrics
+    window.stage.context.font = parseFontSize(this.fontSize) + ' ' + this.font;
+    this._textMetrics = window.stage.context.measureText(text);
+    this._width = this._textMetrics.width;
+    this._height = this._textMetrics.actualBoundingBoxAscent + this._textMetrics.actualBoundingBoxDescent;
+  }
+
+  init() {
+    let x, y;
+    switch (this.textAlign) {
+      case 'center':
+        x = this.position.x - (this._width / 2);
+        break;
+      case 'right':
+        x = this.position.x - this._width;
+        break;
+      default:
+        x = this.position.x;
+    }
+    switch (this.textBaseline) {
+      case 'top':
+        y = this.position.y;
+        break;
+      case 'middle':
+        y = this.position.y - (this._height / 2);
+        break;
+      case 'bottom':
+        y = this.position.y - this._height;
+        break;
+      case 'alphabetic':
+      default:
+        y = this.position.y - this._textMetrics.actualBoundingBoxAscent;
+    }
+    this.body = Matter.Bodies.rectangle(x, y, this._width, this._height, {
+      friction: window.friction,
+      frictionAir: 0,
+      isStatic: true
+    });
   }
 
   render(context) {
@@ -48,6 +88,7 @@ export function display(x, y, text) {
     text,
     true
   );
+  actor.init();
   window.stage.addChild(actor);
   return actor;
 }
@@ -62,6 +103,7 @@ export function write(x, y, text) {
       text,
       false
     );
+    actor.init();
     window.stage.addChild(actor);
     return actor;
   }
@@ -80,6 +122,7 @@ function _write(text, linebreak) {
   const actor = new Text(cursorX, cursorY, text, false);
   actor.textAlign = 'left';
   actor.textBaseline = 'top';
+  actor.init();
   window.stage.addChild(actor);
 
   // Update cursor position
@@ -87,9 +130,7 @@ function _write(text, linebreak) {
     cursorX = 5;
     cursorY = cursorY + parseInt(parseFontSize(actor.fontSize)) * lineHeight;
   } else {
-    window.stage.context.font = parseFontSize(actor.fontSize) + ' ' + actor.font;
-    const metrics = window.stage.context.measureText(text);
-    cursorX = cursorX + metrics.width;
+    cursorX = cursorX + actor._width;
   }
 
   return actor;

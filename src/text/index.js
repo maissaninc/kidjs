@@ -1,5 +1,6 @@
 import Actor from '../stage/actor';
 import Matter from 'matter-js';
+import { degreesToRadians }  from '../core/math';
 import { parseLength } from '../core/units';
 
 let cursorX = 5;
@@ -16,6 +17,7 @@ export default class Text extends Actor {
     this.fontSize = window.fontSize;
     this.textAlign = window.textAlign;
     this.textBaseline = window.textBaseline;
+    this._boundingPolygon = [];
 
     // Determine text metrics
     window.stage.context.font = parseFontSize(this.fontSize) + ' ' + this.font;
@@ -63,7 +65,12 @@ export default class Text extends Actor {
     context.textAlign = this.textAlign;
     context.textBaseline = this.textBaseline;
     const output = this.live ? window._kidjs_.eval(this.text) : this.text;
+    context.save();
+    context.translate(this.x, this.y);
+    context.rotate(degreesToRadians(this.angle));
+    context.translate(-this.x, -this.y);
     context.fillText(output, this.x, this.y);
+    context.restore();
   }
 }
 

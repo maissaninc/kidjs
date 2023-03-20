@@ -1,5 +1,4 @@
 import Animation from '../animation';
-import Circle from '../shape/circle';
 import Vector from '../core/vector';
 import { degreesToRadians, radiansToDegrees }  from '../core/math';
 import Matter from 'matter-js';

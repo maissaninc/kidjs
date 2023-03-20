@@ -1,5 +1,6 @@
 import Actor from '../stage/actor';
 import Matter from 'matter-js';
+import Vector from '../core/vector';
 import { degreesToRadians }  from '../core/math';
 import { parseLength } from '../core/units';
 
@@ -10,49 +11,127 @@ let lineHeight = 1.1;
 export default class Text extends Actor {
   constructor(x, y, text, live) {
     super(x, y);
-    this.text = text;
+    this._text = text;
     this.live = live;
     this.fill = window.fontColor;
-    this.font = window.font;
-    this.fontSize = window.fontSize;
-    this.textAlign = window.textAlign;
-    this.textBaseline = window.textBaseline;
+    this._font = window.font;
+    this._fontSize = window.fontSize;
+    this._textAlign = window.textAlign;
+    this._textBaseline = window.textBaseline;
     this._boundingPolygon = [];
+    this.updateMetrics();
+  }
 
-    // Determine text metrics
+  set text(value) {
+    this._text = value;
+    this.updateMetrics();
+    this.updateBody();
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  set font(value) {
+    this._font = value;
+    this.updateMetrics();
+    this.updateBody();
+  }
+
+  get font() {
+    return this._font;
+  }
+
+  set fontSize(value) {
+    this._fontSize = value;
+    this.updateMetrics();
+    this.updateBody();
+  }
+
+  get fontSize() {
+    return this._fontSize;
+  }
+
+  set textAlign(value) {
+    this._textAlign = value;
+    this.updateMetrics();
+    this.updateBody();
+  }
+
+  get textAlign() {
+    return this._textAlign;
+  }
+
+  set textBaseline(value) {
+    this._textBaseline = value;
+    this.updateMetrics();
+    this.updateBody();
+  }
+
+  get textBaseline() {
+    return this._textBaseline;
+  }
+
+  /**
+   * Update text metrics.
+   */
+  updateMetrics() {
+    window.stage.context.textBaseline = this.textBaseline;
     window.stage.context.font = parseFontSize(this.fontSize) + ' ' + this.font;
-    this._textMetrics = window.stage.context.measureText(text);
+    this._textMetrics = window.stage.context.measureText(this.text);
     this._width = this._textMetrics.width;
     this._height = this._textMetrics.actualBoundingBoxAscent + this._textMetrics.actualBoundingBoxDescent;
   }
 
-  init() {
-    let x, y;
+  /**
+   * Update physics body.
+   */
+  updateBody() {
+    this.updateBoundingPolygon();
+    if (this.body) {
+      Matter.Body.setVertices(this.body, this._boundingPolygon);
+    }
+  }
+
+  /**
+   * Create bounding polygon around text.
+   */
+  updateBoundingPolygon() {
+    this._boundingPolygon = [];
+
+    // Determine left most coordinate
+    let x;
     switch (this.textAlign) {
       case 'center':
-        x = this.position.x - (this._width / 2);
+        x = -(this._width / 2);
         break;
       case 'right':
-        x = this.position.x - this._width;
+        x = -this._width;
         break;
       default:
-        x = this.position.x;
+        x = 0;
     }
-    switch (this.textBaseline) {
-      case 'top':
-        y = this.position.y;
-        break;
-      case 'middle':
-        y = this.position.y - (this._height / 2);
-        break;
-      case 'bottom':
-        y = this.position.y - this._height;
-        break;
-      case 'alphabetic':
-      default:
-        y = this.position.y - this._textMetrics.actualBoundingBoxAscent;
+    
+    // Points across top of text
+    for (let i = 0; i < this.text.length; i = i + 1) {
+      let metrics = window.stage.context.measureText(this.text[i]);
+      this._boundingPolygon.push(new Vector(x, -metrics.actualBoundingBoxAscent));
+      x = x + metrics.width;
+      this._boundingPolygon.push(new Vector(x, -metrics.actualBoundingBoxAscent));
     }
-    this.body = Matter.Bodies.rectangle(x, y, this._width, this._height, {
+
+    // Continue back across bottom of text
+    for (let i = this.text.length - 1; i >= 0; i = i - 1) {
+      let metrics = window.stage.context.measureText(this.text[i]);
+      this._boundingPolygon.push(new Vector(x, metrics.actualBoundingBoxDescent));
+      x = x - metrics.width;
+      this._boundingPolygon.push(new Vector(x, metrics.actualBoundingBoxDescent));
+    }
+  }
+
+  init() {
+    this.updateBoundingPolygon();
+    this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       friction: window.friction,
       frictionAir: 0,
       isStatic: true
@@ -71,6 +150,18 @@ export default class Text extends Actor {
     context.translate(-this.x, -this.y);
     context.fillText(output, this.x, this.y);
     context.restore();
+
+    // Debug bounding polygon
+    /*if (this._boundingPolygon.length > 0) {
+      let v = this._boundingPolygon[0].rotate(this.angle);
+      context.beginPath();
+      context.moveTo(this.x + v.x, this.y + v.y);
+      for (let point of this._boundingPolygon) {
+        v = point.rotate(this.angle);
+        context.lineTo(this.x + v.x, this.y + v.y);
+      }
+      context.stroke();
+    }*/
   }
 }
 

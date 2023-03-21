@@ -16,6 +16,7 @@ export default class Text extends Actor {
     this.fill = window.fontColor;
     this._font = window.font;
     this._fontSize = window.fontSize;
+    this._fontWeight = window.fontWeight;
     this._textAlign = window.textAlign;
     this._textBaseline = window.textBaseline;
     this._boundingPolygon = [];
@@ -77,7 +78,7 @@ export default class Text extends Actor {
    */
   updateMetrics() {
     window.stage.context.textBaseline = this.textBaseline;
-    window.stage.context.font = parseFontSize(this.fontSize) + ' ' + this.font;
+    window.stage.context.font = this.fontWeight + ' ' + parseFontSize(this.fontSize) + ' ' + this.font;
     this._textMetrics = window.stage.context.measureText(this.text);
     this._width = this._textMetrics.width;
     this._height = this._textMetrics.actualBoundingBoxAscent + this._textMetrics.actualBoundingBoxDescent;
@@ -140,7 +141,7 @@ export default class Text extends Actor {
 
   render(context) {
     context.fillStyle = this.fill;
-    context.font = parseFontSize(this.fontSize) + ' ' + this.font;
+    context.font = this.fontWeight + ' ' + parseFontSize(this.fontSize) + ' ' + this.font;
     context.textAlign = this.textAlign;
     context.textBaseline = this.textBaseline;
     const output = this.live ? window._kidjs_.eval(this.text) : this.text;

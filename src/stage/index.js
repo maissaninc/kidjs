@@ -170,9 +170,10 @@ export default class Stage {
     window.lineWidth = 3;
 
     // Reset font properties
-    window.font = 'Arial';
+    window.font = window._kidjs_.settings.defaultFont ?? 'Arial';
     window.fontColor = 'black';
-    window.fontSize = '40px';
+    window.fontSize = window._kidjs_.settings.defaultFontSize ?? '40px';
+    window.fontWeight = window._kidjs_.settings.defaultFontWeight ?? '400';
     window.textAlign = 'center';
     window.textBaseline = 'middle';
 

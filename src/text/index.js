@@ -53,6 +53,16 @@ export default class Text extends Actor {
     return this._fontSize;
   }
 
+  set fontWeight(value) {
+    this._fontWeight = value;
+    this.updateMetrics();
+    this.updateBody();
+  }
+
+  get fontWeight() {
+    return this._fontWeight;
+  }
+
   set textAlign(value) {
     this._textAlign = value;
     this.updateMetrics();

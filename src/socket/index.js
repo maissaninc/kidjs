@@ -52,8 +52,6 @@ export function initSockets() {
       );
     }
   }
-
-  console.log('Sockets initialized');
 }
 
 export function join(room) {

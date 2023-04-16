@@ -26,6 +26,7 @@ import { random } from './math';
 import { replacePercentUnits } from './units';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
+import { prompt } from '../input/prompt';
 import { KidjsError } from './error';
 
 let triggers = [];
@@ -66,6 +67,7 @@ export function init() {
       window.pentagon = pentagon;
       window.pie = pie;
       window.polygon = polygon;
+      window.prompt = prompt;
       window.random = random;
       window.rect = rect;
       window.rectangle = rect;

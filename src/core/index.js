@@ -136,9 +136,9 @@ export function init() {
       let match = e.stack.match(/(\d+):(\d+)/);
       if (match) {
         if (runtime) {
-          lineNumber = window._kidjs_.sourceMap[match[1]] + 1;
+          lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]);
         } else {
-          lineNumber = match[1];
+          lineNumber = parseInt(match[1]);
         }
       }
       console.log('Error: ' + e.message + ' at line ' + lineNumber);

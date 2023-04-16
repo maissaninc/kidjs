@@ -33,6 +33,14 @@ export default class Text extends Actor {
     return this._text;
   }
 
+  get color() {
+    return this.fill;
+  }
+
+  set color(value) {
+    this.fill = value;
+  }
+
   set font(value) {
     this._font = value;
     this.updateMetrics();

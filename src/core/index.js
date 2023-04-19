@@ -115,7 +115,6 @@ export function init() {
       if (lapsed > 1000) {
         stop();
         throw new KidjsError('Freeze detected');
-        await wait(1);
       }
 
       window.dispatchEvent(new CustomEvent('KID.step', {
@@ -275,6 +274,30 @@ async function compile(code) {
         if (node.body[i].type == 'ExpressionStatement' &&
           node.body[i].expression.type == 'CallExpression' &&
           node.body[i].expression.callee.name == 'wait'
+        ) {
+          node.body[i].expression = {
+            type: 'AwaitExpression',
+            argument: Object.assign({}, node.body[i].expression)
+          };
+        }
+
+        // Add await to prompt() calls with return
+        if (node.body[i].type == 'VariableDeclaration' &&
+          node.body[i].declarations.length > 0 &&
+          node.body[i].declarations[0].init &&
+          node.body[i].declarations[0].init.type == 'CallExpression' &&
+          node.body[i].declarations[0].init.callee.name == 'prompt'
+        ) {
+          node.body[i].declarations[0].init = {
+            type: 'AwaitExpression',
+            argument: Object.assign({},  node.body[i].declarations[0].init)
+          };
+        }        
+
+        // Add await to prompt() calls without return
+        if (node.body[i].type == 'ExpressionStatement' &&
+          node.body[i].expression.type == 'CallExpression' &&
+          node.body[i].expression.callee.name == 'prompt'
         ) {
           node.body[i].expression = {
             type: 'AwaitExpression',

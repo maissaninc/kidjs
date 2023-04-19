@@ -21,6 +21,12 @@ export async function prompt(text) {
     el.appendChild(button);
     document.body.appendChild(el);
 
+    // Prevent click from propagating
+    el.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+    el.addEventListener('mouseup', function(e) { e.stopPropagation(); });
+    el.addEventListener('touchstart', function(e) { e.stopPropagation(); });
+    el.addEventListener('touchend', function(e) { e.stopPropagation(); });
+
     // Return input
     button.addEventListener('click', function() {
       document.body.removeChild(el);

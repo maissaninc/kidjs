@@ -56,6 +56,7 @@ export function initSockets() {
 
 export function join(room) {
   rooms[room] = new Socket();
+  return rooms[room];
 }
 
 export function send(message) {

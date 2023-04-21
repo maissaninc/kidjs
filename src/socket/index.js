@@ -4,7 +4,7 @@ export class Socket {
 
   constructor(room = '') {
     this.room = room;
-    this.listeners = {};
+    this.eventListeners = {};
   }
 
   send(message) {
@@ -17,9 +17,24 @@ export class Socket {
   }
 
   receive(message, event = 'message') {
-    if (typeof this.listeners[event] === 'function') {
-      this.listeners[event](message);
+    if (this.eventListeners[event] !== undefined) {
+      for (let listener of this.eventListeners[event]) {
+        if (typeof listener === 'function') {
+          listener(message);
+        }
+      }
     }
+  }
+
+  addEventListener(event, callback) {
+    if (this.eventListeners[event] == undefined) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(callback); 
+  }
+
+  on(event, callback) {
+    this.addEventListener(event, callback);
   }
 }
 

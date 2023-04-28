@@ -70,7 +70,7 @@ export function initSockets() {
 }
 
 export function join(room) {
-  rooms[room] = new Socket();
+  rooms[room] = new Socket(room);
   if (typeof window._kidjs_.socketJoin === 'function') {
     window._kidjs_.socketJoin(room);
   }

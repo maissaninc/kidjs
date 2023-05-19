@@ -305,11 +305,6 @@ export default class Stage {
    * @param {Event} [event] - Event object.
    */
   dispatchEvent(event, context = window) {
-
-    // Could incorrectly detect freeze if event triggers while
-    // browser is in the background
-    window._kidjs_.stats.lastFrame = Date.now();
-
     if (this.eventListeners[event.type] !== undefined) {
       for (let listener of this.eventListeners[event.type]) {
         if (typeof listener.handler == 'function') {

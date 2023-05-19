@@ -43,6 +43,9 @@ export function initSockets() {
   // Setup receive method
   window._kidjs_.socketReceive = function(parameters) {
     console.debug('Socket receive', parameters);
+
+    // Could incorrectly detect freeze if browser is in the background
+    window._kidjs_.stats.lastFrame = Date.now();
     
     // No message received
     if (!parameters.message) {

@@ -1,4 +1,6 @@
 export async function prompt(text) {
+  closeAllPrompts();
+
   return new Promise(function(resolve, reject) {
 
     // Prompt dialog
@@ -83,4 +85,11 @@ export async function prompt(text) {
       }
     });
   });
+}
+
+export function closeAllPrompts() {
+  let els = document.querySelectorAll('.kidjs-prompt');
+  for (let i = 0; i < els.length; i = i + 1) {
+    document.body.removeChild(els[i]);
+  }
 }

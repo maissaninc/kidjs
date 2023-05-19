@@ -26,7 +26,7 @@ import { random } from './math';
 import { replacePercentUnits } from './units';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
-import { prompt } from '../input/prompt';
+import { prompt, closeAllPrompts } from '../input/prompt';
 import { KidjsError } from './error';
 
 let triggers = [];
@@ -563,6 +563,7 @@ function generateSourceMap(code, offset) {
 
 export function reset() {
   log('Reset');
+  window.dispatchEvent(new CustomEvent('KID.reset'));
 
   // Reset event listeners
   triggers = [];
@@ -582,6 +583,9 @@ export function reset() {
   if (window._kidjs_.defaultStyle) {
     window._kidjs_.defaultStyle.reset();
   }
+
+  // Close prompts
+  closeAllPrompts();
 
   window.stage.reset();
 }

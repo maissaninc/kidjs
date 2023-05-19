@@ -14,6 +14,7 @@ export default class Text extends Actor {
     this._text = text ? text : '';
     this.live = live;
     this.fill = window.fontColor;
+    this.themeColor = false;
     this._font = window.font;
     this._fontSize = window.fontSize;
     this._fontWeight = window.fontWeight;
@@ -160,6 +161,28 @@ export default class Text extends Actor {
   }
 
   render(context) {
+
+    // Create default style
+    if (!window._kidjs_.defaultStyle) {
+      window._kidjs_.defaultStyle = new Style(context);
+    }
+    if (!this.style) {
+      this.style = window._kidjs_.defaultStyle;
+    }
+
+    // Choose random color
+    if (this.fill == 'random') {
+      this.fill = `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Choose next color in theme
+    if (this.fill == 'theme' || this.fill == 'default') {
+      if (!this.themeColor) {
+        this.themeColor = this.style.nextColor();
+      }
+      this.fill = this.themeColor;
+    }
+
     context.fillStyle = this.fill;
     context.font = this.fontWeight + ' ' + parseFontSize(this.fontSize) + ' ' + this.font;
     context.textAlign = this.textAlign;

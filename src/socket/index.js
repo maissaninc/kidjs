@@ -86,3 +86,6 @@ export function send(message) {
   }
 }
   
+window.addEventListener('KID.reset', function() {
+  rooms = {};
+});

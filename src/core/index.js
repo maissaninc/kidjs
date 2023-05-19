@@ -114,6 +114,7 @@ export function init() {
       let lapsed = Date.now() - window._kidjs_.stats.lastFrame;
       if (lapsed > 1000) {
         stop();
+        console.debug(info);
         throw new KidjsError('Freeze detected');
       }
 

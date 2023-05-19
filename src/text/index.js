@@ -11,7 +11,7 @@ let lineHeight = 1.1;
 export default class Text extends Actor {
   constructor(x, y, text, live) {
     super(x, y);
-    this._text = text;
+    this._text = text ? text : '';
     this.live = live;
     this.fill = window.fontColor;
     this._font = window.font;
@@ -107,7 +107,7 @@ export default class Text extends Actor {
    */
   updateBody() {
     this.updateBoundingPolygon();
-    if (this.body) {
+    if (this.body && this._boundingPolygon.length > 0) {
       Matter.Body.setVertices(this.body, this._boundingPolygon);
     }
   }
@@ -150,11 +150,13 @@ export default class Text extends Actor {
 
   init() {
     this.updateBoundingPolygon();
-    this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
-      friction: window.friction,
-      frictionAir: 0,
-      isStatic: true
-    });
+    if (this._boundingPolygon.length > 0) {
+      this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
+        friction: window.friction,
+        frictionAir: 0,
+        isStatic: true
+      });
+    }
   }
 
   render(context) {

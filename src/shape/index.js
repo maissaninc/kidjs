@@ -88,6 +88,9 @@ export default class Shape extends Actor {
 
     // Choose random color
     if (this.fill == 'random') {
+      let r = Math.floor(Math.random() * 256);
+      let g = Math.floor(Math.random() * 256);
+      let b = Math.floor(Math.random() * 256);
       this.fill = `rgb(${r}, ${g}, ${b})`;
     }
 

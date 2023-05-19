@@ -1,5 +1,6 @@
 import Actor from '../stage/actor';
 import Matter from 'matter-js';
+import Style from '../style';
 import Vector from '../core/vector';
 import { degreesToRadians }  from '../core/math';
 import { parseLength } from '../core/units';
@@ -172,6 +173,9 @@ export default class Text extends Actor {
 
     // Choose random color
     if (this.fill == 'random') {
+      let r = Math.floor(Math.random() * 256);
+      let g = Math.floor(Math.random() * 256);
+      let b = Math.floor(Math.random() * 256);
       this.fill = `rgb(${r}, ${g}, ${b})`;
     }
 

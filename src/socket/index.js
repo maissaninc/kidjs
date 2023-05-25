@@ -16,6 +16,16 @@ export class Socket {
     }
   }
 
+  emit(event, message) {
+    if (typeof window._kidjs_.socketSend === 'function') {
+      window._kidjs_.socketSend({
+        room: this.room,
+        event: event,
+        message: message
+      });
+    }
+  }
+
   receive(message, event = 'message') {
     if (this.eventListeners[event] !== undefined) {
       for (let listener of this.eventListeners[event]) {

@@ -327,6 +327,8 @@ export default class Actor {
   push(x = 0, y = 0) {
     if (this.body) {
       this.anchored = false;
+      this.velocity._x = this.body.velocity.x + x;
+      this.velocity._y = this.body.velocity.y + y;
       Matter.Body.setVelocity(this.body, new Vector(
         this.body.velocity.x + x,
         this.body.velocity.y + y
@@ -336,6 +338,8 @@ export default class Actor {
       this.anchored = false;
       for (let i = 0; i < this.children.length; i = i + 1) {
         if (this.children[i].body) {
+          this.children[i].velocity._x = this.children[i].body.velocity.x + x;
+          this.children[i].velocity._y = this.children[i].body.velocity.y + y;    
           Matter.Body.setVelocity(this.children[i].body, new Vector(
             this.children[i].body.velocity.x + x,
             this.children[i].body.velocity.y + y

@@ -202,6 +202,12 @@ export default class Actor {
       }
     }
 
+    // Update velocity property
+    if (this.body) {
+      this.velocity.x = this.body.velocity.x;
+      this.velocity.y = this.body.velocity.y;
+    }
+
     // Update animations
     if (this.animations.length > 0) {
       if (this.animations[this.animationActive].status == 'queued') {

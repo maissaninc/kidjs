@@ -204,8 +204,8 @@ export default class Actor {
 
     // Update velocity property
     if (this.body) {
-      this.velocity.x = this.body.velocity.x;
-      this.velocity.y = this.body.velocity.y;
+      this.velocity._x = this.body.velocity.x;
+      this.velocity._y = this.body.velocity.y;
     }
 
     // Update animations

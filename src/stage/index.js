@@ -161,6 +161,7 @@ export default class Stage {
     this._rightWall.invisible = true;
     this._ceiling.invisible = true;
     this._floor.invisible = true;
+    console.log(window._kidjs_.settings);
     this.resize(window._kidjs_.settings.width, window._kidjs_.settings.height);
 
     // Reset text cursor

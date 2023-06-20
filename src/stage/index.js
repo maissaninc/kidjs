@@ -18,8 +18,6 @@ export default class Stage {
   constructor(width = window.innerWidth, height = window.innerHeight) {
     this.running = false;
     this.frame = 0;
-    this.width = parseInt(width);
-    this.height = parseInt(height);
 
     // Create Matter.js engine and listen for events
     this.engine = Matter.Engine.create();
@@ -41,6 +39,7 @@ export default class Stage {
     this.eventListeners = {};
 
     log(`Stage created (${width} x ${height})`);
+    this.resize(width, height);
   }
 
   /**
@@ -50,7 +49,7 @@ export default class Stage {
    * @param {int} [width] - Optional stage width. Defaults to browser width.
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
-  resize(width = window.innerWidth, height = window.innerHeight) {
+  resize(width, height) {
 
     // If no width or height default to window size
     if (!parseInt(width)) width = window.innerWidth;

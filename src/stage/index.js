@@ -35,7 +35,6 @@ export default class Stage {
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
     this.canvas.style.objectFit = 'contain';
-    this.canvas.style.backgroundColor = '#000000';
 
     // Initialize
     this.actors = [];

@@ -44,11 +44,9 @@ window.addEventListener('DOMContentLoaded', function() {
   document.body.appendChild(grid.canvas);
 
   // Resize canvas
-  if (!window.KID.settings.width || !window.KID.settings.height) {
-    window.addEventListener('resize', function() {
-      window.stage.resize();
-    });
-  }
+  window.addEventListener('resize', function() {
+    window.stage.resize(KID.settings.width, KID.settings.height);
+  });
 
   // Clear method
   window.clear = function() {

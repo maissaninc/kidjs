@@ -60,9 +60,6 @@ export default class Stage {
       this.width = parseInt(width);
       this.height = parseInt(height);
 
-      log('Test');
-      log(window._kidjs_.settings);
-
       log(`Stage resized (${width} x ${height})`);
       if (window._kidjs_.settings.pixelSize > 1) {
         let scale = 1 / window._kidjs_.settings.pixelSize;

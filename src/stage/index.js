@@ -98,7 +98,9 @@ export default class Stage {
       }
 
       // Redraw grid
-      window.grid.render();
+      if (window.grid) {
+        window.grid.render();
+      }
     }
   }
 

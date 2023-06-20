@@ -39,6 +39,7 @@ let urlFilter;
 export function init() {
   window._kidjs_ = {
     settings: {
+      backgroundColor: null,
       slowMotion: false,
       grid: false,
       pixelSize: 1

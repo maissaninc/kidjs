@@ -233,7 +233,12 @@ export default class Stage {
   render() {
     if (this.running) {
       this.frame++;
-      this.context.clearRect(0, 0, this.width, this.height);
+      if (window._kidjs_.settings.backgroundColor) {
+        this.context.fillStyle = window._kidjs_.settings.backgroundColor;
+        this.context.fillRect(0, 0, this.width, this.height);
+      } else {
+        this.context.clearRect(0, 0, this.width, this.height);
+      }
 
       // Update physics simulation
       this._leftWall.ghost = !window.walls;

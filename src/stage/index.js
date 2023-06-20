@@ -29,6 +29,13 @@ export default class Stage {
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.canvas.style.display = 'block';
+    this.canvas.style.position = 'fixed';
+    this.canvas.style.top = '0px';
+    this.canvas.style.left = '0px';
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = '100%';
+    this.canvas.style.objectFit = 'contain';
+    this.canvas.style.backgroundColor = '#000000';
 
     // Initialize
     this.actors = [];
@@ -45,49 +52,51 @@ export default class Stage {
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
   resize(width = window.innerWidth, height = window.innerHeight) {
-    this.width = parseInt(width);
-    this.height = parseInt(height);
-    log(`Stage resized (${width} x ${height})`);
-    if (window._kidjs_.settings.pixelSize > 1) {
-      let scale = 1 / window._kidjs_.settings.pixelSize;
-      this.canvas.width = Math.floor(this.width * scale);
-      this.canvas.height = Math.floor(this.height * scale);
-      this.canvas.style.width = this.canvas.width * (1 / scale) + 'px';
-      this.canvas.style.height = this.canvas.height * (1 / scale) + 'px';
-      this.canvas.style.imageRendering = 'pixelated';
-    } else {
-      let scale = window.devicePixelRatio;
-      this.canvas.width = Math.floor(this.width * scale);
-      this.canvas.height = Math.floor(this.height * scale);
-      this.canvas.style.width = this.width + 'px';
-      this.canvas.style.height = this.height + 'px';
-      this.context.scale(scale, scale);
-    }
-    window.width = this.width;
-    window.height = this.height;
 
-    // Resize walls
-    if (this._leftWall) {
-      this._leftWall.x = -WALL_DEPTH / 2;
-      this._leftWall.y = this.height / 2;
-      this._leftWall.height = this.height + WALL_DEPTH * 2;
-      this._leftWall.updateBody();
-      this._rightWall.x = this.width + WALL_DEPTH / 2;
-      this._rightWall.y = this.height / 2;
-      this._rightWall.height = this.height + WALL_DEPTH * 2;
-      this._rightWall.updateBody();
-      this._ceiling.x = this.width / 2;
-      this._ceiling.y = -WALL_DEPTH / 2;
-      this._ceiling.width = this.width + WALL_DEPTH * 2;
-      this._ceiling.updateBody();
-      this._floor.x = this.width / 2;
-      this._floor.y = this.height + WALL_DEPTH / 2;
-      this._floor.width = this.width + WALL_DEPTH * 2;
-      this._floor.updateBody();
-    }
+    // If size has changed
+    if (this.width != parseInt(width) || this.height != parseInt(height)) {
 
-    // Redraw grid
-    window.grid.render();
+      // Resize canvas
+      this.width = parseInt(width);
+      this.height = parseInt(height);
+      log(`Stage resized (${width} x ${height})`);
+      if (window._kidjs_.settings.pixelSize > 1) {
+        let scale = 1 / window._kidjs_.settings.pixelSize;
+        this.canvas.width = Math.floor(this.width * scale);
+        this.canvas.height = Math.floor(this.height * scale);
+        this.canvas.style.imageRendering = 'pixelated';
+      } else {
+        let scale = window.devicePixelRatio;
+        this.canvas.width = Math.floor(this.width * scale);
+        this.canvas.height = Math.floor(this.height * scale);
+        this.context.scale(scale, scale);
+      }
+      window.width = this.width;
+      window.height = this.height;
+
+      // Resize walls
+      if (this._leftWall) {
+        this._leftWall.x = -WALL_DEPTH / 2;
+        this._leftWall.y = this.height / 2;
+        this._leftWall.height = this.height + WALL_DEPTH * 2;
+        this._leftWall.updateBody();
+        this._rightWall.x = this.width + WALL_DEPTH / 2;
+        this._rightWall.y = this.height / 2;
+        this._rightWall.height = this.height + WALL_DEPTH * 2;
+        this._rightWall.updateBody();
+        this._ceiling.x = this.width / 2;
+        this._ceiling.y = -WALL_DEPTH / 2;
+        this._ceiling.width = this.width + WALL_DEPTH * 2;
+        this._ceiling.updateBody();
+        this._floor.x = this.width / 2;
+        this._floor.y = this.height + WALL_DEPTH / 2;
+        this._floor.width = this.width + WALL_DEPTH * 2;
+        this._floor.updateBody();
+      }
+
+      // Redraw grid
+      window.grid.render();
+    }
   }
 
   /**

@@ -52,6 +52,10 @@ export default class Stage {
    */
   resize(width = window.innerWidth, height = window.innerHeight) {
 
+    // If no width or height default to window size
+    if (!parseInt(width)) width = window.innerWidth;
+    if (!parseInt(height)) height = window.innerHeight;
+
     // If size has changed
     if (this.width != parseInt(width) || this.height != parseInt(height)) {
 

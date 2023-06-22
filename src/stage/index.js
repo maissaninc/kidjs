@@ -203,6 +203,7 @@ export default class Stage {
     window.floor = true;
     window.walls = true;
     window.friction = 0.1;
+    this.previousFriction = 0.1;
 
     // Clear stage
     this.clear();
@@ -242,6 +243,15 @@ export default class Stage {
         this.context.fillRect(0, 0, this.width, this.height);
       } else {
         this.context.clearRect(0, 0, this.width, this.height);
+      }
+
+      // Detect change in friction
+      if (window.friction != this.previousFriction) {
+        this.previousFriction = window.friction;
+        this._leftWall.friction = window.friction;
+        this._rightWall.friction = window.friction;
+        this._ceiling.friction = window.friction;
+        this._floor.friction = window.friction;
       }
 
       // Update physics simulation

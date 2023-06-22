@@ -64,18 +64,6 @@ export default class Shape extends Actor {
     }
   }
 
-  get friction() {
-    if (this.body) {
-      return this.body.friction;
-    }
-  }
-
-  set friction(value) {
-    if (this.body) {
-      this.body.friction = value;
-    }
-  }
-
   prerender(context) {
 
     // Create default style

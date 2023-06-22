@@ -135,6 +135,7 @@ export default class Actor {
   set friction(value) {
     if (this.body) {
       this.body.friction = value;
+      this.body.frictionStatic = value;
     }
   }
 

@@ -22,6 +22,7 @@ export default class Stage {
     // Create Matter.js engine and listen for events
     this.engine = Matter.Engine.create();
     Matter.Events.on(this.engine, 'collisionStart', (event) => this.onCollisionStart(event));
+    Matter.Resolver._restingThresh = 0.001;
 
     // Create canvas
     this.canvas = document.createElement('canvas');

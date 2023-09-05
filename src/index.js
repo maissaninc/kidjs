@@ -73,4 +73,7 @@ window.KID = {
   setAssetUrlFilter: setAssetUrlFilter
 };
 
+let scripts = document.getElementsByTagName("script");
+console.log(scripts[scripts.length-1].src);
+
 window.debug = true;

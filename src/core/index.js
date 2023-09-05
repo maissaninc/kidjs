@@ -147,6 +147,13 @@ export function init() {
       new KidjsError(e.message, lineNumber);
     },
 
+    import: function(library) {
+      let scripts = document.getElementsByTagName("script");
+      console.log(scripts);
+      //let scriptEl = document.createElement("script");
+      //scriptEl.src = 
+    },
+
     seed: Date.now(),
     sourceMap: []
   };
@@ -191,7 +198,8 @@ async function compile(code) {
   try {
     ast = acorn.parse(code, {
       locations: true,
-      onComment: comments
+      onComment: comments,
+      sourceType: 'module'
     });
   } catch(e) {
     window._kidjs_.error(e);
@@ -210,6 +218,11 @@ async function compile(code) {
 
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
+
+        // Import library
+        if (node.body[i].type == 'ImportDeclaration') {
+          node.body[i] = acorn.parse("_kidjs_.import('" + node.body[i].source.value + "')");
+        }
 
         // Check if call to on() method
         let target = isNodeMethod('on', node.body[i]);

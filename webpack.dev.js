@@ -2,13 +2,16 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.js',
+  entry: {
+    'kid': './src/index.js',
+    'neural-network': './src/libraries/neural-network.js'
+  },
   optimization: {
     minimize: false
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'kid.js',
+    filename: '[name].js',
   },
   module: {
     rules: [

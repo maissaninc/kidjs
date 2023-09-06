@@ -70,10 +70,7 @@ window.KID = {
   run: run,
   stop: stop,
   settings: window._kidjs_.settings,
-  setAssetUrlFilter: setAssetUrlFilter
+  setAssetUrlFilter: setAssetUrlFilter,
 };
-
-let scripts = document.getElementsByTagName("script");
-console.log(scripts[scripts.length-1].src);
 
 window.debug = true;

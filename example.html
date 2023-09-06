@@ -9,6 +9,13 @@
 
       import "neural-network"
 
+      let net = neuralNetwork()
+      net.train(1, 'ok');
+      net.train(0, 'ok');
+      net.train(4, 'notok');
+      let test = net.run(0);
+      console.log(test);
+
       function placeDomino(x, y) {
         let domino = rect(x, y, 20, 100)
         domino.anchored = false

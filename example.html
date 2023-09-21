@@ -10,12 +10,39 @@
       import "neural-network"
 
       let net = neuralNetwork()
-      net.train(1, 'ok');
-      net.train(0, 'ok');
-      net.train(4, 'notok');
-      let test = net.run(0);
-      console.log(test);
+      //net.nn.train([{input: 1, output: {ok:1}}]);
+      //net.nn.train([{input: 0, output: {ok:1}}]);
+      //net.nn.train([{input: 4, output: {notok:1}}]);
 
+      net.train(4, 5);
+      net.train(8, 5);
+
+      //net.train(1, [3]);
+      //net.train(0, [3]);
+      //net.train(3, [3]);
+      //net.train(4, [3]);
+
+         /*   net.nn.train([{
+              input: [0, 0],
+              output: [0,1]
+            },
+            {
+              input: [0, 1],
+              output: [1,1]
+            },
+            {
+              input: [1, 0],
+              output: [1,2]
+            },
+            {
+              input: [1, 1],
+              output: [0,1]
+            }
+          ]);*/
+
+      let test = net.run(4);
+     // console.log(test);
+/*
       function placeDomino(x, y) {
         let domino = rect(x, y, 20, 100)
         domino.anchored = false
@@ -49,7 +76,7 @@
 
       on('mousedown', start)
       on('mousemove', dragging)
-      on('mouseup', release)
+      on('mouseup', release)*/
 
     </script>
   </body>

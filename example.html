@@ -10,38 +10,100 @@
       import "neural-network"
 
       let net = neuralNetwork()
-      //net.nn.train([{input: 1, output: {ok:1}}]);
-      //net.nn.train([{input: 0, output: {ok:1}}]);
-      //net.nn.train([{input: 4, output: {notok:1}}]);
 
-      net.train(4, 5);
-      net.train(8, 5);
 
-      //net.train(1, [3]);
-      //net.train(0, [3]);
-      //net.train(3, [3]);
-      //net.train(4, [3]);
+      gravity = 0
+      friction = 0
+      ceiling = false
+      floor = false
 
-         /*   net.nn.train([{
-              input: [0, 0],
-              output: [0,1]
-            },
-            {
-              input: [0, 1],
-              output: [1,1]
-            },
-            {
-              input: [1, 0],
-              output: [1,2]
-            },
-            {
-              input: [1, 1],
-              output: [0,1]
-            }
-          ]);*/
+      let player = rect(width / 2, 50, 100, 20)
+      let computer = rect(width / 2, height - 50, 100, 20)
+      let interval
+      let states
 
-      let test = net.run(4);
-     // console.log(test);
+      let ball = circle(width / 2, height / 2, 40)
+      function launchBall() {
+        let pushX = (random(0, 1) - 0.5) * random(10, 20)
+        let pushY = random(-10, 10)
+        ball.push(pushX, pushY)
+
+        interval = setInterval(moveComputerPaddle, 1000)
+        states = []
+      }
+
+      function movePaddle(key) {
+        if (key == 'ArrowLeft') {
+          player.x = player.x - 10
+        }
+        if (key == 'ArrowRight') {
+          player.x = player.x + 10
+        }
+      }
+
+      function moveComputerPaddle() {
+        wait(0.05)
+
+        let result = net.run([computer.x, ball.x, ball.y, ball.velocity.x, ball.velocity.y]);
+        console.log(result);
+
+        // Move left
+        let move
+        if (result < 0.5) {
+          move = -100
+
+        // Move right
+        } else {
+          move = 100
+        }
+
+        states.push({
+          input: [computer.x, ball.x, ball.y, ball.velocity.x, ball.velocity.y],
+          output: [move]
+        })
+
+        // Move paddle, but stay inside bounds
+        let newX = computer.x + move
+        if (newX < 50) {
+          newX = 50
+        }
+        if (newX > width - 50) {
+          newX = width - 50
+        }
+        computer.moveTo(newX, computer.y)
+      }
+
+      on('keydown', movePaddle)
+      on('click', launchBall)
+
+
+      function success() {
+        // Train nn
+        net.train(states)
+      }
+
+      computer.on('collision', success)
+
+      function checkBallPosition() {
+
+        // CPU missed
+        if (ball.y > height) {
+          console.log('FAILWD')
+        }
+
+        // Reset ball
+        if (ball.y < 0 || ball.y > height) {
+          clearInterval(interval)
+          ball.x = width / 2
+          ball.y = height / 2
+          ball.speed = 0
+        }
+      }
+
+      ball.on('move', checkBallPosition)
+
+
+
 /*
       function placeDomino(x, y) {
         let domino = rect(x, y, 20, 100)

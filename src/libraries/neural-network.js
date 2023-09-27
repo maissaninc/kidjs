@@ -16,74 +16,96 @@ export class NeuralNetwork {
   }
 
   _parseInput(input) {
-
-    // Single number
     if (typeof input == 'number') {
       input = [input];
     }
-
     return input;
   }
 
   _parseOutput(output) { 
+    if (typeof output == 'number') {
+      output = [output];
+    }
     return output;
   }
 
-  _normalizeData(data) {
-    let result = [];
-    let minimums = [];
-    let maximums = [];
+  _parseResult(result) {
+    console.log(typeof result);
+    console.log(result.length);
+    if (typeof result == 'number') {
+      return result;
+    }
+    if (result.length && result.length == 1 && typeof result[0] == 'number') {
+      return result[0];
+    }
+    return result;
+  }
 
-    // Determine minimum and maximum values for each input
+  _normalizeData(data) {
+    
+    let result = [];
+    let inputMinimums = [];
+    let inputMaximums = [];
+    let outputMinimums = [];
+    let outputMaximums = [];
+
+    // Determine minimum and maximum values for each input and oupt
     for (let i = 0; i < data.length; i = i + 1) {
+
+      // Inputs
       for (let j in data[i].input) {
-        if (!minimums[j] || !maximums[j]) {
-          minimums[j] = 0;
-          maximums[j] = 1;
+        if (!inputMinimums[j] || !inputMaximums[j]) {
+          inputMinimums[j] = 0;
+          inputMaximums[j] = 1;
         }
-        if (data[i].input[j] < minimums[j]) {
-          minimums[j] = data[i].input[j];
+        if (data[i].input[j] < inputMinimums[j]) {
+          inputMinimums[j] = data[i].input[j];
         }
-        if (data[i].input[j] > maximums[j]) {
-          maximums[j] = data[i].input[j];
+        if (data[i].input[j] > inputMaximums[j]) {
+          inputMaximums[j] = data[i].input[j];
+        }
+      }
+
+      // Outputs
+      for (let j in data[i].output) {
+        if (!outputMinimums[j] || !outputMaximums[j]) {
+          outputMinimums[j] = 0;
+          outputMaximums[j] = 1;
+        }
+        if (data[i].input[j] < outputMinimums[j]) {
+          outputMinimums[j] = data[i].output[j];
+        }
+        if (data[i].input[j] > outputMaximums[j]) {
+          outputMaximums[j] = data[i].output[j];
         }
       }
     }
 
     // Calculate size of each range
-    let size = [];
-    for (let i in minimums) {
-      size[i] = maximums[i] - minimums[i];
+    let inputSize = [];
+    let outputSize = [];
+    for (let i in inputMinimums) {
+      inputSize[i] = inputMaximums[i] - inputMinimums[i];
+    }
+    for (let i in outputMinimums) {
+      outputSize[i] = outputMaximums[i] - outputMinimums[i];
     }
 
-    // Normalize all inputs to be between 0-1
+    // Normalize all inputs and outputs to be between 0-1
     for (let i = 0; i < data.length; i = i + 1) {
       let normalized = {
         input: [],
-        output: data[i].output
+        output: []
       };
       for (let j in data[i].input) {
-        normalized.input[j] = (data[i].input[j] + minimums[j]) / size[j];
+        normalized.input[j] = (data[i].input[j] + inputMinimums[j]) / inputSize[j];
+      }
+      for (let j in data[i].output) {
+        normalized.output[j] = (data[i].output[j] + outputMinimums[j]) / outputSize[j];
       }
       result.push(normalized);
     }
 
-    return result;
-  }
-
-  /**
-   * Run inputs through network.
-   * 
-   * @param {*} input
-   */
-  run(input) {
-    if (this._needsTraining) {
-      let data = this._normalizeData(this._trainingData);
-      console.log(data);
-      this.nn.train(data);
-      this._needsTraining = false;
-    }
-    let result = this.nn.run(this._parseInput(input));
     return result;
   }
 
@@ -94,12 +116,48 @@ export class NeuralNetwork {
    * @param {*} output
    */
   train(input, output) {
-    let data = {
-      input: this._parseInput(input),
-      output: this._parseOutput(output)
-    };
-    this._trainingData.push(data);
+
+    this._needsTraining = true;
+
+    // Array of objects passed
+    if (Array.isArray(input) && input[0]['input'] && input[0]['output']) {
+      this._trainingData = [...this._trainingData, ...input];
+      return;
+    }
+
+    // Single input and output values passed
+    if (typeof input !== undefined && typeof output !== undefined) {
+      let data = {
+        input: this._parseInput(input),
+        output: this._parseOutput(output)
+      };
+      this._trainingData.push(data);
+    }
   }
+
+  /**
+   * Run inputs through network.
+   * 
+   * @param {*} input
+   */
+    run(input) {
+
+      // If not training data, return random value
+      if (this._trainingData.length == 0) {
+        return Math.random();
+      }
+
+      // Train network
+      if (this._needsTraining && this._trainingData.length > 0) {
+        let data = this._normalizeData(this._trainingData);
+        this.nn.train(data);
+        this._needsTraining = false;
+      }
+
+      // Run input through network
+      let result = this.nn.run(this._parseInput(input));
+      return this._parseResult(result);
+    }
 }
 
 export function neuralNetwork() {

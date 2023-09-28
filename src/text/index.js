@@ -21,6 +21,7 @@ export default class Text extends Actor {
     this._fontWeight = window.fontWeight;
     this._textAlign = window.textAlign;
     this._textBaseline = window.textBaseline;
+    this._ghost = true;
     this._boundingPolygon = [];
     this.updateMetrics();
   }
@@ -156,7 +157,8 @@ export default class Text extends Actor {
       this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
         friction: window.friction,
         frictionAir: 0,
-        isStatic: true
+        isStatic: true,
+        isSensor: this._ghost
       });
     }
   }

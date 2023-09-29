@@ -40,14 +40,27 @@ export class NeuralNetwork {
     if (result.length && result.length == 1 && typeof result[0] == 'number') {
       return result[0];
     }
+  }
+
+  _normalizeInput(input) {
+    let result = [];
+    for (let i in input) {
+      result[i] = (input[i] - this._inputMinimums[i]) / this._inputSize[i];
+    }
+    return result;
+  }
+
+  _normalizeOutput(output) {
+    let result = [];
+    for (let i in output) {
+      result[i] = (output[i] - this._outputMinimums[i]) / this._outputSize[i];
+    }
     return result;
   }
 
   _normalizeData(data) {
-    
-    let result = [];
 
-    // Determine minimum and maximum values for each input and oupt
+    // Update minimum and maximums
     for (let i = 0; i < data.length; i = i + 1) {
 
       // Inputs
@@ -88,20 +101,13 @@ export class NeuralNetwork {
     }
 
     // Normalize all inputs and outputs to be between 0-1
+    let result = [];
     for (let i = 0; i < data.length; i = i + 1) {
-      let normalized = {
-        input: [],
-        output: []
-      };
-      for (let j in data[i].input) {
-        normalized.input[j] = (data[i].input[j] + this._inputMinimums[j]) / this._inputSize[j];
-      }
-      for (let j in data[i].output) {
-        normalized.output[j] = (data[i].output[j] + this._outputMinimums[j]) / this._outputSize[j];
-      }
-      result.push(normalized);
+      result.push({
+        input: this._normalizeInput(data[i].input),
+        output: this._normalizeOutput(data[i].output)
+      });
     }
-
     return result;
   }
 
@@ -153,8 +159,13 @@ export class NeuralNetwork {
     }
 
     // Run input through network
-    input = this._parseInput(input);
+    input = this._normailzeInput(this._parseInput(input));
     let result = this.nn.run(input);
+
+    // "Reverse" normalize output
+    for (let i in result) {
+      result[i] = result[i] * this._outputSize[i] + this._outputMinimums[i];
+    }
     return this._parseResult(result);
   }
 }

@@ -11,88 +11,70 @@
 
       let net = neuralNetwork()
 
-      net.train([300, 100, -5.4, 5], 300);
-      net.train([121, 150, 10.4, 9.4], 100);
-      net.train([402, 50, -5.4, 5], 540);
-      net.train([250, 350, -1.4, 1.56], 43);
-
-      x = net.run([132, 23, -4.5, 3.4]);
-      console.log(x)
-
-     /* gravity = 0
+      gravity = 0
       friction = 0
-      ceiling = false
       floor = false
 
-      let player = rect(width / 2, 50, width / 5, 20)
       let computer = rect(width / 2, height - 50, width / 5, 20)
+      let hits = 0
+      let state
       let mode = 'TRAINING'
 
       fontColor = 'lightgray'
+      display(20, 20, hits)
       display(width / 2, height / 2, mode)
 
       let ball = circle(width / 2, height / 2, 40)
-      function launchBall() {
+      on('frame', checkBallPosition)
+      ball.on('collision', moveComputerPaddle)
+
+      function launchTrainingBall() {
         let pushX = random(-10, 10)
-        let pushY = (random(0, 1) - 0.5) * 20
+        let pushY = random(5, 10)
+        ball.x = random(0, width)
+        ball.y = random(0, height / 2)
         ball.push(pushX, pushY)
         moveComputerPaddle()
       }
 
-      function movePaddle() {
-        player.x = mouseX
+      function checkBallPosition() {
+        console.log(ball.y)
+        if (ball.y > height) {
+          ball.speed = 0
+          launchTrainingBall()
+        }
       }
 
-      let state
+      launchTrainingBall()
 
       function moveComputerPaddle() {
         wait(0.01)
-
         state = [ball.x, ball.y, ball.velocity.x, ball.velocity.y];
-
-        // If training, choose random location
         let x
         if (mode == 'TRAINING') {
           x = random(0, width)
-
-        // Else, let the network decide
         } else {
-          x = net.run(state);
-          console.log(x)
+          x = net.run(state)
         }
-
-        // Move to new location
         computer.moveTo(x, computer.y)
       }
 
-      on('mousemove', movePaddle)
-      on('click', launchBall)
-
       function success() {
         if (mode == 'TRAINING') {
+          hits = hits + 1
           net.train(state, computer.x)
         }
       }
 
-      player.on('collision', moveComputerPaddle)
       computer.on('collision', success)
-
-      function checkBallPosition() {
-        if (ball.y < 0 || ball.y > height) {
-          ball.x = width / 2
-          ball.y = height / 2
-          ball.speed = 0
-        }
-      }
 
       ball.on('move', checkBallPosition)
 
       function startGame() {
-        mode = 'NETWORK'
+        mode = 'GAME'
       }
 
-      on('space', startGame)*/
-
+      on('space', startGame)
 
 /*
       function placeDomino(x, y) {

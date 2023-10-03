@@ -160,10 +160,11 @@ export class NeuralNetwork {
     input = this._normalizeInput(this._parseInput(input));
     let result = this.nn.run(input);
 
-    // "Reverse" normalize output
+    // "Reverse" normalized output
     for (let i in result) {
       result[i] = result[i] * this._outputSize[i] + this._outputMinimums[i];
     }
+
     return this._parseResult(result);
   }
 }

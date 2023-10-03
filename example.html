@@ -11,7 +11,15 @@
 
       let net = neuralNetwork()
 
-      gravity = 0
+      net.train([300, 100, -5.4, 5], 300);
+      net.train([121, 150, 10.4, 9.4], 100);
+      net.train([402, 50, -5.4, 5], 540);
+      net.train([250, 350, -1.4, 1.56], 43);
+
+      x = net.run([132, 23, -4.5, 3.4]);
+      console.log(x)
+
+     /* gravity = 0
       friction = 0
       ceiling = false
       floor = false
@@ -83,7 +91,7 @@
         mode = 'NETWORK'
       }
 
-      on('space', startGame)
+      on('space', startGame)*/
 
 
 /*

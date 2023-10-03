@@ -65,7 +65,7 @@ export class NeuralNetwork {
 
       // Inputs
       for (let j in data[i].input) {
-        if (!this._inputMinimums[j] || !this._inputMaximums[j]) {
+        if (typeof this._inputMinimums[j] == 'undefined' || typeof this._inputMaximums[j] == 'undefined') {
           this._inputMinimums[j] = 0;
           this._inputMaximums[j] = 1;
         }
@@ -79,14 +79,14 @@ export class NeuralNetwork {
 
       // Outputs
       for (let j in data[i].output) {
-        if (!this._outputMinimums[j] || !this._outputMaximums[j]) {
+        if (typeof this._outputMinimums[j] == 'undefined' || typeof this._outputMaximums[j] == 'undefined') {
           this._outputMinimums[j] = 0;
           this._outputMaximums[j] = 1;
         }
-        if (data[i].input[j] < this._outputMinimums[j]) {
+        if (data[i].output[j] < this._outputMinimums[j]) {
           this._outputMinimums[j] = data[i].output[j];
         }
-        if (data[i].input[j] > this._outputMaximums[j]) {
+        if (data[i].output[j] > this._outputMaximums[j]) {
           this._outputMaximums[j] = data[i].output[j];
         }
       }
@@ -151,15 +151,13 @@ export class NeuralNetwork {
 
     // Train network
     if (this._needsTraining && this._trainingData.length > 0) {
-      console.log(this._trainingData);
       let data = this._normalizeData(this._trainingData);
-      console.log(data);
       this.nn.train(data);
       this._needsTraining = false;
     }
 
     // Run input through network
-    input = this._normailzeInput(this._parseInput(input));
+    input = this._normalizeInput(this._parseInput(input));
     let result = this.nn.run(input);
 
     // "Reverse" normalize output

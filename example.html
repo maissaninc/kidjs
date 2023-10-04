@@ -14,56 +14,63 @@
       gravity = 0
       friction = 0
       floor = false
+      ceiling = false
 
-      let computer = rect(width / 2, height - 50, width / 5, 20)
+      let computer = rect(width / 2, height - 50, width / 4, 20)
       let hits = 0
+      let misses = 0
       let state
       let mode = 'TRAINING'
 
       fontColor = 'lightgray'
-      display(20, 20, hits)
+      display(40, 40, hits)
+      display(width - 40, 40, misses)
       display(width / 2, height / 2, mode)
 
-      let ball = circle(width / 2, height / 2, 40)
+      let ball = circle(width / 2, 50, 40)
+
       on('frame', checkBallPosition)
-      ball.on('collision', moveComputerPaddle)
+      ball.on('collision', onBounce)
 
-      function launchTrainingBall() {
-        let pushX = random(-10, 10)
-        let pushY = random(5, 10)
-        ball.x = random(0, width)
-        ball.y = random(0, height / 2)
-        ball.push(pushX, pushY)
-        moveComputerPaddle()
-      }
-
-      function checkBallPosition() {
-        console.log(ball.y)
-        if (ball.y > height) {
-          ball.speed = 0
-          launchTrainingBall()
+      function onMouseMove() {
+        if (mode == 'TRAINING') {
+          computer.x = mouseX
         }
       }
 
-      launchTrainingBall()
+      on('mousemove', onMouseMove)
 
-      function moveComputerPaddle() {
+      function onBounce() {
         wait(0.01)
         state = [ball.x, ball.y, ball.velocity.x, ball.velocity.y];
-        let x
-        if (mode == 'TRAINING') {
-          x = random(0, width)
-        } else {
-          x = net.run(state)
+
+        if (mode == 'AUTOPILOT') {
+          let x = net.run(state)
+          computer.moveTo(x, computer.y)
         }
-        computer.moveTo(x, computer.y)
+      }
+
+
+      function checkBallPosition() {
+        if (ball.speed == 0) {
+          let pushX = random(-10, 10)
+          let pushY = random(2, 8)
+          ball.push(pushX, pushY)
+          onBounce()
+        }
+        if (ball.y < 0 || ball.y > height) {
+            ball.speed = 0
+            ball.x = random(0, width)
+            ball.y = 50
+        }
+        if (ball.y > height) {
+          misses = misses + 1
+        }
       }
 
       function success() {
-        if (mode == 'TRAINING') {
           hits = hits + 1
           net.train(state, computer.x)
-        }
       }
 
       computer.on('collision', success)
@@ -71,46 +78,13 @@
       ball.on('move', checkBallPosition)
 
       function startGame() {
-        mode = 'GAME'
+        mode = 'AUTOPILOT'
+        hits = 0
+        misses = 0
       }
 
       on('space', startGame)
 
-/*
-      function placeDomino(x, y) {
-        let domino = rect(x, y, 20, 100)
-        domino.anchored = false
-        domino.bounciness = 0
-      }
-
-      for (let x = 200; x < width - 200; x = x + 60) {
-        placeDomino(x, 200)
-      }
-      
-      let startX
-      let startY
-      let marble
-
-      function start() {
-        startX = mouseX
-        startY = mouseY
-        marble = circle(startX, startY, 50)
-      }
-
-      function dragging() {
-        if (mouseButton) {
-          marble.x = mouseX
-          marble.y = mouseY
-        }
-      }
-
-      function release() {
-        marble.push(startX - mouseX, startY - mouseY)
-      }
-
-      on('mousedown', start)
-      on('mousemove', dragging)
-      on('mouseup', release)*/
 
     </script>
   </body>

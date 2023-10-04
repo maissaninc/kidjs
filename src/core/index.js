@@ -101,7 +101,6 @@ export function init() {
     },
 
     onframe: function() {
-      window.dispatchEvent(new Event('animationframe'));
       for (let i = 0; i < triggers.length; i++) {
         try {
           if (window._kidjs_.eval(triggers[i].condition)) {

@@ -375,7 +375,7 @@ export default class Stage {
     for (let pair of event.pairs) {
       let a = this.findChildByBody(pair.bodyA);
       let b = this.findChildByBody(pair.bodyB);
-      if (a && b) {
+      if (a && b && a.collides && b.collides) {
         a.dispatchEvent(new CustomEvent('collision', { detail: b }));
         b.dispatchEvent(new CustomEvent('collision', { detail: a }));
       }

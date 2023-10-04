@@ -22,6 +22,7 @@ export default class Text extends Actor {
     this._textAlign = window.textAlign;
     this._textBaseline = window.textBaseline;
     this._ghost = true;
+    this._collides = false;
     this._boundingPolygon = [];
     this.updateMetrics();
   }

@@ -257,9 +257,13 @@ export default class Stage {
 
       // Update physics simulation
       this._leftWall.ghost = !window.walls;
+      this._leftWall.collides = window.walls;
       this._rightWall.ghost = !window.walls;
+      this._rightWall.collides = window.walls;
       this._ceiling.ghost = !window.ceiling;
+      this._ceiling.collides = window.ceiling;
       this._floor.ghost = !window.floor;
+      this._floor.collides = window.floor;
       this.engine.gravity.y = window.gravity;
       Matter.Engine.update(this.engine);
 

@@ -16,7 +16,6 @@
       floor = false
       ceiling = false
 
-      let computer = rect(width / 2, height - 50, width / 4, 20)
       let hits = 0
       let misses = 0
       let state
@@ -27,55 +26,56 @@
       display(width - 40, 40, misses)
       display(width / 2, height / 2, mode)
 
+      let paddle = rect(width / 2, height - 50, width / 4, 20)
       let ball = circle(width / 2, 50, 40)
+
 
       on('frame', checkBallPosition)
       ball.on('collision', onBounce)
+      launchBall()
 
       function onMouseMove() {
         if (mode == 'TRAINING') {
-          computer.x = mouseX
+          paddle.x = mouseX
         }
       }
 
       on('mousemove', onMouseMove)
 
       function onBounce() {
-        wait(0.01)
+        wait(0.05)
         state = [ball.x, ball.y, ball.velocity.x, ball.velocity.y];
-
         if (mode == 'AUTOPILOT') {
+          console.log(state[2] + ',' + state[3])
           let x = net.run(state)
-          computer.moveTo(x, computer.y)
+          paddle.moveTo(x, paddle.y)
         }
       }
 
+      function launchBall() {
+        ball.x = random(0, width)
+        ball.y = 50
+        ball.speed = random(5, 10)
+        ball.direction = random(45, 135)
+        onBounce()
+      }
 
       function checkBallPosition() {
-        if (ball.speed == 0) {
-          let pushX = random(-10, 10)
-          let pushY = random(2, 8)
-          ball.push(pushX, pushY)
-          onBounce()
-        }
-        if (ball.y < 0 || ball.y > height) {
-            ball.speed = 0
-            ball.x = random(0, width)
-            ball.y = 50
+        if (ball.y < 0 ) {
+          hits = hits + 1
+          launchBall()
         }
         if (ball.y > height) {
           misses = misses + 1
+          launchBall()
         }
       }
 
       function success() {
-          hits = hits + 1
-          net.train(state, computer.x)
+        net.train(state, paddle.x)
       }
 
-      computer.on('collision', success)
-
-      ball.on('move', checkBallPosition)
+      paddle.on('collision', success)
 
       function startGame() {
         mode = 'AUTOPILOT'

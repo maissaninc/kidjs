@@ -30,7 +30,7 @@
       let ball = circle(width / 2, 50, 40)
 
 
-      on('frame', checkBallPosition)
+      ball.on('move', checkBallPosition)
       ball.on('collision', onBounce)
       launchBall()
 
@@ -61,6 +61,7 @@
       }
 
       function checkBallPosition() {
+        console.log(ball.y)
         if (ball.y < 0 ) {
           hits = hits + 1
           launchBall()

@@ -52,8 +52,6 @@ export default class Stage {
    */
   resize(width, height) {
 
-    console.log(width, height);
-
     // If no width or height default to window size
     if (!parseInt(width)) width = window.innerWidth;
     if (!parseInt(height)) height = window.innerHeight;
@@ -159,8 +157,6 @@ export default class Stage {
     log('Stage cleared');
     this.actors = [];
     Matter.Composite.clear(this.engine.world);
-
-    console.log(window._kidjs_.settings);
 
     // Add walls
     this._leftWall = rect(-WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
@@ -283,7 +279,7 @@ export default class Stage {
         actor.update();
 
         // Render
-        if (!actor.invisible) {
+        if (actor.visible) {
           actor.render(this.context);
         }
       }

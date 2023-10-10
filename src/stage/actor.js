@@ -24,6 +24,7 @@ export default class Actor {
     this._bounciness = 0.8;
     this._ghost = false;
     this._collides = true;
+    this._visible = true;
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -121,7 +122,7 @@ export default class Actor {
   }
 
   get collides() {
-    return this._collides;
+    return this._collides && this._visible;
   }
 
   set direction(value) {
@@ -194,6 +195,29 @@ export default class Actor {
       return v.length;
     }
     return 0;
+  }
+
+  set visible(value) {
+    this._visible = value;
+    if (this.body) {
+      if (!value) {
+        this.body.isSensor = true;
+      } else {
+        this.body.isSensor = this._ghost;
+      }
+    }
+  }
+
+  get visible() {
+    return this._visible;
+  }
+
+  set invisible(value) {
+    this.visible = !value;
+  }
+
+  get invisible() {
+    return !this.visible;
   }
 
   /**

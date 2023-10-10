@@ -7,85 +7,40 @@
   <body>
     <script type="kidjs">
 
-      import "neural-network"
+      function placeDomino(x, y) {
+        let domino = rect(x, y, 20, 100)
+        domino.anchored = false
+        domino.bounciness = 0
+      }
 
-      let net = neuralNetwork()
+      for (let x = 200; x < width - 200; x = x + 60) {
+        placeDomino(x, 200)
+      }
+      
+      let startX
+      let startY
+      let marble
 
-      gravity = 0
-      friction = 0
-      floor = false
-      ceiling = false
+      function start() {
+        startX = mouseX
+        startY = mouseY
+        marble = circle(startX, startY, 50)
+      }
 
-      let hits = 0
-      let misses = 0
-      let state
-      let mode = 'TRAINING'
-
-      fontColor = 'lightgray'
-      display(40, 40, hits)
-      display(width - 40, 40, misses)
-      display(width / 2, height / 2, mode)
-
-      let paddle = rect(width / 2, height - 50, width / 4, 20)
-      let ball = circle(width / 2, 50, 40)
-
-
-      ball.on('move', checkBallPosition)
-      ball.on('collision', onBounce)
-      launchBall()
-
-      function onMouseMove() {
-        if (mode == 'TRAINING') {
-          paddle.x = mouseX
+      function dragging() {
+        if (mouseButton) {
+          marble.x = mouseX
+          marble.y = mouseY
         }
       }
 
-      on('mousemove', onMouseMove)
-
-      function onBounce() {
-        wait(0.05)
-        state = [ball.x, ball.y, ball.velocity.x, ball.velocity.y];
-        if (mode == 'AUTOPILOT') {
-          console.log(state[2] + ',' + state[3])
-          let x = net.run(state)
-          paddle.moveTo(x, paddle.y)
-        }
+      function release() {
+        marble.push(startX - mouseX, startY - mouseY)
       }
 
-      function launchBall() {
-        ball.x = random(0, width)
-        ball.y = 50
-        ball.speed = random(5, 10)
-        ball.direction = random(45, 135)
-        onBounce()
-      }
-
-      function checkBallPosition() {
-        console.log(ball.y)
-        if (ball.y < 0 ) {
-          hits = hits + 1
-          launchBall()
-        }
-        if (ball.y > height) {
-          misses = misses + 1
-          launchBall()
-        }
-      }
-
-      function success() {
-        net.train(state, paddle.x)
-      }
-
-      paddle.on('collision', success)
-
-      function startGame() {
-        mode = 'AUTOPILOT'
-        hits = 0
-        misses = 0
-      }
-
-      on('space', startGame)
-
+      on('mousedown', start)
+      on('mousemove', dragging)
+      on('mouseup', release)
 
     </script>
   </body>

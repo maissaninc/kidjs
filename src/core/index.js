@@ -160,14 +160,17 @@ export function init() {
 
     import: async function(library) {
       return new Promise(function(resolve, reject) {
-        if (!window._kidjs_.libraries.includes(library)) {
+        if (
+          ['neural-network'].includes(library) && 
+          !window._kidjs_.libraries.includes(library)
+        ) {
           let scriptEl = document.createElement('script');
           scriptEl.src = scriptPath + '/' + library + '.js';
           scriptEl.onload = resolve;
           document.body.appendChild(scriptEl); 
           window._kidjs_.libraries.push(library);
         } else {
-          reject();
+          resolve();
         }
       });   
     },

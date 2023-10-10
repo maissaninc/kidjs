@@ -279,7 +279,7 @@ export default class Stage {
         actor.update();
 
         // Render
-        if (actor.visible) {
+        if (!actor.invisible) {
           actor.render(this.context);
         }
       }

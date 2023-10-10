@@ -24,7 +24,6 @@ export default class Actor {
     this._bounciness = 0.8;
     this._ghost = false;
     this._collides = true;
-    this._visible = true;
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -122,7 +121,7 @@ export default class Actor {
   }
 
   get collides() {
-    return this._collides && this._visible;
+    return this._collides;
   }
 
   set direction(value) {
@@ -195,29 +194,6 @@ export default class Actor {
       return v.length;
     }
     return 0;
-  }
-
-  set visible(value) {
-    this._visible = value;
-    if (this.body) {
-      if (!value) {
-        this.body.isSensor = true;
-      } else {
-        this.body.isSensor = this._ghost;
-      }
-    }
-  }
-
-  get visible() {
-    return this._visible;
-  }
-
-  set invisible(value) {
-    this.visible = !value;
-  }
-
-  get invisible() {
-    return !this.visible;
   }
 
   /**
@@ -505,11 +481,34 @@ export default class Actor {
   }
 
   /**
+   * Hide actor.
+   */
+  hide() {
+    this.invisible = true;
+    if (this.body) {
+      this.body.isSensor = true
+      this.collides = false
+    } 
+  }
+
+  /**
+   * Show actor.
+   */
+  show() {
+    this.invisible = false;
+    if (this.body) {
+      this.body.isSensor = this._ghost;
+      this.collides = true;
+    } 
+  }
+
+  /**
    * Remove actor from stage.
    */
   remove() {
     window.stage.removeChild(this);
   }
+  
 
   /**
    * Assign properties of another actor to this one.

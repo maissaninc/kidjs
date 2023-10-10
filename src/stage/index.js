@@ -160,6 +160,8 @@ export default class Stage {
     this.actors = [];
     Matter.Composite.clear(this.engine.world);
 
+    console.log(window._kidjs_.settings);
+
     // Add walls
     this._leftWall = rect(-WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);
     this._rightWall = rect(this.width + WALL_DEPTH / 2, this.height / 2, WALL_DEPTH, this.height);

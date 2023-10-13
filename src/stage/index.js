@@ -257,9 +257,13 @@ export default class Stage {
 
       // Update physics simulation
       this._leftWall.ghost = !window.walls;
+      this._leftWall.collides = window.walls;
       this._rightWall.ghost = !window.walls;
+      this._rightWall.collides = window.walls;
       this._ceiling.ghost = !window.ceiling;
+      this._ceiling.collides = window.ceiling;
       this._floor.ghost = !window.floor;
+      this._floor.collides = window.floor;
       this.engine.gravity.y = window.gravity;
       Matter.Engine.update(this.engine);
 
@@ -267,7 +271,7 @@ export default class Stage {
       for (let actor of this.actors) {
 
         // If non-zero velocity, fire move event
-        if (actor.body && actor.body.velocity.x != 0 && actor.body.velocity.y != 0) {
+        if (actor.body && (actor.body.velocity.x != 0 || actor.body.velocity.y != 0)) {
           actor.dispatchEvent(new CustomEvent('move'));
         }
 
@@ -375,7 +379,7 @@ export default class Stage {
     for (let pair of event.pairs) {
       let a = this.findChildByBody(pair.bodyA);
       let b = this.findChildByBody(pair.bodyB);
-      if (a && b) {
+      if (a && b && a.collides && b.collides) {
         a.dispatchEvent(new CustomEvent('collision', { detail: b }));
         b.dispatchEvent(new CustomEvent('collision', { detail: a }));
       }

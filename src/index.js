@@ -70,7 +70,7 @@ window.KID = {
   run: run,
   stop: stop,
   settings: window._kidjs_.settings,
-  setAssetUrlFilter: setAssetUrlFilter
+  setAssetUrlFilter: setAssetUrlFilter,
 };
 
 window.debug = true;

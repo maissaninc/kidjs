@@ -36,6 +36,11 @@ let parentSetInterval;
 let intervals = [];
 let urlFilter;
 
+// Determine script root
+let scripts = document.getElementsByTagName('script');
+let scriptSrc = scripts[scripts.length - 1].src;
+let scriptPath = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
+
 export function init() {
   window._kidjs_ = {
     settings: {
@@ -88,10 +93,14 @@ export function init() {
         window.join = join;
         window.send = send;
       }
+
+      // From other libraries
+      for (let i = 0; i < window._kidjs_.hooks.setGlobals.length; i = i + 1) {
+        window._kidjs_.hooks.setGlobals[0]();
+      }
     },
 
     onframe: function() {
-      window.dispatchEvent(new Event('animationframe'));
       for (let i = 0; i < triggers.length; i++) {
         try {
           if (window._kidjs_.eval(triggers[i].condition)) {
@@ -147,6 +156,29 @@ export function init() {
       new KidjsError(e.message, lineNumber);
     },
 
+    libraries: [],
+
+    import: async function(library) {
+      return new Promise(function(resolve, reject) {
+        if (
+          ['neural-network'].includes(library) && 
+          !window._kidjs_.libraries.includes(library)
+        ) {
+          let scriptEl = document.createElement('script');
+          scriptEl.src = scriptPath + '/' + library + '.js';
+          scriptEl.onload = resolve;
+          document.body.appendChild(scriptEl); 
+          window._kidjs_.libraries.push(library);
+        } else {
+          resolve();
+        }
+      });   
+    },
+
+    hooks: {
+      setGlobals: []
+    },
+
     seed: Date.now(),
     sourceMap: []
   };
@@ -191,7 +223,8 @@ async function compile(code) {
   try {
     ast = acorn.parse(code, {
       locations: true,
-      onComment: comments
+      onComment: comments,
+      sourceType: 'module'
     });
   } catch(e) {
     window._kidjs_.error(e);
@@ -202,6 +235,9 @@ async function compile(code) {
   // Keep track of functions converted to async
   let convertedFunctions = [];
 
+  // Keep track of libraries to import
+  let libraries = [];
+
   // Walk entire source tree
   walk.full(ast, function(node) {
 
@@ -210,6 +246,13 @@ async function compile(code) {
 
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
+
+        // Import library
+        if (node.body[i].type == 'ImportDeclaration') {
+          libraries.push(node.body[i].source.value);
+          node.body.splice(i, 1);
+          continue;
+        }
 
         // Check if call to on() method
         let target = isNodeMethod('on', node.body[i]);
@@ -358,6 +401,11 @@ async function compile(code) {
 
   // Generate source map
   window._kidjs_.sourceMap = generateSourceMap(processed, 15);
+
+  // Load libraries
+  for (let i = 0; i < libraries.length; i = i + 1) {
+    await window._kidjs_.import(libraries[i]);
+  }
 
   return `
     (async function() {

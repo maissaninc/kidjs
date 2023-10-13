@@ -36,8 +36,6 @@ export default class Oval extends Shape {
 
   explode() {
 
-    console.log('eplode');
-
     // Don't explode twice
     if (this.exploded) return;
     this.exploded = true;
@@ -78,8 +76,6 @@ export default class Oval extends Shape {
       fragment.angularVelocity = Math.random() * 5;
       fragments.push(fragment);
     }
-
-    console.log(fragments);
 
     // Remove self from stage
     this.remove();

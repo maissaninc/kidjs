@@ -23,6 +23,7 @@ export default class Actor {
     this.spinnable = true;
     this._bounciness = 0.8;
     this._ghost = false;
+    this._collides = true;
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -113,6 +114,14 @@ export default class Actor {
 
   get bounciness() {
     return this.body ? this.body.restitution : 0;
+  }
+
+  set collides(value) {
+    this._collides = value;
+  }
+
+  get collides() {
+    return this._collides;
   }
 
   set direction(value) {
@@ -472,11 +481,34 @@ export default class Actor {
   }
 
   /**
+   * Hide actor.
+   */
+  hide() {
+    this.invisible = true;
+    if (this.body) {
+      this.body.isSensor = true
+      this.collides = false
+    } 
+  }
+
+  /**
+   * Show actor.
+   */
+  show() {
+    this.invisible = false;
+    if (this.body) {
+      this.body.isSensor = this._ghost;
+      this.collides = true;
+    } 
+  }
+
+  /**
    * Remove actor from stage.
    */
   remove() {
     window.stage.removeChild(this);
   }
+  
 
   /**
    * Assign properties of another actor to this one.

@@ -28,7 +28,7 @@ export default class Style {
     this.context.fillStyle = color;
     this.context.fill();
     this.context.fillStyle = this.texture.pattern;
-    this.context.globalAlpha = this.texture.opacity;
+    this.context.globalAlpha = this.context.globalAlpha * this.texture.opacity;
     this.context.globalCompositeOperation = 'overlay';
     this.context.fill();
     this.context.globalAlpha = 1;

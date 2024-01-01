@@ -7,6 +7,7 @@ export default class Shape extends Actor {
     this.fill = window.fill;
     this.stroke = window.stroke;
     this.lineWidth = window.lineWidth;
+    this.opacity = 1;
     this.themeColor = false;
     this._fragments = [];
   }
@@ -91,6 +92,7 @@ export default class Shape extends Actor {
     }
 
     context.beginPath();
+    context.globalAlpha = this.opacity;
   }
 
   postrender(context) {

@@ -343,14 +343,15 @@ export default class Stage {
       for (let listener of this.eventListeners[event.type]) {
         if (typeof listener.handler == 'function') {
 
-          // Swtich on event object type
+          // Switch on event object type
           switch (event.constructor.name) {
             case 'KeyboardEvent':
               listener.handler.call(context, event.key);
               return;
             case 'MouseEvent':
             case 'PointerEvent':
-              listener.handler.call(context, event.x, event.y);
+              let position = this.toStageCoordinates(event.x, event.y);
+              listener.handler.call(context, position.x, position.y);
               return;
           }
 
@@ -383,6 +384,41 @@ export default class Stage {
         a.dispatchEvent(new CustomEvent('collision', { detail: b }));
         b.dispatchEvent(new CustomEvent('collision', { detail: a }));
       }
+    }
+  }
+
+  /**
+   * Translate page coordinates to scene coordinates.
+   * 
+   * @param {int} [x] - X coordinate
+   * @param {int} [y] - Y coordinate
+   * @return {object} Translated coordinates
+   */
+  toStageCoordinates(x, y) {
+
+    // Get bounding box of canvas
+    let canvasRect = this.canvas.getBoundingClientRect();
+    
+    // Determine contained size of canvas
+    let ratio = this.width / this.height;
+    let w = canvasRect.height * ratio;
+    let h = canvasRect.height
+    if (w > canvasRect.width) {
+      w = canvasRect.width;
+      h = canvasRect.width / ratio;
+    }
+
+    // Determine offset
+    let offsetX = (canvasRect.width - w) / 2;
+    let offsetY = (canvasRect.height - h) / 2;
+
+    // Translate and scale
+    let x2 = (this.width / w) * (x - offsetX);
+    let y2 = (this.height / h) * (y - offsetY);
+
+    return {
+      x: x2,
+      y: y2
     }
   }
 }

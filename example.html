@@ -7,109 +7,40 @@
   <body>
     <script type="kidjs">
 
-      gravity = 0
-      friction = 0
-  
-      let dead = false
-  
-      let scale = 0.5
-  
-      let ershoot=triangle(370*scale,270*scale,40*scale,80*scale)
-      ershoot.color='lightsteelblue'
-      let ershoot2=triangle(430*scale,270*scale,40*scale,80*scale)
-      ershoot2.color='lightsteelblue'
-      let shipspace=triangle(400*scale,300*scale,150*scale)
-      shipspace.color='slategrey'
-      let wodniw=triangle(400*scale,250*scale,30*scale)
-      wodniw.color='aliceblue'
-      let pilotshipspace=circle(400*scale,250*scale,10*scale)
-      pilotshipspace.color='midnightblue'
-      let shotgun=circle(370*scale,235*scale,10*scale)
-      shotgun.color='red'
-      let shotgun2=circle(430*scale,235*scale,10*scale)
-      shotgun2.color='red'
-      let ershoot3formplat= circle(400*scale,315*scale,30*scale)
-      ershoot3formplat.color='lightsteelgrey'
-      let ershoot3=rectangle(400*scale,305*scale,10*scale,25*scale)
-      ershoot3.color='dimgrey'
-      let shotgunmain=semicircle(400*scale,290*scale,10*scale)
-      shotgunmain.angle=180
-      shotgunmain.color='red'
-      let flamered=triangle(400*scale,385*scale,90*scale,100*scale)
-      flamered.angle=180
-      flamered.color='red'
-      let flameorange=triangle(400*scale,375*scale,70*scale,80*scale)
-      flameorange.angle=180
-      flameorange.color='orangered'
-      let flameyellow=triangle(400*scale,360*scale,40*scale,50*scale)
-      flameyellow.angle=180
-      flameyellow.color='orange'
-      let flamewhite=triangle(400*scale,350*scale,20*scale,30*scale)
-      flamewhite.angle=180
-      flamewhite.color='white'
-  
-      let ship = group(ershoot, ershoot2, shipspace, wodniw, pilotshipspace, shotgun, shotgun2, ershoot3formplat, ershoot3, shotgunmain, flamered, flameorange, flameyellow, flamewhite)
-      ship.x = width / 2
-      ship.y = height / 2
-  
-      ship.on('collision', function(obj) {
-          if (obj.constructor.name == 'Circle') {
-              ship.explode()
-              dead = true
-          }
-      })
-  
-      function deg2Rad(deg) {
-          return deg * Math.PI / 180
+      function placeDomino(x, y) {
+        let domino = rect(x, y, 20, 100)
+        domino.anchored = false
+        domino.bounciness = 0
       }
-  
-      function fire() {
-          if (!dead) {
-              let a = ship.angle - 90
-              let x = ship.x + Math.cos(deg2Rad(a)) * 45
-              let y = ship.y + Math.sin(deg2Rad(a)) * 45
-              let bullet = circle(x, y, 10)
-              bullet.speed = 3
-              bullet.direction = a
-              bullet.on('collision', function(obj) {
-                  if (obj.constructor.name == 'Circle') {
-                      obj.explode()
-                      setTimeout(function() {
-                          obj.remove()
-                      }, 1000)
-                  }
-                  this.remove()
-              });
-          }
+
+      for (let x = 200; x < width - 200; x = x + 60) {
+        placeDomino(x, 200)
       }
-  
-      function keydown(key) {
-          if (key == 'a' || key == 'A') {
-              ship.angle = ship.angle - 2
-          }
-          if (key == 'd' || key == 'D') {
-              ship.angle = ship.angle + 2
-          }
+      
+      let startX
+      let startY
+      let marble
+
+      function start() {
+        startX = mouseX
+        startY = mouseY
+        marble = circle(startX, startY, 50)
       }
-  
-      on('keydown', keydown)
-      on('s', fire)
-  
-      for (let i = 0; i < 10; i = i + 1) {
-          let distance = 0
-          let x, y
-          while (distance < 200) {
-              x = random(80, width - 80)
-              y = random(80, height - 80)
-              distance = Math.sqrt(Math.pow(x - width / 2, 2) + Math.pow(y - height / 2, 2))
-          }
-          let size = random(10, 40)
-          let asteroid = circle(x, y, size)
-          asteroid.speed = random(1, 5) / 10
-          asteroid.direction = random(360)
-          asteroid.bounciness = 1
+
+      function dragging() {
+        if (mouseButton) {
+          marble.x = mouseX
+          marble.y = mouseY
+        }
       }
-  
+
+      function release() {
+        marble.push(startX - mouseX, startY - mouseY)
+      }
+
+      on('mousedown', start)
+      on('mousemove', dragging)
+      on('mouseup', release)
 
     </script>
   </body>

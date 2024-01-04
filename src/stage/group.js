@@ -32,11 +32,7 @@ export default class Group extends Actor {
   }
 
   get angle() {
-    let total = 0;
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      total += this.children[i].angle;
-    }
-    return total / this.children.length;
+    return this._angle;
   }
 
   set angle(value) {
@@ -49,6 +45,7 @@ export default class Group extends Actor {
       this.children[i].x = cp.x + v.x;
       this.children[i].y = cp.y + v.y;
     }
+    this._angle = value;
   }
 
   set x(value) {

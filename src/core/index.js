@@ -123,10 +123,13 @@ export function init() {
 
       // Watch for freeze ups
       let lapsed = Date.now() - window._kidjs_.stats.lastFrame;
-      if (lapsed > 1000) {
+      if (!document.hidden && lapsed > 1000) {
         stop();
         throw new KidjsError('Freeze detected');
       }
+      document.addEventListener('visibilitychange', function() {
+        window._kidjs_.stats.lastFrame = Date.now();
+      });
 
       window.dispatchEvent(new CustomEvent('KID.step', {
         detail: {

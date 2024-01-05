@@ -550,31 +550,33 @@ function createStepStatement(location, info) {
  * @param {Object} ast - Expression tree
  */
 function insertStepStatements(ast) {
-  for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
+  if (ast.body) {
+    for (let i = ast.body.length - 1; i >= 0; i = i - 1) {
 
-    // Insert step statement after
-    if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
-      let info = {};
-      if (ast.body[i].type == 'ExpressionStatement' && ast.body[i].expression.callee) {
-        info.callee = ast.body[i].expression.callee.name;
+      // Insert step statement after
+      if (['ExpressionStatement', 'VariableDeclaration'].includes(ast.body[i].type)) {
+        let info = {};
+        if (ast.body[i].type == 'ExpressionStatement' && ast.body[i].expression.callee) {
+          info.callee = ast.body[i].expression.callee.name;
+        }
+        ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc, info));
       }
-      ast.body.splice(i + 1, 0, createStepStatement(ast.body[i].loc, info));
-    }
 
-    // Recursively insert step statements inside blocks
-    if (['ForStatement', 'WhileStatement', 'DoWhileStatement', 'FunctionDeclaration'].includes(ast.body[i].type)) {
-      if (typeof ast.body[i].body != undefined) {
-        insertStepStatements(ast.body[i].body);
+      // Recursively insert step statements inside blocks
+      if (['ForStatement', 'WhileStatement', 'DoWhileStatement', 'FunctionDeclaration'].includes(ast.body[i].type)) {
+        if (typeof ast.body[i].body != undefined) {
+          insertStepStatements(ast.body[i].body);
+        }
       }
-    }
 
-    // Recursively insert step statements into if blocks
-    if (ast.body[i].type == 'IfStatement') {
-      if (ast.body[i].consequent) {
-        insertStepStatements(ast.body[i].consequent);
-      }
-      if (ast.body[i].alternate) {
-        insertStepStatements(ast.body[i].alternate);
+      // Recursively insert step statements into if blocks
+      if (ast.body[i].type == 'IfStatement') {
+        if (ast.body[i].consequent) {
+          insertStepStatements(ast.body[i].consequent);
+        }
+        if (ast.body[i].alternate) {
+          insertStepStatements(ast.body[i].alternate);
+        }
       }
     }
   }

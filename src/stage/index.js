@@ -1,6 +1,5 @@
-import { evaluateTriggers } from '../core';
+import { updateGroups } from './group';
 import { resetCursor } from '../text';
-import Rect from '../shape/rect';
 import Matter from 'matter-js';
 import { log } from '../debug';
 
@@ -245,6 +244,9 @@ export default class Stage {
       } else {
         this.context.clearRect(0, 0, this.width, this.height);
       }
+
+      // Update groups
+      updateGroups();
 
       // Detect change in friction
       if (window.friction != this.previousFriction) {

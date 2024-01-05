@@ -3,6 +3,7 @@ import Matter from 'matter-js';
 import Vector from '../core/vector';
 
 let counter = 0;
+let groups = [];
 
 export default class Group extends Actor {
 
@@ -18,6 +19,10 @@ export default class Group extends Actor {
     this.children = [];
     this.constraints = [];
     this._anchored = true;
+
+    this._deltaX = 0;
+    this._deltaY = 0;
+    this._deltaAngle = 0;
   }
 
   set anchored(value) {
@@ -36,23 +41,11 @@ export default class Group extends Actor {
   }
 
   set angle(value) {
-    let cp = new Vector(this.x, this.y);
-    let delta = value - this.angle;
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].angle += delta;
-      let v = this.children[i].position.subtract(cp);
-      v = v.rotate(delta)
-      this.children[i].x = cp.x + v.x;
-      this.children[i].y = cp.y + v.y;
-    }
-    this._angle = value;
+    this._deltaAngle = value - this.angle;
   }
 
   set x(value) {
-    let delta = value - this.x;
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].x += delta;
-    }
+    this._deltaX = value - this.x;
   }
 
   get x() {
@@ -64,10 +57,7 @@ export default class Group extends Actor {
   }
 
   set y(value) {
-    let delta = value - this.y;
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].y += delta;
-    }
+    this._deltaY = value - this.y;
   }
 
   get y() {
@@ -100,6 +90,28 @@ export default class Group extends Actor {
       }
     }
     return bounds;
+  }
+
+  /**
+   * Update the position and orientation of group.
+   * This is called each frame.
+   */
+  update() {
+
+    // Update children
+    let cp = new Vector(this.x, this.y);
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].angle += this._deltaAngle;
+      let v = this.children[i].position.subtract(cp);
+      v = v.rotate(this._deltaAngle)
+      this.children[i].x = cp.x + v.x + this._deltaX;
+      this.children[i].y = cp.y + v.y + this._deltaY;
+    }
+
+    this._angle = this._angle + this._deltaAngle;
+    this._deltaAngle = 0;
+    this._deltaX = 0;
+    this._deltaY = 0;
   }
 
   /**
@@ -181,6 +193,9 @@ export default class Group extends Actor {
     for (let i = 0; i < this.children.length; i = i + 1) {
       window.stage.removeChild(this.children[i]);
     }
+    groups = groups.filter(function(item) {
+      return item.id != this.id;
+    });
     this.children = [];
   }
 
@@ -219,6 +234,7 @@ export default class Group extends Actor {
       Matter.Composite.add(window.stage.engine.world, constraint);
     }
 
+    groups.push(group);
     return group;
   }
 }
@@ -231,5 +247,12 @@ export function group(...actors) {
       Matter.Composite.add(window.stage.engine.world, constraint);
     }
   }
+  groups.push(group);
   return group;
+}
+
+export function updateGroups() {
+  for (let i = 0; i < groups.length; i = i + 1) {
+    groups[i].update();
+  }
 }

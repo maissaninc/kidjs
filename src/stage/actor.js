@@ -269,6 +269,30 @@ export default class Actor {
   }
 
   /**
+   * Move forward in the direction of current rotation.
+   *
+   * @param {float} distance - Number of pixels to move
+   * @return {Actor} Reference to self
+   */
+  forward(distance) {
+    this.x = this.x + Math.cos(degreesToRadians(this.angle)) * distance;
+    this.y = this.y + Math.sin(degreesToRadians(this.angle)) * distance;
+    return this;
+  }
+
+  /**
+   * Move backward in the direction of current rotation.
+   *
+   * @param {float} distance - Number of pixels to move
+   * @return {Actor} Reference to self
+   */
+  backward(distance) {
+    this.x = this.x - Math.cos(degreesToRadians(this.angle)) * distance;
+    this.y = this.y - Math.sin(degreesToRadians(this.angle)) * distance;
+    return this;
+  }
+
+  /**
    * Add animation.
    *
    * @param {object} properties - Properties to animate

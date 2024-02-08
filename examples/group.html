@@ -36,13 +36,16 @@
 
       function move(key) {
         if (key == 'ArrowLeft') {
-          spaceship.angle = spaceship.angle - 2
+          spaceship.rotate(2)
         }
         if (key == 'ArrowRight') {
-          spaceship.angle = spaceship.angle + 2
+          spaceship.rotate(-2)
         }
         if (key == 'ArrowUp') {
           spaceship.forward(2)
+        }
+        if (key == 'ArrowDown') {
+          spaceship.backward(2)
         }
       }
 

@@ -140,17 +140,27 @@ export default class Shape extends Actor {
   clone(x = false, y = false) {
     if (this.body) {
       let width = this.body.bounds.max.x - this.body.bounds.min.x;
-      let copy = new this.copy();
+      let copy = this.copy();
       copy.assign(this);
+
+      // Set position of cline
       if (x !== false && y !== false) {
         copy.x = x;
         copy.y = y;
       } else {
-        this.x = this.x + width + 5;
+        copy.x = this.x + width + 5;
       }
+
+      // Copy properties
       copy.init();
       copy.angle = this.angle;
       copy.anchored = this.anchored;
+      copy.fill = this.fill;
+      copy.stroke = this.stroke;
+      copy.lineWidth = this.lineWidth;
+      copy.opacity = this.opacity;
+
+      // Add clone to stage
       window.stage.addChild(copy);
       return copy;
     }

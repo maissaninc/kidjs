@@ -261,9 +261,9 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   rotate(degrees) {
-    this._angle = this._angle + degrees;
+    this.angle = this.angle + degrees;
     if (this.body) {
-      Matter.Body.setAngle(this.body, degreesToRadians(this._angle));
+      Matter.Body.setAngle(this.body, degreesToRadians(this.angle));
     }
     return this;
   }

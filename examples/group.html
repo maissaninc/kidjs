@@ -51,6 +51,12 @@
 
       on('keydown', move)
 
+      function crash() {
+        spaceship.anchored = false
+      }
+
+      on('click', crash)
+
     </script>
   </body>
 </html>

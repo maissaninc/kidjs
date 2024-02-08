@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Dominos</title>
+    <script src="../dist/kid.js"></script>
+  </head>
+  <body>
+    <script type="kidjs">
+
+      let flame1 = oval(400, 470, 20, 100)
+      flame1.color = 'red'
+    
+      let flame2 = oval(400, 470, 12, 50)
+      flame2.color = 'orange'
+    
+      let shipBody = triangle(400, 400, 60, 100)
+      shipBody.color = 'olivedrab'
+
+      let leftWing = triangle(350, 450, 30, 100)
+      leftWing.color = 'olivedrab'
+      leftWing.angle = -110
+    
+      let rightWing = triangle(450, 450, 30, 100)
+      rightWing.color = 'olivedrab'
+      rightWing.angle = 110
+    
+      let shipWindow = triangle(400, 390, 15, 30)
+      shipWindow.color = 'white'
+    
+      let burner = rect(400, 457, 30, 15)
+      burner.color = 'lightgray'
+
+      let spaceship = group(flame1, flame2, shipBody, leftWing, rightWing, shipWindow, burner);
+      spaceship.x = width / 2
+      spaceship.y = height / 2
+
+      function move(key) {
+        if (key == 'ArrowLeft') {
+          spaceship.angle = spaceship.angle - 2
+        }
+        if (key == 'ArrowRight') {
+          spaceship.angle = spaceship.angle + 2
+        }
+        if (key == 'ArrowUp') {
+          spaceship.forward(2)
+        }
+      }
+
+      on('keydown', move)
+
+    </script>
+  </body>
+</html>

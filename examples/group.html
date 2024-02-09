@@ -7,6 +7,8 @@
   <body>
     <script type="kidjs">
 
+      let platform = rect(width / 2, height - 200, width - 100, 20)
+
       let flame1 = oval(400, 470, 20, 100)
       flame1.color = 'red'
     
@@ -33,6 +35,7 @@
       let spaceship = group(flame1, flame2, shipBody, leftWing, rightWing, shipWindow, burner);
       spaceship.x = width / 2
       spaceship.y = height / 2
+      //spaceship.anchored = false
 
       function move(key) {
         if (key == 'ArrowLeft') {
@@ -56,6 +59,13 @@
       }
 
       on('click', crash)
+
+      spaceship.on('collision', function() {
+        console.log('Collide');
+      });
+
+      let ball = circle(200,200,30)
+      ball.anchored = false
 
     </script>
   </body>

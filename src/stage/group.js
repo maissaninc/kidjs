@@ -1,6 +1,5 @@
 import Actor from './actor';
 import Matter from 'matter-js';
-import Vector from '../core/vector';
 
 let counter = 0;
 let groups = [];
@@ -35,17 +34,13 @@ export default class Group extends Actor {
    * @param {CanvasRenderingContext2D} context - Context to render on.
    */
   render(context) {
+    context.beginPath();
+    context.rect(this.bounds.min.x, this.bounds.min.y, this.bounds.max.x - this.bounds.min.x, this.bounds.max.y - this.bounds.min.y);
+    context.strokeStyle = 'yellow';
+    context.lineWidth = 2;
+    context.stroke();
     for (let i = 0; i < this.children.length; i = i + 1) {
       this.children[i].render(context);
-    }
-  }
-
-  /**
-   * Update group properties based on physics bodies.
-   */
-  update() {
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].update();
     }
   }
 
@@ -55,18 +50,28 @@ export default class Group extends Actor {
    * @param {Actor} actor - Actor to add to the group.
    */
   addChild(actor) {
-    if (actor.body) {
-      Matter.Body.setParts(this.body, [...this.body.parts, actor.body]);
-    }
+
+    // Add to group and remove from stage
     this.children.push(actor);
     window.stage.removeChild(actor);
+
+    // Update parts in body
+    let bodies = [];
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      if (this.children[i].body) {
+        bodies.push(this.children[i].body);
+      }
+    }
+    Matter.Body.setParts(this.body, bodies);
   }
 
   /**
    * Explode group.
    */
   explode() {
+    window.stage.removeChild(group);
     for (let i = 0; i < this.children.length; i = i + 1) {
+      window.stage.addChild(this.children[i]);
       if (typeof this.children[i].explode == 'function') {
         this.children[i].explode();
       }
@@ -103,7 +108,6 @@ export default class Group extends Actor {
       copy.angle = this.children[i].angle;
       copy.anchored = this.children[i].anchored;
       group.addChild(copy);
-      window.stage.addChild(copy);
     }
 
     // Position group
@@ -115,6 +119,7 @@ export default class Group extends Actor {
     }
 
     groups.push(group);
+    window.stage.addChild(group);
     return group;
   }
 }

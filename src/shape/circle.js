@@ -2,7 +2,6 @@ import Shape from './';
 import Matter from 'matter-js';
 import Pie from './pie';
 import Vector from '../core/vector';
-import { degreesToRadians } from '../core/math';
 import { parseLength } from '../core/units';
 
 export default class Circle extends Shape {

@@ -118,6 +118,10 @@ export default class Actor {
     return this.body ? this.body.restitution : 0;
   }
 
+  get bounds() {
+    return this.body ? this.body.bounds : undefined;
+  }
+
   set collides(value) {
     this._collides = value;
   }

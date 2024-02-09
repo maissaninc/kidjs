@@ -59,12 +59,6 @@ export default class Shape extends Actor {
     this.fill = value;
   }
 
-  get bounds() {
-    if (this.body) {
-      return this.body.bounds;
-    }
-  }
-
   prerender(context) {
 
     // Create default style

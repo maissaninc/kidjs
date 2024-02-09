@@ -36,10 +36,6 @@ export default class Group extends Actor {
     });
   }
 
-  get bounds() {
-    return this.body.bounds;
-  }
-
   /**
    * Render group.
    *

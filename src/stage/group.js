@@ -17,11 +17,36 @@ export default class Group extends Actor {
     counter = counter + 1;
     this.id = counter;
     this.children = [];
-    this.body = Matter.Body.create();
+    this.body = Matter.Body.create({
+      friction: window.friction,
+      frictionStatic: window.friction,
+      frictionAir: 0,
+      isStatic: true
+    });
   }
 
   get bounds() {
     return this.body.bounds;
+  }
+
+  /**
+   * Render group.
+   *
+   * @param {CanvasRenderingContext2D} context - Context to render on.
+   */
+  render(context) {
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].render(context);
+    }
+  }
+
+  /**
+   * Update group properties based on physics bodies.
+   */
+  update() {
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      this.children[i].update();
+    }
   }
 
   /**
@@ -34,23 +59,7 @@ export default class Group extends Actor {
       Matter.Body.setParts(this.body, [...this.body.parts, actor.body]);
     }
     this.children.push(actor);
-  }
-
-  /**
-   * Add event listener to all children.
-   *
-   * @param {string} [event] - Name of event.
-   * @param {function} [handler] - Event handler to execute when event occurs.
-   */
-  on(event, handler) {
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].addEventListener(event, function(...args) {
-        handler.apply(this, args);
-      }.bind(this), {
-        canonicalHandler: handler,
-        group: this
-      });
-    }
+    window.stage.removeChild(actor);
   }
 
   /**
@@ -68,9 +77,7 @@ export default class Group extends Actor {
    * Remove group.
    */
   remove() {
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      window.stage.removeChild(this.children[i]);
-    }
+    window.stage.removeChild(this);
     groups = groups.filter(function(item) {
       return item.id != this.id;
     });
@@ -118,11 +125,6 @@ export function group(...actors) {
     group.addChild(actor);
   }
   groups.push(group);
+  window.stage.addChild(group);
   return group;
-}
-
-export function updateGroups() {
-  for (let i = 0; i < groups.length; i = i + 1) {
-    groups[i].update();
-  }
 }

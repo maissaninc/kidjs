@@ -275,8 +275,8 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   forward(distance) {
-    this.x = this.x + Math.cos(degreesToRadians(this.angle)) * distance;
-    this.y = this.y + Math.sin(degreesToRadians(this.angle)) * distance;
+    this.x = this.x + Math.cos(degreesToRadians(this.angle - 90)) * distance;
+    this.y = this.y + Math.sin(degreesToRadians(this.angle - 90)) * distance;
     return this;
   }
 
@@ -287,8 +287,8 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   backward(distance) {
-    this.x = this.x - Math.cos(degreesToRadians(this.angle)) * distance;
-    this.y = this.y - Math.sin(degreesToRadians(this.angle)) * distance;
+    this.x = this.x - Math.cos(degreesToRadians(this.angle - 90)) * distance;
+    this.y = this.y - Math.sin(degreesToRadians(this.angle - 90)) * distance;
     return this;
   }
 
@@ -532,7 +532,6 @@ export default class Actor {
   remove() {
     window.stage.removeChild(this);
   }
-  
 
   /**
    * Assign properties of another actor to this one.

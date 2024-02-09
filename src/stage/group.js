@@ -2,7 +2,6 @@ import Actor from './actor';
 import Matter from 'matter-js';
 
 let counter = 0;
-let groups = [];
 
 export default class Group extends Actor {
 
@@ -16,11 +15,24 @@ export default class Group extends Actor {
     counter = counter + 1;
     this.id = counter;
     this.children = [];
+  }
+
+  /**
+   * Initialize physics body.
+   */
+  init() {
+    let bodies = [];
+    for (let i = 0; i < this.children.length; i = i + 1) {
+      if (this.children[i].body) {
+        bodies.push(this.children[i].body);
+      }
+    }
     this.body = Matter.Body.create({
       friction: window.friction,
       frictionStatic: window.friction,
       frictionAir: 0,
-      isStatic: true
+      isStatic: true,
+      parts: bodies
     });
   }
 
@@ -45,27 +57,6 @@ export default class Group extends Actor {
   }
 
   /**
-   * Add an actor to the group.
-   *
-   * @param {Actor} actor - Actor to add to the group.
-   */
-  addChild(actor) {
-
-    // Add to group and remove from stage
-    this.children.push(actor);
-    window.stage.removeChild(actor);
-
-    // Update parts in body
-    let bodies = [];
-    for (let i = 0; i < this.children.length; i = i + 1) {
-      if (this.children[i].body) {
-        bodies.push(this.children[i].body);
-      }
-    }
-    Matter.Body.setParts(this.body, bodies);
-  }
-
-  /**
    * Explode group.
    */
   explode() {
@@ -83,9 +74,6 @@ export default class Group extends Actor {
    */
   remove() {
     window.stage.removeChild(this);
-    groups = groups.filter(function(item) {
-      return item.id != this.id;
-    });
     this.children = [];
   }
 
@@ -98,17 +86,17 @@ export default class Group extends Actor {
   clone(x = false, y = false) {
     let width = this.bounds.max.x - this.bounds.min.x;
     let group = new Group();
-    group.assign(this);
+    
+    // Copy children
     for (let i = 0; i < this.children.length; i = i + 1) {
-
-      // Copy of child
       let copy = this.children[i].copy();
       copy.assign(this.children[i]);
       copy.init();
       copy.angle = this.children[i].angle;
       copy.anchored = this.children[i].anchored;
-      group.addChild(copy);
+      group.children.push(copy);
     }
+    group.init();
 
     // Position group
     if (x !== false && y !== false) {
@@ -118,7 +106,6 @@ export default class Group extends Actor {
       this.x = this.x + width + 5;
     }
 
-    groups.push(group);
     window.stage.addChild(group);
     return group;
   }
@@ -126,10 +113,15 @@ export default class Group extends Actor {
 
 export function group(...actors) {
   let group = new Group();
-  for (const actor of actors) {
-    group.addChild(actor);
+  group.children = actors;
+
+  // Remove children from stage
+  for (let i = 0; i < actors.length; i = i + 1) {
+    window.stage.removeChild(actors[i]);
   }
-  groups.push(group);
+
+  // Initialize group and add to stage
+  group.init();
   window.stage.addChild(group);
   return group;
 }

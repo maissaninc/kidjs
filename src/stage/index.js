@@ -142,7 +142,7 @@ export default class Stage {
    */
   findChildByBody(body) {
     for (let actor of this.actors) {
-      if (actor.body && actor.body.id == body.id) {
+      if (actor.body && (actor.body.id == body.id || actor.body.id == body.parent.id)) {
         return actor;
       }
     }

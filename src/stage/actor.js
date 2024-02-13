@@ -54,7 +54,6 @@ export default class Actor {
   set x(value) {
     this.position.x = value;
     if (this.body) {
-      console.log(this.body);
       Matter.Body.setPosition(this.body, this.position);
     }
   }
@@ -62,7 +61,6 @@ export default class Actor {
   set y(value) {
     this.position.y = value;
     if (this.body) {
-      console.log(this.body);
       Matter.Body.setPosition(this.body, this.position);
     }
   }
@@ -281,8 +279,11 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   forward(distance) {
-    this.x = this.x + Math.cos(degreesToRadians(this.angle - 90)) * distance;
-    this.y = this.y + Math.sin(degreesToRadians(this.angle - 90)) * distance;
+    this.position.x = this.x + Math.cos(degreesToRadians(this.angle - 90)) * distance;
+    this.position.y = this.y + Math.sin(degreesToRadians(this.angle - 90)) * distance;
+    if (this.body) {
+      Matter.Body.setPosition(this.body, this.position);
+    }
     return this;
   }
 
@@ -293,8 +294,10 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   backward(distance) {
-    this.x = this.x - Math.cos(degreesToRadians(this.angle - 90)) * distance;
-    this.y = this.y - Math.sin(degreesToRadians(this.angle - 90)) * distance;
+    let x = this.x - Math.cos(degreesToRadians(this.angle - 90)) * distance;
+    let y = this.y - Math.sin(degreesToRadians(this.angle - 90)) * distance;
+    this.x = x;
+    this.y = y;
     return this;
   }
 

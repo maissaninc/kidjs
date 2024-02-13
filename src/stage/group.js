@@ -50,6 +50,15 @@ export default class Group extends Actor {
       context.strokeStyle = 'red';
       context.lineWidth = 0.5;
       context.stroke();
+      context.beginPath();
+      context.moveTo(this.body.vertices[0].x, this.body.vertices[0].y);
+      for (let i = 1; i < this.body.vertices.length; i = i + 1) {
+        context.lineTo(this.body.vertices[i].x, this.body.vertices[i].y);
+      }
+      context.closePath();
+      context.strokeStyle = 'orange';
+      context.stroke();
+
     }
 
     for (let i = 0; i < this.children.length; i = i + 1) {

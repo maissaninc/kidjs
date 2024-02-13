@@ -7,6 +7,8 @@
   <body>
     <script type="kidjs">
 
+      window.debug = true
+
       let platform = rect(width / 2, height - 200, width - 100, 20)
 
       let flame1 = oval(400, 470, 20, 100)
@@ -62,6 +64,10 @@
       spaceship.on('collision', function() {
         console.log('Collide');
       });
+
+      let a = triangle(800, 200, 50, 100)
+      a.angle = 40
+      a.anchored = false
 
 
     </script>

@@ -19,7 +19,7 @@ export default class Oval extends Shape {
         Math.sin(theta) * this.radiusY
       ));
     }
-    this.body =  Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
+    this.body = Matter.Bodies.fromVertices(this.position.x, this.position.y, this._boundingPolygon, {
       friction: window.friction,
       frictionStatic: window.friction,
       frictionAir: 0,
@@ -80,6 +80,13 @@ export default class Oval extends Shape {
     // Remove self from stage
     this.remove();
     this._fragments = fragments;
+  }
+
+  /**
+   * Copy shape.
+   */
+  copy() {
+    return new this.constructor(this.x, this.y, this.radiusX, this.radiusY);
   }
 }
 

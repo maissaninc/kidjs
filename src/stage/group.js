@@ -27,6 +27,8 @@ export default class Group extends Actor {
         bodies.push(this.children[i].body);
       }
     }
+    console.log(this.children);
+    console.log(bodies);
     this.body = Matter.Body.create({
       friction: window.friction,
       frictionStatic: window.friction,
@@ -113,7 +115,8 @@ export default class Group extends Actor {
       group.x = group.x - this.x + x;
       group.y = group.y - this.y + y;
     } else {
-      this.x = this.x + width + 5;
+      group.x = this.x + width + 5;
+      group.y = this.y;
     }
 
     window.stage.addChild(group);

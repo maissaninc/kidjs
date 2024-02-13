@@ -130,11 +130,22 @@ export default class Polygon extends Shape {
       return;
     }
     this.prerender(context);
-    let v = this.points[0].rotate(this.angle);
-    context.moveTo(this.x + v.x, this.y + v.y);
-    for (let point of this.points) {
-      v = point.rotate(this.angle);
-      context.lineTo(this.x + v.x, this.y + v.y);
+
+    // Use Matter.js vertices when available
+    if (this.body && this.body.vertices.length > 0) {
+      context.moveTo(this.body.vertices[0].x, this.body.vertices[0].y);
+      for (let i = 1; i < this.body.vertices.length; i = i + 1) {
+        context.lineTo(this.body.vertices[i].x, this.body.vertices[i].y);
+      }
+
+    // Otherwise use points array
+    } else {
+      let v = this.points[0].rotate(this.angle);
+      context.moveTo(this.x + v.x, this.y + v.y);
+      for (let point of this.points) {
+        v = point.rotate(this.angle);
+        context.lineTo(this.x + v.x, this.y + v.y);
+      }
     }
     this.postrender(context);
   }

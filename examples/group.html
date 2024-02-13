@@ -37,6 +37,7 @@
       let spaceship = group(flame1, flame2, shipBody, leftWing, rightWing, shipWindow, burner);
       spaceship.x = width / 2
       spaceship.y = height / 2
+      spaceship.angle = 10
 
       function move(key) {
         if (key == 'ArrowLeft') {
@@ -61,14 +62,20 @@
 
       on('click', crash)
 
-      spaceship.on('collision', function() {
-        spaceship.explode();
-      });
+      //spaceship.angularVelocity = 0.1
+      
+      on('animationframe', function() {
+        console.log(spaceship.body.angle, spaceship.body.parts[1].angle)
+      })
 
-      let a = triangle(800, 200, 50, 100)
-      a.angle = 40
-      a.anchored = false
 
+      let a = triangle(30, 30, 50)
+      let b = triangle(width - 30, 70, 50)
+      b.angle = 160
+      let c = group(a, b)
+      c.anchored = false
+
+      spaceship.clone()
 
     </script>
   </body>

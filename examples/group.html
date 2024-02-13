@@ -62,7 +62,7 @@
       on('click', crash)
 
       spaceship.on('collision', function() {
-        console.log('Collide');
+        spaceship.explode();
       });
 
       let a = triangle(800, 200, 50, 100)

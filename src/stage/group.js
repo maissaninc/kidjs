@@ -70,7 +70,7 @@ export default class Group extends Actor {
    * Explode group.
    */
   explode() {
-    window.stage.removeChild(group);
+    window.stage.removeChild(this);
     for (let i = 0; i < this.children.length; i = i + 1) {
       window.stage.addChild(this.children[i]);
       if (typeof this.children[i].explode == 'function') {

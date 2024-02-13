@@ -9,7 +9,7 @@
 
       window.debug = true
 
-      let platform = rect(width / 2, height - 200, width - 100, 20)
+      let platform = rect(width / 2, height - 200, width - 200, 20)
 
       let flame1 = oval(400, 470, 20, 100)
       flame1.color = 'red'
@@ -61,19 +61,6 @@
       }
 
       on('click', crash)
-
-      //spaceship.angularVelocity = 0.1
-      
-      on('animationframe', function() {
-        console.log(spaceship.body.angle, spaceship.body.parts[1].angle)
-      })
-
-
-      let a = triangle(30, 30, 50)
-      let b = triangle(width - 30, 70, 50)
-      b.angle = 160
-      let c = group(a, b)
-      c.anchored = false
 
       spaceship.clone()
 

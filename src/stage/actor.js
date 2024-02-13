@@ -172,6 +172,16 @@ export default class Actor {
     return this._ghost;
   }
 
+  set inertia(value) {
+    if (this.body) {
+      Matter.Body.setInertia(this.body, value);
+    }
+  }
+
+  get inertia() {
+    return this.body ? this.body.inertia : Infinity;
+  }
+
   set mass(value) {
     if (this.body) {
       Matter.Body.setMass(this.body, value);

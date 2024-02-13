@@ -27,14 +27,9 @@ export default class Group extends Actor {
         bodies.push(this.children[i].body);
       }
     }
-    console.log(this.children);
-    console.log(bodies);
     this.body = Matter.Body.create({
-      friction: window.friction,
-      frictionStatic: window.friction,
-      frictionAir: 0,
-      isStatic: true,
-      parts: bodies
+      isStatic: false,
+      parts: bodies,
     });
   }
 

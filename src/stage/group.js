@@ -24,11 +24,15 @@ export default class Group extends Actor {
     let bodies = [];
     for (let i = 0; i < this.children.length; i = i + 1) {
       if (this.children[i].body) {
+        this.children[i].anchored = false;
         bodies.push(this.children[i].body);
       }
     }
     this.body = Matter.Body.create({
-      isStatic: false,
+      friction: window.friction,
+      frictionStatic: window.friction,
+      frictionAir: 0,
+      isStatic: true,
       parts: bodies,
     });
   }
@@ -97,10 +101,8 @@ export default class Group extends Actor {
     // Copy children
     for (let i = 0; i < this.children.length; i = i + 1) {
       let copy = this.children[i].copy();
-      copy.assign(this.children[i]);
       copy.init();
-      copy.angle = this.children[i].angle;
-      copy.anchored = this.children[i].anchored;
+      copy.assign(this.children[i]);
       group.children.push(copy);
     }
     group.init();

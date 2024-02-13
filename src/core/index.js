@@ -156,7 +156,8 @@ export function init() {
           lineNumber = parseInt(match[1]);
         }
       }
-      console.log('Error: ' + e.message + ' at line ' + lineNumber);
+      console.error('Error: ' + e.message + ' at line ' + lineNumber);
+      console.error(e.stack);
       new KidjsError(e.message, lineNumber);
     },
 

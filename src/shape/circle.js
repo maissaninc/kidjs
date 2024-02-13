@@ -94,7 +94,9 @@ export default class Circle extends Shape {
    * Copy shape.
    */
   copy() {
-    return new this.constructor(this.x, this.y, this.radius);
+    let shape = new this.constructor(this.x, this.y, this.radius);
+    shape.assign(this);
+    return shape;
   }
 }
 

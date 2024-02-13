@@ -54,6 +54,10 @@
         }
       }
 
+      spaceship.on('collision', function() {
+        console.log('Collision', this.id)
+      })
+
       on('keydown', move)
 
       function crash() {
@@ -62,7 +66,11 @@
 
       on('click', crash)
 
-      spaceship.clone()
+      spaceship.anchored = false
+
+      wait(5)
+      let clone = spaceship.clone()
+      clone.anchored = false
 
     </script>
   </body>

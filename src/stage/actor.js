@@ -98,7 +98,7 @@ export default class Actor {
   }
 
   set anchored(value) {
-    if (this.body) {
+    if (this.body && value != this.anchored) {
       Matter.Body.setStatic(this.body, value);
       this.body.restitution = this._bounciness;
     }
@@ -568,6 +568,7 @@ export default class Actor {
     this.x = source.x;
     this.y = source.y;
     this.angle = source.angle;
+    this.anchored = source.anchored;
     for (let type in source.eventListeners) {
       this.eventListeners[type] = source.eventListeners[type].filter(
         item => !item.group

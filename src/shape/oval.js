@@ -86,7 +86,9 @@ export default class Oval extends Shape {
    * Copy shape.
    */
   copy() {
-    return new this.constructor(this.x, this.y, this.radiusX, this.radiusY);
+    let shape = new this.constructor(this.x, this.y, this.radiusX, this.radiusY);
+    shape.assign(this);
+    return shape;
   }
 }
 

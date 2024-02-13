@@ -119,7 +119,9 @@ export default class Shape extends Actor {
    * Copy shape.
    */
   copy() {
-    return new this.constructor(this.x, this.y);
+    let shape = new this.constructor(this.x, this.y);
+    shape.assign(this);
+    return shape;
   }
 
   /**
@@ -132,6 +134,7 @@ export default class Shape extends Actor {
     this.fill = source.fill;
     this.stroke = source.stroke;
     this.lineWidth = source.lineWidth;
+    this.opacity = source.opacity;
   }
 
   /**
@@ -156,12 +159,6 @@ export default class Shape extends Actor {
 
       // Copy properties
       copy.init();
-      copy.angle = this.angle;
-      copy.anchored = this.anchored;
-      copy.fill = this.fill;
-      copy.stroke = this.stroke;
-      copy.lineWidth = this.lineWidth;
-      copy.opacity = this.opacity;
 
       // Add clone to stage
       window.stage.addChild(copy);

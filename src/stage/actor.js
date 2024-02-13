@@ -66,7 +66,14 @@ export default class Actor {
   }
 
   get angle() {
-    return this.body ? radiansToDegrees(this.body.angle) : this._angle;
+    if (this.body) {
+      if (this.body.parent.id != this.body.id) {
+        return radiansToDegrees(this.body.parent.angle) + this._angle;
+      } else {
+        return radiansToDegrees(this.body.angle);
+      }
+    }
+    return this._angle;
   }
 
   set angle(value) {

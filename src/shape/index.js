@@ -94,11 +94,14 @@ export default class Shape extends Actor {
     this.style.fill(this.fill);
     this.style.stroke(this.stroke, this.lineWidth);
 
-    context.beginPath();
-    context.rect(this.bounds.min.x, this.bounds.min.y, this.bounds.max.x - this.bounds.min.x, this.bounds.max.y - this.bounds.min.y);
-    context.strokeStyle = 'black';
-    context.lineWidth = 2;
-    context.stroke();
+    // Debug information
+    if (window.debug) {
+      context.beginPath();
+      context.rect(this.bounds.min.x, this.bounds.min.y, this.bounds.max.x - this.bounds.min.x, this.bounds.max.y - this.bounds.min.y);
+      context.strokeStyle = 'black';
+      context.lineWidth = 0.5;
+      context.stroke();
+    }
   }
 
   /**

@@ -42,11 +42,16 @@ export default class Group extends Actor {
    * @param {CanvasRenderingContext2D} context - Context to render on.
    */
   render(context) {
-    context.beginPath();
-    context.rect(this.bounds.min.x, this.bounds.min.y, this.bounds.max.x - this.bounds.min.x, this.bounds.max.y - this.bounds.min.y);
-    context.strokeStyle = 'yellow';
-    context.lineWidth = 2;
-    context.stroke();
+
+    // Debug information
+    if (window.debug) {
+      context.beginPath();
+      context.rect(this.bounds.min.x, this.bounds.min.y, this.bounds.max.x - this.bounds.min.x, this.bounds.max.y - this.bounds.min.y);
+      context.strokeStyle = 'red';
+      context.lineWidth = 0.5;
+      context.stroke();
+    }
+
     for (let i = 0; i < this.children.length; i = i + 1) {
       this.children[i].render(context);
     }

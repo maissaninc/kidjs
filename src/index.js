@@ -73,4 +73,4 @@ window.KID = {
   setAssetUrlFilter: setAssetUrlFilter,
 };
 
-window.debug = true;
+window.debug = false;

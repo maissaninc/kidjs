@@ -8,9 +8,9 @@ export default class Triangle extends Polygon {
     super(x, y);
     this.width = width;
     this.height = height;
-    this.addPoint(-width / 2, -height / 2);
-    this.addPoint(width / 2, -height / 2);
-    this.addPoint(0, height / 2);
+    this.addPoint(-width / 2, -height * 1/3);
+    this.addPoint(width / 2, -height * 1/3);
+    this.addPoint(0, height * 2/3);
   }
 
   copy() {

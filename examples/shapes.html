@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Group</title>
+    <title>Shapes</title>
     <script src="../dist/kid.js"></script>
   </head>
   <body>
@@ -9,9 +9,27 @@
 
       window.debug = true
 
+      stroke = 'black'
+
       circle(100, 100, 50)
 
-      star(200, 100, 50)
+      star(200, 100, 50).spin()
+
+      square(300, 100, 50).spin()
+
+      rectangle(400, 100, 50, 25).spin()
+
+      pentagon(500, 100, 50).spin()
+
+      hexagon(600, 100, 50).spin()
+
+      heptagon(100, 200, 50).spin()
+
+      octagon(200, 200, 50).spin()
+
+      oval(300, 200, 50, 25).spin()
+
+      pie(400, 200, 50, 0, 70).spin()
 
     </script>
   </body>

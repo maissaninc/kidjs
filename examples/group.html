@@ -61,7 +61,7 @@
       on('keydown', move)
 
       function crash() {
-        spaceship.anchored = false
+        spaceship.explode()
       }
 
       on('click', crash)

@@ -1,5 +1,6 @@
-import { resetCursor } from '../text';
 import Matter from 'matter-js';
+import Style from '../style';
+import { resetCursor } from '../text';
 import { log } from '../debug';
 
 const WALL_DEPTH = 1000;
@@ -32,6 +33,11 @@ export default class Stage {
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
     this.canvas.style.objectFit = 'contain';
+
+    // Create default style
+    if (!window._kidjs_.defaultStyle) {
+      window._kidjs_.defaultStyle = new Style(this.context);
+    }
 
     // Initialize
     this.actors = [];

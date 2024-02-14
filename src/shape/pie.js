@@ -54,6 +54,15 @@ export default class Pie extends Shape {
     }
     this.postrender(context);
   }
+
+  /**
+   * Copy shape.
+   */
+  copy() {
+    let shape = new this.constructor(this.x, this.y, this.radius, this.startAngle, this.endAngle);
+    shape.assign(this);
+    return shape;
+  }
 }
 
 export function pie(x, y, diameter, startAngle = 0, endAngle = 60) {

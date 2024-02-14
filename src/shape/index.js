@@ -1,5 +1,4 @@
 import Actor from '../stage/actor';
-import Style from '../style';
 
 export default class Shape extends Actor {
   constructor(x, y) {
@@ -10,6 +9,27 @@ export default class Shape extends Actor {
     this.opacity = 1;
     this.themeColor = false;
     this._fragments = [];
+
+    // Use default style
+    if (!this.style) {
+      this.style = window._kidjs_.defaultStyle;
+    }
+
+    // Choose random color
+    if (this.fill == 'random') {
+      let r = Math.floor(Math.random() * 256);
+      let g = Math.floor(Math.random() * 256);
+      let b = Math.floor(Math.random() * 256);
+      this.fill = `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Choose next color in theme
+    if (this.fill == 'theme' || this.fill == 'default') {
+      if (!this.themeColor) {
+        this.themeColor = this.style.nextColor();
+      }
+      this.fill = this.themeColor;
+    }
   }
 
   _rgb() {
@@ -60,31 +80,6 @@ export default class Shape extends Actor {
   }
 
   prerender(context) {
-
-    // Create default style
-    if (!window._kidjs_.defaultStyle) {
-      window._kidjs_.defaultStyle = new Style(context);
-    }
-    if (!this.style) {
-      this.style = window._kidjs_.defaultStyle;
-    }
-
-    // Choose random color
-    if (this.fill == 'random') {
-      let r = Math.floor(Math.random() * 256);
-      let g = Math.floor(Math.random() * 256);
-      let b = Math.floor(Math.random() * 256);
-      this.fill = `rgb(${r}, ${g}, ${b})`;
-    }
-
-    // Choose next color in theme
-    if (this.fill == 'theme' || this.fill == 'default') {
-      if (!this.themeColor) {
-        this.themeColor = this.style.nextColor();
-      }
-      this.fill = this.themeColor;
-    }
-
     context.beginPath();
     context.globalAlpha = this.opacity;
   }

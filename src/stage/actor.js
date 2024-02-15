@@ -296,8 +296,8 @@ export default class Actor {
    * @return {Actor} Reference to self
    */
   forward(distance) {
-    this.position.x = this.x + Math.cos(degreesToRadians(this.angle - 90)) * distance;
-    this.position.y = this.y + Math.sin(degreesToRadians(this.angle - 90)) * distance;
+    this.position.x = this.x + Math.cos(degreesToRadians(this.angle)) * distance;
+    this.position.y = this.y + Math.sin(degreesToRadians(this.angle)) * distance;
     if (this.body) {
       Matter.Body.setPosition(this.body, this.position);
     }
@@ -308,11 +308,12 @@ export default class Actor {
    * Move backward in the direction of current rotation.
    *
    * @param {float} distance - Number of pixels to move
+   * @param {float} axis - Angle of axis to move along
    * @return {Actor} Reference to self
    */
   backward(distance) {
-    let x = this.x - Math.cos(degreesToRadians(this.angle - 90)) * distance;
-    let y = this.y - Math.sin(degreesToRadians(this.angle - 90)) * distance;
+    let x = this.x - Math.cos(degreesToRadians(this.angle)) * distance;
+    let y = this.y - Math.sin(degreesToRadians(this.angle)) * distance;
     this.x = x;
     this.y = y;
     return this;

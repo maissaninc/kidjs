@@ -73,6 +73,11 @@ export default class Group extends Actor {
    * Explode group.
    */
   explode() {
+
+    // Don't explode twice
+    if (this.exploded) return;
+    this.exploded = true;
+
     window.stage.removeChild(this);
     for (let i = 0; i < this.children.length; i = i + 1) {
       window.stage.addChild(this.children[i]);

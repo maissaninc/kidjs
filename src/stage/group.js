@@ -35,6 +35,8 @@ export default class Group extends Actor {
       isStatic: true,
       parts: bodies,
     });
+    this.position.x = this.body.position.x;
+    this.position.y = this.body.position.y;
   }
 
   /**

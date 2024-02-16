@@ -25,6 +25,9 @@ export default class Actor {
     this._ghost = false;
     this._collides = true;
 
+    // External properties
+    this.locked = false;
+
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
     this.velocity.onchange = () => {
@@ -52,16 +55,20 @@ export default class Actor {
   }
 
   set x(value) {
-    this.position.x = value;
-    if (this.body) {
-      Matter.Body.setPosition(this.body, this.position);
+    if (!this.locked) {
+      this.position.x = value;
+      if (this.body) {
+        Matter.Body.setPosition(this.body, this.position);
+      }
     }
   }
 
   set y(value) {
-    this.position.y = value;
-    if (this.body) {
-      Matter.Body.setPosition(this.body, this.position);
+    if (!this.locked) {
+      this.position.y = value;
+      if (this.body) {
+        Matter.Body.setPosition(this.body, this.position);
+      }
     }
   }
 
@@ -77,9 +84,11 @@ export default class Actor {
   }
 
   set angle(value) {
-    this._angle = value;
-    if (this.body) {
-      Matter.Body.setAngle(this.body, degreesToRadians(this._angle));
+    if (!this.locked) {
+      this._angle = value;
+      if (this.body) {
+        Matter.Body.setAngle(this.body, degreesToRadians(this._angle));
+      }
     }
   }
 
@@ -91,16 +100,20 @@ export default class Actor {
   }
 
   set angularVelocity(value) {
-    this._angularVelocity = value;
-    if (this.body) {
-      Matter.Body.setAngularVelocity(this.body, degreesToRadians(this._angularVelocity));
+    if (!this.locked) {
+      this._angularVelocity = value;
+      if (this.body) {
+        Matter.Body.setAngularVelocity(this.body, degreesToRadians(this._angularVelocity));
+      }
     }
   }
 
   set anchored(value) {
-    if (this.body && value != this.anchored) {
-      Matter.Body.setStatic(this.body, value);
-      this.body.restitution = this._bounciness;
+    if (!this.locked) {
+      if (this.body && value != this.anchored) {
+        Matter.Body.setStatic(this.body, value);
+        this.body.restitution = this._bounciness;
+      }
     }
   }
 
@@ -113,9 +126,11 @@ export default class Actor {
   }
 
   set bounciness(value) {
-    this._bounciness = value;
-    if (this.body) {
-      this.body.restitution = value;
+    if (!this.locked) {
+      this._bounciness = value;
+      if (this.body) {
+        this.body.restitution = value;
+      }
     }
   }
 
@@ -128,7 +143,9 @@ export default class Actor {
   }
 
   set collides(value) {
-    this._collides = value;
+    if (!this.locked) {
+      this._collides = value;
+    }
   }
 
   get collides() {
@@ -136,11 +153,13 @@ export default class Actor {
   }
 
   set direction(value) {
-    if (this.body) {
-      Matter.Body.setVelocity(this.body, new Vector(
-        Math.cos(degreesToRadians(value)) * this.speed,
-        Math.sin(degreesToRadians(value)) * this.speed
-      ));
+    if (!this.locked) {
+      if (this.body) {
+        Matter.Body.setVelocity(this.body, new Vector(
+          Math.cos(degreesToRadians(value)) * this.speed,
+          Math.sin(degreesToRadians(value)) * this.speed
+        ));
+      }
     }
   }
 
@@ -153,9 +172,11 @@ export default class Actor {
   }
 
   set friction(value) {
-    if (this.body) {
-      this.body.friction = value;
-      this.body.frictionStatic = value;
+    if (!this.locked) {
+      if (this.body) {
+        this.body.friction = value;
+        this.body.frictionStatic = value;
+      }
     }
   }
 
@@ -164,13 +185,15 @@ export default class Actor {
   }
 
   set ghost(value) {
-    if (value == this._ghost) return;
-    this._ghost = value;
-    if (this.body) {
-      if (value) {
-        this.body.isSensor = true;
-      } else {
-        this.body.isSensor = false;
+    if (!this.locked) {
+      if (value == this._ghost) return;
+      this._ghost = value;
+      if (this.body) {
+        if (value) {
+          this.body.isSensor = true;
+        } else {
+          this.body.isSensor = false;
+        }
       }
     }
   }
@@ -180,8 +203,10 @@ export default class Actor {
   }
 
   set inertia(value) {
-    if (this.body) {
-      Matter.Body.setInertia(this.body, value);
+    if (!this.locked) {
+      if (this.body) {
+        Matter.Body.setInertia(this.body, value);
+      }
     }
   }
 
@@ -190,8 +215,10 @@ export default class Actor {
   }
 
   set mass(value) {
-    if (this.body) {
-      Matter.Body.setMass(this.body, value);
+    if (!this.locked) {
+      if (this.body) {
+        Matter.Body.setMass(this.body, value);
+      }
     }
   }
 
@@ -200,12 +227,14 @@ export default class Actor {
   }
 
   set speed(value) {
-    if (this.body) {
-      this.anchored = false;
-      Matter.Body.setVelocity(this.body, new Vector(
-        Math.cos(degreesToRadians(this.direction)) * value,
-        Math.sin(degreesToRadians(this.direction)) * value
-      ));
+    if (!this.locked) {
+      if (this.body) {
+        this.anchored = false;
+        Matter.Body.setVelocity(this.body, new Vector(
+          Math.cos(degreesToRadians(this.direction)) * value,
+          Math.sin(degreesToRadians(this.direction)) * value
+        ));
+      }
     }
   }
 
@@ -419,6 +448,13 @@ export default class Actor {
   spin(speed = 1) {
     this.angularVelocity = speed;
     return this;
+  }
+
+  /**
+   * Explode object.
+   */
+  explode() {
+    // Overridden by derived class
   }
 
   /**

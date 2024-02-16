@@ -40,6 +40,9 @@ export default class Semicircle extends Shape {
 
   explode() {
 
+    // Shape is locked
+    if (this.locked) return;
+
     // Don't explode twice
     if (this.exploded) return;
     this.exploded = true;

@@ -50,6 +50,10 @@ export default class Circle extends Shape {
     if (this.exploded) return;
     this.exploded = true;
 
+    // Save fill color
+    let previousFill = window.fill;
+    window.fill = this.fill;
+
     // Break into 6 pie pieces
     let fragments = [];
     for (let angle = 0; angle < Math.PI * 5/3; angle = angle + Math.PI * 1/3) {
@@ -91,6 +95,9 @@ export default class Circle extends Shape {
     // Remove self from stage
     this.remove();
     this._fragments = fragments;
+
+    // Restore fill color
+    window.fill = previousFill;
   }
 
   /**

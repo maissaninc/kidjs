@@ -151,6 +151,10 @@ export default class Polygon extends Shape {
     if (this.exploded) return;
     this.exploded = true;
 
+    // Save fill color
+    let previousFill = window.fill;
+    window.fill = this.fill;
+
     // Explode into fragments
     let fragments = [];
     for (let i = 0; i < this.points.length; i = i + 1) {
@@ -191,6 +195,9 @@ export default class Polygon extends Shape {
     // Remove self from stage
     this.remove();
     this._fragments = fragments;
+
+    // Restore fill color
+    window.fill = previousFill;
   }
 
   /**

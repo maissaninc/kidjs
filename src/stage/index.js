@@ -84,22 +84,30 @@ export default class Stage {
 
       // Resize walls
       if (this._leftWall) {
+        this._leftWall.locked = false;
         this._leftWall.x = -WALL_DEPTH / 2;
         this._leftWall.y = this.height / 2;
         this._leftWall.height = this.height + WALL_DEPTH * 2;
         this._leftWall.updateBody();
+        this._leftWall.locked = true;
+        this._rightWall.locked = false;
         this._rightWall.x = this.width + WALL_DEPTH / 2;
         this._rightWall.y = this.height / 2;
         this._rightWall.height = this.height + WALL_DEPTH * 2;
         this._rightWall.updateBody();
+        this._rightWall.locked = true;
+        this._ceiling.locked = false;
         this._ceiling.x = this.width / 2;
         this._ceiling.y = -WALL_DEPTH / 2;
         this._ceiling.width = this.width + WALL_DEPTH * 2;
         this._ceiling.updateBody();
+        this._ceiling.locked = true;
+        this._floor.locked = false;
         this._floor.x = this.width / 2;
         this._floor.y = this.height + WALL_DEPTH / 2;
         this._floor.width = this.width + WALL_DEPTH * 2;
         this._floor.updateBody();
+        this._floor.locked = true;
       }
 
       // Redraw grid
@@ -168,9 +176,13 @@ export default class Stage {
     this._ceiling = rect(this.width / 2, -WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
     this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
     this._leftWall.invisible = true;
+    this._leftWall.locked = true;
     this._rightWall.invisible = true;
+    this._rightWall.locked = true;
     this._ceiling.invisible = true;
+    this._ceiling.locked = true;
     this._floor.invisible = true;
+    this._floor.locked = true;
     this.resize(window._kidjs_.settings.width, window._kidjs_.settings.height);
 
     // Reset text cursor

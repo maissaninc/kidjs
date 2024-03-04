@@ -218,13 +218,30 @@ export function polygon(...args) {
     args[i] = parseLength(args[i], 'x');
     args[i + 1] = parseLength(args[i + 1], 'y');
   }
-  if (args.length > 3) {
-    const shape = new Polygon(args[0], args[1]);
-    for (let i = 2; i < args.length - 1; i = i + 1) {
-      shape.addPoint(args[i], args[i + 1]);
-    }
+
+  // Must have at least three points
+  if (args.length <= 5) return;
+
+  // Determine center point
+  let sumX = 0;
+  let sumY = 0;
+  for (let i = 0; i < args.length - 1; i = i + 2) {
+    sumX = sumX + args[i];
+    sumY = sumY + args[i + 1];
   }
+  let cx = sumX / Math.floor(args.length / 2);
+  let cy = sumY / Math.floor(args.length / 2);
+
+  // Create polygon
+  const shape = new Polygon(cx, cy);
+
+  // Add points
+  for (let i = 0; i < args.length - 1; i = i + 2) {
+    shape.addPoint(args[i] - cx, args[i + 1] - cy);
+  }
+
+  // Initialize and return shape
   shape.init();
   window.stage.addChild(shape);
-  return shape;
+  return shape;  
 }

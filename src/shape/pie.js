@@ -25,12 +25,10 @@ export default class Pie extends Shape {
     }
 
     // Determine center point of pie
-    let points = [
-      this._boundingPolygon[0],
-      this._boundingPolygon[1],
-      this._boundingPolygon[this._boundingPolygon.length - 1]
-    ];
-    this._cp = Vector.average(points);
+    this._cp = Vector.average(this._boundingPolygon);
+
+    // Close the polygon
+    this._boundingPolygon.push(new Vector(0, 0));
 
     // Center bounding polygon around center points
     for (let i = 0; i < this._boundingPolygon.length; i = i + 1) {
@@ -44,6 +42,9 @@ export default class Pie extends Shape {
       frictionAir: 0,
       isStatic: true
     });
+
+    console.log(this.body.vertices);
+    console.log(this._boundingPolygon);
   }
 
   render(context) {
@@ -52,6 +53,7 @@ export default class Pie extends Shape {
     for (let i = 0; i < this.body.vertices.length; i = i + 1) {
       context.lineTo(this.body.vertices[i].x, this.body.vertices[i].y);
     }
+    context.lineTo(this.body.vertices[0].x, this.body.vertices[0].y);
     this.postrender(context);
   }
 

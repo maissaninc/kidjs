@@ -12,6 +12,7 @@ import { circle } from '../shape/circle';
 import { curve } from '../shape/curve';
 import { line } from '../shape/line';
 import { oval } from '../shape/oval';
+import { path } from '../shape/path';
 import { pie } from '../shape/pie';
 import { polygon } from '../shape/polygon';
 import { rect, square } from '../shape/rect';
@@ -70,6 +71,7 @@ export function init() {
       window.octagon = octagon;
       window.on = on;
       window.oval = oval;
+      window.path = path;
       window.pentagon = pentagon;
       window.pie = pie;
       window.polygon = polygon;

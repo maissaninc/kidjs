@@ -5,9 +5,7 @@ export default class Path extends Shape {
   constructor(x = 0, y = 0) {
     super(x, y);
     this._path = new Path2D();
-    if (!this.stroke) {
-      this.stroke = 'black';
-    }
+    this.stroke = 'black';
   }
 
   moveTo(x, y) {
@@ -28,11 +26,13 @@ export default class Path extends Shape {
 
   render(context) {
     context.strokeStyle = this.stroke;
-    context.lineWidth = this.width;
+    context.lineWidth = this.lineWidth;
     context.stroke(this._path);
   }
 }
 
 export function path() {
-  return new Path();
+  const shape = new Path();
+  window.stage.addChild(shape);
+  return shape;
 }

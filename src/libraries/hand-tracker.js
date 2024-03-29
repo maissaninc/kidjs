@@ -17,13 +17,19 @@ export class HandTracker {
    * @constructor
    */
   async init() {
-    const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm');
-    this.handLandmarker = await HandLandmarker.createFromModelPath(vision, 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task');
-    await this.handLandmarker.setOptions({ runningMode: 'VIDEO' });
+    const vision = await FilesetResolver.forVisionTasks(
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm'
+    );
+    this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+        delegate: 'GPU'
+      },
+      runningMode: 'VIDEO',
+      numHands: 2
+    });
     this.videoElement = document.createElement('video');
-    this.videoElement.style.position = 'absolute';
     this.videoElement.setAttribute('autoplay', '');
-    document.body.appendChild(this.videoElement);
   }
 
   async start() {
@@ -33,15 +39,37 @@ export class HandTracker {
       video: true
     }).then((stream) => {
       this.videoElement.srcObject = stream;
-      this.videoElement.addEventListener('loadeddata', () => this.onAnimationFrame());
+      this.videoElement.addEventListener('loadeddata', () => {
+        this.active = true;
+        this.onAnimationFrame();
+      });
     });
+
+    this.fingers = [];
+    for (let i = 0; i < 20; i = i + 1) {
+      this.fingers.push(window.circle(0, 0, 40));
+    }
+  }
+
+  stop() {
+    this.active = false;
   }
 
   onAnimationFrame() {
     let results = this.handLandmarker.detectForVideo(
-      this.videoElement.srcObject, performance.now()
+      this.videoElement, performance.now()
     );
-    console.log('OK', results);
+    
+    if (results.landmarks.length > 0) {
+      for (let i = 0; i < Math.min(this.fingers.length, results.landmarks[0].length); i = i + 1) {
+        this.fingers[i].x = window.stage.canvas.width / 2 - results.landmarks[0][i].x * window.stage.canvas.width / 2;
+        this.fingers[i].y = results.landmarks[0][i].y * window.stage.canvas.height / 2;
+      }
+    }
+
+    if (this.active) {
+      requestAnimationFrame(this.onAnimationFrame.bind(this));
+    }
   }
 }
 

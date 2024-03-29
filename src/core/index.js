@@ -166,7 +166,7 @@ export function init() {
     import: async function(library) {
       return new Promise(function(resolve, reject) {
         if (
-          ['neural-network'].includes(library) && 
+          ['hand-tracker', 'neural-network'].includes(library) && 
           !window._kidjs_.libraries.includes(library)
         ) {
           let scriptEl = document.createElement('script');

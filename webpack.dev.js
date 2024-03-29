@@ -4,7 +4,8 @@ module.exports = {
   mode: 'development',
   entry: {
     'kid': './src/index.js',
-    'neural-network': './src/libraries/neural-network.js'
+    'neural-network': './src/libraries/neural-network.js',
+    'hand-tracker': './src/libraries/hand-tracker.js'
   },
   optimization: {
     minimize: false

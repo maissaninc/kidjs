@@ -42,9 +42,6 @@ export default class Pie extends Shape {
       frictionAir: 0,
       isStatic: true
     });
-
-    console.log(this.body.vertices);
-    console.log(this._boundingPolygon);
   }
 
   render(context) {

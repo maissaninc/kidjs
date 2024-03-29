@@ -1,7 +1,7 @@
 /*!
  * MIT License
  *
- * Copyright (C) 2020-2022 Chris Maissan
+ * Copyright (C) 2020-2024 Chris Maissan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

@@ -1,5 +1,5 @@
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
-import { phalange } from './phalange';
+import Phalange from './phalange';
 
 export class HandTracker {
 
@@ -48,7 +48,7 @@ export class HandTracker {
 
     this.phalanges = [];
     for (let i = 0; i < 20; i = i + 1) {
-      this.phalanges.push(phalange());
+      this.phalanges.push(new Phalange());
     }
   }
 

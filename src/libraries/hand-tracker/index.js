@@ -1,4 +1,5 @@
-import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
+import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
+import { phalange } from './phalange';
 
 export class HandTracker {
 
@@ -45,9 +46,9 @@ export class HandTracker {
       });
     });
 
-    this.fingers = [];
+    this.phalanges = [];
     for (let i = 0; i < 20; i = i + 1) {
-      this.fingers.push(window.circle(0, 0, 40));
+      this.phalanges.push(phalange());
     }
   }
 
@@ -61,9 +62,16 @@ export class HandTracker {
     );
     
     if (results.landmarks.length > 0) {
-      for (let i = 0; i < Math.min(this.fingers.length, results.landmarks[0].length); i = i + 1) {
-        this.fingers[i].x = window.stage.canvas.width / 2 - results.landmarks[0][i].x * window.stage.canvas.width / 2;
-        this.fingers[i].y = results.landmarks[0][i].y * window.stage.canvas.height / 2;
+      for (let i = 0; i < this.phalanges.length; i = i + 1) {
+        let x1 = window.stage.canvas.width / 2 - results.landmarks[0][(i % 4 == 0) ? 0 : i].x * window.stage.canvas.width / 2;
+        let y1 = results.landmarks[0][(i % 4 == 0) ? 0 : i].y * window.stage.canvas.height / 2;
+        let x2 = window.stage.canvas.width / 2 - results.landmarks[0][i + 1].x * window.stage.canvas.width / 2;
+        let y2 = results.landmarks[0][i + 1].y * window.stage.canvas.height / 2;
+        this.phalanges[i].show(x1, y1, x2, y2);
+      }
+    } else {
+      for (let i = 0; i < this.phalanges.length; i = i + 1) {
+        this.phalanges[i].hide();
       }
     }
 

@@ -21,28 +21,24 @@ export default class Phalange extends Actor {
    * Update bounding polygin.
    */
   updateBoundingPolygon() {
-    this.boundingPolygon = [];
-
-    this.boundingPolygon.push(new Vector(
-      this.a.x + Math.cos(this.angle) * this.width / 2,
-      this.a.y + Math.sin(this.angle) * this.width / 2
-    ));
-
-    this.boundingPolygon.push(new Vector(
-      this.a.x + Math.cos(this.angle + Math.PI) * this.width / 2,
-      this.a.y + Math.sin(this.angle + Math.PI) * this.width / 2
-    ));
-
-    this.boundingPolygon.push(new Vector(
-      this.b.x + Math.cos(this.angle + Math.PI) * this.width / 2,
-      this.b.y + Math.sin(this.angle + Math.PI) * this.width / 2
-    ));
-
-
-    this.boundingPolygon.push(new Vector(
-      this.b.x + Math.cos(this.angle) * this.width / 2,
-      this.b.y + Math.sin(this.angle) * this.width / 2
-    ));
+    this.boundingPolygon = [
+      new Vector(
+        this.a.x + Math.cos(this.angle + Math.PI / 2) * this.width / 2,
+        this.a.y - Math.sin(this.angle + Math.PI / 2) * this.width / 2
+      ),
+      new Vector(
+        this.a.x + Math.cos(this.angle - Math.PI / 2) * this.width / 2,
+        this.a.y - Math.sin(this.angle - Math.PI / 2) * this.width / 2
+      ),
+      new Vector(
+        this.b.x + Math.cos(this.angle - Math.PI / 2) * this.width / 2,
+        this.b.y - Math.sin(this.angle - Math.PI / 2) * this.width / 2
+      ),
+      new Vector(
+        this.b.x + Math.cos(this.angle + Math.PI / 2) * this.width / 2,
+        this.b.y - Math.sin(this.angle + Math.PI / 2) * this.width / 2
+      )
+    ];
   }
 
   /**
@@ -62,9 +58,10 @@ export default class Phalange extends Actor {
     this.b.y = y2;
 
     // Update angle
-    let opposite = this.b.x - this.a.x;
-    let adjacent = this.b.y + this.a.y;
-    this.angle = Math.atan(opposite / adjacent) % Math.PI;
+    let u = this.b.subtract(this.a);
+    let v = new Vector(1, 0);
+    this.angle = Math.acos(u.dot(v) / (u.length * v.length));
+    console.log(this.angle);
     this.updateBoundingPolygon();
 
     // Create body
@@ -77,6 +74,7 @@ export default class Phalange extends Actor {
 
   hide() {
     this.body = false;
+    window.stage.removeChild(this);
   }
 
   /**

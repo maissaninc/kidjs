@@ -13,8 +13,10 @@
 
         HandTracker.start()
 
-        let ball = circle(500, 500, 100)
-        ball.anchored = false
+        for (let i = 0; i < 30; i = i + 1) {
+          let ball = circle(random(width), random(height), 50)
+          ball.anchored = false
+        }
         
     </script>
   </body>

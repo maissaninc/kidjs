@@ -1,4 +1,5 @@
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
+import Palm from './palm';
 import Phalange from './phalange';
 
 export class HandTracker {
@@ -46,6 +47,7 @@ export class HandTracker {
       });
     });
 
+    this.palm = new Palm();
     this.phalanges = [];
     for (let i = 0; i < 20; i = i + 1) {
       this.phalanges.push(new Phalange());
@@ -62,6 +64,20 @@ export class HandTracker {
     );
     
     if (results.landmarks.length > 0) {
+      this.palm.show(
+        window.stage.canvas.width / 2 - results.landmarks[0][0].x * window.stage.canvas.width / 2,
+        results.landmarks[0][0].y * window.stage.canvas.height / 2,
+        window.stage.canvas.width / 2 - results.landmarks[0][1].x * window.stage.canvas.width / 2,
+        results.landmarks[0][1].y * window.stage.canvas.height / 2,
+        window.stage.canvas.width / 2 - results.landmarks[0][5].x * window.stage.canvas.width / 2,
+        results.landmarks[0][5].y * window.stage.canvas.height / 2,
+        window.stage.canvas.width / 2 - results.landmarks[0][9].x * window.stage.canvas.width / 2,
+        results.landmarks[0][9].y * window.stage.canvas.height / 2,
+        window.stage.canvas.width / 2 - results.landmarks[0][13].x * window.stage.canvas.width / 2,
+        results.landmarks[0][13].y * window.stage.canvas.height / 2,
+        window.stage.canvas.width / 2 - results.landmarks[0][17].x * window.stage.canvas.width / 2,
+        results.landmarks[0][17].y * window.stage.canvas.height / 2
+      );
       for (let i = 0; i < this.phalanges.length; i = i + 1) {
         let x1 = window.stage.canvas.width / 2 - results.landmarks[0][(i % 4 == 0) ? 0 : i].x * window.stage.canvas.width / 2;
         let y1 = results.landmarks[0][(i % 4 == 0) ? 0 : i].y * window.stage.canvas.height / 2;
@@ -70,6 +86,7 @@ export class HandTracker {
         this.phalanges[i].show(x1, y1, x2, y2);
       }
     } else {
+      this.palm.hide();
       for (let i = 0; i < this.phalanges.length; i = i + 1) {
         this.phalanges[i].hide();
       }

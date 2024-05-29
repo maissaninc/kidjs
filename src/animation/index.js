@@ -157,6 +157,18 @@ export default class Animation {
     return this.actor.move(x, y, duration, tween, true);
   }
 
+  fade(opacity, duration = 1, tween = 'easeinout') {
+    return this.actor.fade(opacity, duration, tween, true);
+  }
+
+  fadeIn(duration = 1, tween = 'easeinout') {
+    return this.actor.fadeIn(duration, tween, true);
+  }
+
+  fadeOut(duration = 1, tween = 'easeinout') {
+    return this.actor.fadeOut(duration, tween, true);
+  }
+
   repeat(count = -1) {
     this.actor.animationRepeat = count;
   }

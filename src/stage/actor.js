@@ -397,9 +397,9 @@ export default class Actor {
   }
 
   /**
-   * Move relative to current position.
+   * Shrink size.
    *
-   * @param {int} amount - Number of pixels to grow
+   * @param {int} amount - Number of pixels to shrink
    * @param {int} duration - Length of animation in seconds
    * @param {string} tween - Easing function
    * @param {boolean} queue - Delay until active animations complete
@@ -407,6 +407,45 @@ export default class Actor {
    */
   shrink(amount, duration = 1, tween = false, queue = false) {
     return this.grow(-amount, duration, tween, queue);
+  }
+
+  /**
+   * Fade opacity.
+   *
+   * @param {number} opacity - Target opacity
+   * @param {int} duration - Length of animation in seconds
+   * @param {string} tween - Easing function
+   * @param {boolean} queue - Delay until active animations complete
+   * @return {Animation} Animation object
+   */
+  fade(opacity, duration = 1, tween = 'easeinout', queue = false) {
+    return this.animate({
+      opacity: opacity
+    }, duration, tween, queue);
+  }
+
+  /**
+   * Fade in.
+   *
+   * @param {number} duration - Length of animation in seconds
+   * @param {string} tween - Easing function
+   * @param {boolean} queue - Delay until active animations complete
+   * @return {Animation} Animation object
+   */
+  fadeIn(duration = 1, tween = 'easeinout', queue = false) {
+    return this.fade(1, duration, tween, queue);
+  }
+
+  /**
+   * Fade out.
+   *
+   * @param {number} duration - Length of animation in seconds
+   * @param {string} tween - Easing function
+   * @param {boolean} queue - Delay until active animations complete
+   * @return {Animation} Animation object
+   */
+  fadeOut(duration = 1, tween = 'easeinout', queue = false) {
+    return this.fade(0, duration, tween, queue);
   }
 
   /**

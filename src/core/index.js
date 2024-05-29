@@ -254,6 +254,8 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
+        console.log(node.body[i]);
+
         // Import library
         if (node.body[i].type == 'ImportDeclaration') {
           libraries.push(node.body[i].source.value);
@@ -324,7 +326,20 @@ async function compile(code) {
         // Add await to wait() calls
         if (node.body[i].type == 'ExpressionStatement' &&
           node.body[i].expression.type == 'CallExpression' &&
+          node.body[i].expression.callee.type == 'Identifier' &&
           node.body[i].expression.callee.name == 'wait'
+        ) {
+          node.body[i].expression = {
+            type: 'AwaitExpression',
+            argument: Object.assign({}, node.body[i].expression)
+          };
+        }
+
+        // Add await if wait() at the end of a chain
+        if (node.body[i].type == 'ExpressionStatement' &&
+          node.body[i].expression.type == 'CallExpression' &&
+          node.body[i].expression.callee.type == 'MemberExpression' &&
+          node.body[i].expression.callee.property.name == 'wait'
         ) {
           node.body[i].expression = {
             type: 'AwaitExpression',

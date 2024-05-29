@@ -297,6 +297,10 @@ export default class Actor {
 
           // Clear queue
           } else {
+            if (typeof this.onAnimationsComplete == 'function') {
+              this.onAnimationsComplete();
+              this.onAnimationsComplete = null;
+            }
             this.animations = [];
             this.animationActive = 0;
             this.animationRepeat = 0;

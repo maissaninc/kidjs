@@ -172,4 +172,10 @@ export default class Animation {
   repeat(count = -1) {
     this.actor.animationRepeat = count;
   }
+
+  async wait() {
+    await new Promise((resolve) => {
+      this.actor.onAnimationsComplete = resolve;
+    })
+  }
 }

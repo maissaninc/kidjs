@@ -254,8 +254,6 @@ async function compile(code) {
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
-        console.log(node.body[i]);
-
         // Import library
         if (node.body[i].type == 'ImportDeclaration') {
           libraries.push(node.body[i].source.value);

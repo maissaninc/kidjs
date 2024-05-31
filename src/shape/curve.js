@@ -46,7 +46,7 @@ export default class Curve extends Shape {
   }
 
   postrender(context) {
-    this.style.stroke(this.stroke, this.lineWidth);
+    this.style.stroke(context, this.stroke, this.lineWidth);
   }
 }
 

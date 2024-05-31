@@ -24,23 +24,23 @@ export default class Style {
     return this.colors[this.colorIndex];
   }
 
-  fill(color) {
-    this.context.fillStyle = color;
-    this.context.fill();
-    this.context.fillStyle = this.texture.pattern;
-    this.context.globalAlpha = this.context.globalAlpha * this.texture.opacity;
-    this.context.globalCompositeOperation = 'overlay';
-    this.context.fill();
-    this.context.globalAlpha = 1;
-    this.context.globalCompositeOperation = 'source-over';
+  fill(context, color) {
+    context.fillStyle = color;
+    context.fill();
+    context.fillStyle = this.texture.pattern;
+    context.globalAlpha = this.context.globalAlpha * this.texture.opacity;
+    context.globalCompositeOperation = 'overlay';
+    context.fill();
+    context.globalAlpha = 1;
+    context.globalCompositeOperation = 'source-over';
   }
 
-  stroke(color, width) {
+  stroke(context, color, width) {
     if (!color) {
       color = 'transparent';
     }
-    this.context.strokeStyle = color;
-    this.context.lineWidth = width;
-    this.context.stroke();
+    context.strokeStyle = color;
+    context.lineWidth = width;
+    context.stroke();
   }
 }

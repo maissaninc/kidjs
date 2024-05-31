@@ -7,11 +7,15 @@
   <body>
     <script type="kidjs">
 
-        let ball = circle(400, 400, 300)
+        let a = square(100, 100, 100)
+        let b = square(150, 150, 100)
+        let g = group(a, b)
+        g.opacity = 0.5
 
-        ball.fadeOut().fadeIn().fadeOut().wait()
-        circle(100, 100, 400)
-        
+        let c = square(400, 100, 100)
+        let d = square(450, 150, 100)
+        c.opacity = 0.5
+        d.opacity = 0.5
 
     </script>
   </body>

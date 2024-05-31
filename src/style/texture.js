@@ -5,6 +5,6 @@ export default class Texture {
     image.onload = () => {
       this.pattern = context.createPattern(image, 'repeat');
     };
-    this.opacity = 0.2;
+    this.opacity = opacity;
   }
 }

@@ -15,6 +15,7 @@ export default class Group extends Actor {
     counter = counter + 1;
     this.id = counter;
     this.children = [];
+    this.opacity = 1;
   }
 
   /**
@@ -61,12 +62,21 @@ export default class Group extends Actor {
       context.closePath();
       context.strokeStyle = 'orange';
       context.stroke();
-
     }
 
+    // Draw children on temporary canvas
+    let tempCanvas = document.createElement('canvas');
+    tempCanvas.width = context.canvas.width;
+    tempCanvas.height = context.canvas.height;
+    let tempContext = tempCanvas.getContext('2d');
     for (let i = 0; i < this.children.length; i = i + 1) {
-      this.children[i].render(context);
+      this.children[i].render(tempContext);
     }
+
+    // Copy to main canvas
+    context.globalAlpha = this.opacity;
+    context.drawImage(tempCanvas, 0, 0);
+    context.globalAlpha = 1;
   }
 
   /**

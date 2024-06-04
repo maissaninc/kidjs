@@ -86,8 +86,8 @@ export default class Shape extends Actor {
 
   postrender(context) {
     context.closePath();
-    this.style.fill(this.fill);
-    this.style.stroke(this.stroke, this.lineWidth);
+    this.style.fill(context, this.fill);
+    this.style.stroke(context, this.stroke, this.lineWidth);
 
     // Debug information
     if (window.debug) {

@@ -1,8 +1,9 @@
+let context = new AudioContext();
+
 export function frequency(frequency, duration = 0.25) {
   return new Promise((resolve) => {
 
     // Play frequency
-    let context = new AudioContext();
     let oscillator = context.createOscillator();
     let gain = context.createGain();
     oscillator.type = 'triangle';

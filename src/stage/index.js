@@ -177,12 +177,16 @@ export default class Stage {
     this._floor = rect(this.width / 2, this.height + WALL_DEPTH / 2, this.width + WALL_DEPTH * 2, WALL_DEPTH);
     this._leftWall.invisible = true;
     this._leftWall.locked = true;
+    this._leftWall.type = 'wall';
     this._rightWall.invisible = true;
     this._rightWall.locked = true;
+    this._rightWall.type = 'wall';
     this._ceiling.invisible = true;
     this._ceiling.locked = true;
+    this._ceiling.type = 'wall';
     this._floor.invisible = true;
     this._floor.locked = true;
+    this._floor.type = 'wall';
     this.resize(window._kidjs_.settings.width, window._kidjs_.settings.height);
 
     // Reset text cursor
@@ -297,6 +301,19 @@ export default class Stage {
         // Render
         if (!actor.invisible) {
           actor.render(this.context);
+        }
+      }
+
+      // Detect collisions between static actors
+      let staticActors = this.actors.filter((actor) => {
+        return (actor.body && actor.type != 'wall' && actor.anchored == true && actor.collides == true);
+      });
+      for (let i = 0; i < staticActors.length - 1; i = i + 1) {
+        for (let j = i + 1; j < staticActors.length; j = j + 1) {
+          if (Matter.Collision.collides(staticActors[i].body, staticActors[j].body)) {
+            staticActors[i].dispatchEvent(new CustomEvent('collision', { detail: staticActors[j] }));
+            staticActors[j].dispatchEvent(new CustomEvent('collision', { detail: staticActors[i] }));
+          }
         }
       }
 

@@ -191,10 +191,8 @@ export default class Actor {
       if (this.body) {
         if (value) {
           this.body.isSensor = true;
-          this.collides = false;
         } else {
           this.body.isSensor = false;
-          this.collides = true;
         }
       }
     }

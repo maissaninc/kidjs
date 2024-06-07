@@ -237,7 +237,7 @@ export function polygon(...args) {
 
   // Add points
   for (let i = 0; i < args.length - 1; i = i + 2) {
-    shape.addPoint(args[i] - cx, args[i + 1] - cy);
+    shape.addPoint(args[i] - cx, cy - args[i + 1]);
   }
 
   // Initialize and return shape

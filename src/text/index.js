@@ -134,7 +134,7 @@ export default class Text extends Actor {
       default:
         x = 0;
     }
-    
+
     // Points across top of text
     for (let i = 0; i < this.text.length; i = i + 1) {
       let metrics = window.stage.context.measureText(this.text[i]);
@@ -203,7 +203,7 @@ export default class Text extends Actor {
     context.restore();
 
     // Debug bounding polygon
-    /*if (this._boundingPolygon.length > 0) {
+    if (window.debug && this._boundingPolygon.length > 0) {
       let v = this._boundingPolygon[0].rotate(this.angle);
       context.beginPath();
       context.moveTo(this.x + v.x, this.y + v.y);
@@ -212,7 +212,7 @@ export default class Text extends Actor {
         context.lineTo(this.x + v.x, this.y + v.y);
       }
       context.stroke();
-    }*/
+    }
   }
 }
 
@@ -234,7 +234,7 @@ export function display(x, y, text) {
   const actor = new Text(
     parseLength(x, 'x'),
     parseLength(y, 'y'),
-    text,
+    String(text),
     true
   );
   actor.init();
@@ -249,7 +249,7 @@ export function write(x, y, text) {
     const actor = new Text(
       parseLength(x, 'x'),
       parseLength(y, 'y'),
-      text,
+      String(text),
       false
     );
     actor.init();
@@ -268,7 +268,12 @@ export function resetCursor() {
 }
 
 function _write(text, linebreak) {
-  const actor = new Text(cursorX, cursorY, text, false);
+  const actor = new Text(
+    cursorX, 
+    cursorY, 
+    String(text), 
+    false
+  );
   actor.textAlign = 'left';
   actor.textBaseline = 'top';
   actor.init();

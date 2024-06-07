@@ -48,82 +48,93 @@ export default class Animation {
 
         // Numeric tween
         if (typeof this.from[property] == 'number') {
-          switch (this.tween.toLowerCase()) {
-            case 'linear':
-              value = Tween.linear(t, this.from[property], this.to[property], this.duration);
-              break;
 
-            case 'easein':
-              value = Tween.easeInQuad(t, this.from[property], this.to[property], this.duration);
-              break;
+          if (t >= this.duration) {
+            value = this.to[property];
+          } else {
+            switch (this.tween.toLowerCase()) {
+              case 'linear':
+                value = Tween.linear(t, this.from[property], this.to[property], this.duration);
+                break;
 
-            case 'easeout':
-              value = Tween.easeOutQuad(t, this.from[property], this.to[property], this.duration);
-              break;
+              case 'easein':
+                value = Tween.easeInQuad(t, this.from[property], this.to[property], this.duration);
+                break;
 
-            case 'easeinout':
-              value = Tween.easeInOutQuad(t, this.from[property], this.to[property], this.duration);
-              break;
+              case 'easeout':
+                value = Tween.easeOutQuad(t, this.from[property], this.to[property], this.duration);
+                break;
 
-            case 'easeinelastic':
-              value = Tween.easeInElastic(t, this.from[property], this.to[property], this.duration);
-              break;
+              case 'easeinout':
+                value = Tween.easeInOutQuad(t, this.from[property], this.to[property], this.duration);
+                break;
 
-            case 'easeoutelastic':
-              value = Tween.easeOutElastic(t, this.from[property], this.to[property], this.duration);
-              break;
+              case 'easeinelastic':
+                value = Tween.easeInElastic(t, this.from[property], this.to[property], this.duration);
+                break;
 
-            case 'easeinoutelastic':
-            default:
-              value = Tween.easeInOutElastic(t, this.from[property], this.to[property], this.duration);
+              case 'easeoutelastic':
+                value = Tween.easeOutElastic(t, this.from[property], this.to[property], this.duration);
+                break;
+
+              case 'easeinoutelastic':
+              default:
+                value = Tween.easeInOutElastic(t, this.from[property], this.to[property], this.duration);
+            }
           }
           this.actor[property] = value;
 
         // Color tween
         } else {
           let r, g, b;
-          switch (this.tween.toLowerCase()) {
-            case 'linear':
-              r = Tween.linear(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.linear(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.linear(t, this.from[property].b, this.to[property].b, this.duration);
-              break;
+          if (t >= this.duration) {
+            r = this.to[property].r;
+            g = this.to[property].g;
+            b = this.to[property].b;
+          } else {
+            switch (this.tween.toLowerCase()) {
+              case 'linear':
+                r = Tween.linear(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.linear(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.linear(t, this.from[property].b, this.to[property].b, this.duration);
+                break;
 
-            case 'easein':
-              r = Tween.easeInQuad(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.easeInQuad(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.easeInQuad(t, this.from[property].b, this.to[property].b, this.duration);
-              break;
+              case 'easein':
+                r = Tween.easeInQuad(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.easeInQuad(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.easeInQuad(t, this.from[property].b, this.to[property].b, this.duration);
+                break;
 
-            case 'easeout':
-              r = Tween.easeOutQuad(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.easeOutQuad(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.easeOutQuad(t, this.from[property].b, this.to[property].b, this.duration);
-              break;
+              case 'easeout':
+                r = Tween.easeOutQuad(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.easeOutQuad(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.easeOutQuad(t, this.from[property].b, this.to[property].b, this.duration);
+                break;
 
-            case 'easeinout':
-              r = Tween.easeInOutQuad(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.easeInOutQuad(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.easeInOutQuad(t, this.from[property].b, this.to[property].b, this.duration);
-              break;
+              case 'easeinout':
+                r = Tween.easeInOutQuad(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.easeInOutQuad(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.easeInOutQuad(t, this.from[property].b, this.to[property].b, this.duration);
+                break;
 
-            case 'easeinelastic':
-              r = Tween.easeInElastic(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.easeInElastic(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.easeInElastic(t, this.from[property].b, this.to[property].b, this.duration);
-              break;
+              case 'easeinelastic':
+                r = Tween.easeInElastic(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.easeInElastic(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.easeInElastic(t, this.from[property].b, this.to[property].b, this.duration);
+                break;
 
-            case 'easeoutelastic':
-              r = Tween.easeOutElastic(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.easeOutElastic(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.easeOutElastic(t, this.from[property].b, this.to[property].b, this.duration);
-              break;
+              case 'easeoutelastic':
+                r = Tween.easeOutElastic(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.easeOutElastic(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.easeOutElastic(t, this.from[property].b, this.to[property].b, this.duration);
+                break;
 
-            case 'easeinoutelastic':
-            default:
-              r = Tween.easeInOutElastic(t, this.from[property].r, this.to[property].r, this.duration);
-              g = Tween.easeInOutElastic(t, this.from[property].g, this.to[property].g, this.duration);
-              b = Tween.easeInOutElastic(t, this.from[property].b, this.to[property].b, this.duration);
+              case 'easeinoutelastic':
+              default:
+                r = Tween.easeInOutElastic(t, this.from[property].r, this.to[property].r, this.duration);
+                g = Tween.easeInOutElastic(t, this.from[property].g, this.to[property].g, this.duration);
+                b = Tween.easeInOutElastic(t, this.from[property].b, this.to[property].b, this.duration);
+            }
           }
           if (Number.isNaN(r)) r = 0;
           if (Number.isNaN(g)) g = 0;

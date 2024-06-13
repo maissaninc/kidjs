@@ -53,8 +53,8 @@ export default class Actor {
   get y() {
     return this.body ? this.body.position.y : this.position.y;
   }
-
-  set x(value) {
+  
+  _setx(value) {
     if (!this.locked) {
       this.position.x = value;
       if (this.body) {
@@ -63,12 +63,26 @@ export default class Actor {
     }
   }
 
-  set y(value) {
+  set x(value) {
+    if (!this.locked) {
+      this.cancelAnimations('x');
+      this._setx(value);
+    }
+  }
+
+  _sety(value) {
     if (!this.locked) {
       this.position.y = value;
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
       }
+    }
+  }
+
+  set y(value) {
+    if (!this.locked) {
+      this.cancelAnimations('y');
+      this._sety(value);
     }
   }
 
@@ -448,6 +462,24 @@ export default class Actor {
    */
   fadeOut(duration = 1, tween = 'easeinout', queue = false) {
     return this.fade(0, duration, tween, queue);
+  }
+
+
+  /**
+   * Cancel animations
+   * 
+   * @param {string} property - Optional, cancel animations containing this property
+   */
+  cancelAnimations(property = false) {
+    for (let i = 0; i < this.animations.length; i = i + 1) {
+      if (property) {
+        if (typeof this.animations[i].to[property] != 'undefined') {
+          this.animations[i].status = 'complete';
+        }
+      } else {
+        this.animations[i].status = 'complete';
+      }
+    }
   }
 
   /**

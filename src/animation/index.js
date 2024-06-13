@@ -82,7 +82,15 @@ export default class Animation {
                 value = Tween.easeInOutElastic(t, this.from[property], this.to[property], this.duration);
             }
           }
-          this.actor[property] = value;
+
+          // Use direct setter if it exists
+          if (typeof this.actor['_set' + property] == 'function') {
+            this.actor['_set' + property](value);
+
+          // Otherwise use default setter
+          } else {
+            this.actor[property] = value;
+          }
 
         // Color tween
         } else {

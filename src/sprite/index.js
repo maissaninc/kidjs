@@ -37,6 +37,7 @@ export default class Sprite extends Actor {
    */
   render(context) {
     if (this.loaded) {
+      context.globalAlpha = this.opacity;
       context.drawImage(
         this.image,
         this.x - (this.width * this.scale / 2),
@@ -44,6 +45,7 @@ export default class Sprite extends Actor {
         this.width * this.scale,
         this.height * this.scale
       );
+      context.globalAlpha = 1;
     }
   }
 }

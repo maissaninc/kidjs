@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Group</title>
+    <script src="../dist/kid.js"></script>
+  </head>
+  <body>
+    <script type="kidjs">
+
+
+let leftWall = rect(25, 250, 50, 500)
+let topWall = rect(250, 25, 400, 50)
+let rightWall = rect(475, 250, 50, 500)
+let bottomWall = rect(250, 475, 400, 50)
+leftWall.opacity = 0
+topWall.opacity = 0
+rightWall.opacity = 0
+bottomWall.opacity = 0
+
+let triangle1 = polygon(50, 50, 300, 50, 50, 200)
+triangle1.color = 'purple'
+triangle1.opacity = 0
+triangle1.fadeIn().wait()
+
+let a1 = image('a-vertical.png', 25, 125, 50, 150)
+a1.opacity = 0;
+a1.fadeIn().wait()
+
+let triangle2 = polygon(300, 50, 450, 50, 450, 300)
+triangle2.color = 'purple'
+triangle2.opacity = 0
+triangle2.fadeIn().wait()
+
+let triangle3 = polygon(450, 300, 450, 450, 200, 450)
+triangle3.color = 'purple'
+triangle3.opacity = 0
+triangle3.fadeIn().wait()
+
+let triangle4 = polygon(200, 450, 50, 450, 50, 200)
+triangle4.color = 'purple'
+triangle4.opacity = 0
+triangle4.fadeIn().wait()
+
+textBaseline = 'middle'
+fontSize = 14
+
+let balls = []
+for (let i = 1; i <= 100; i++) {
+  let ball = circle(250, 150, 32)
+  ball.bounciness = 0
+  let label = write(250, 152, i)
+  label.color = 'white'
+  let g = group(ball, label)
+  g.bounciness = 1
+  g.anchored = false
+  balls.push(g)
+  wait(0.01)
+}
+
+wait(4)
+for (let i = 0; i < balls.length; i++) {
+  balls[i].remove()
+}
+
+triangle2.moveTo(triangle2.x - 250, triangle2.y + 150, 1, 'linear').wait()
+triangle1.moveTo(triangle1.x + 150, triangle1.y, 1, 'linear').wait()
+triangle3.moveTo(triangle3.x, triangle3.y - 250, 1, 'linear').wait()
+
+balls = []
+for (let i = 1; i <= 25; i++) {
+  let ball = circle(75, 75, 32)
+  ball.bounciness = 1
+  let label = write(75, 77, i)
+  label.color = 'white'
+  let g = group(ball, label)
+  g.bounciness = 1
+  g.anchored = false
+  balls.push(g)
+  wait(0.01)
+}
+for (let i = 26; i <= 100; i++) {
+    let ball = circle(375, 275, 32)
+    ball.bounciness = 1
+    let label = write(375, 277, i)
+    label.color = 'white'
+    let g = group(ball, label)
+    g.bounciness = 1
+    g.anchored = false
+    balls.push(g)
+    wait(0.01)
+  }
+
+</script>
+</body>
+</html>

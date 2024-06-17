@@ -65,17 +65,22 @@ export default class Group extends Actor {
     }
 
     // Draw children on temporary canvas
+    let scale = context.canvas.width / window.innerWidth;
     let tempCanvas = document.createElement('canvas');
     tempCanvas.width = context.canvas.width;
     tempCanvas.height = context.canvas.height;
     let tempContext = tempCanvas.getContext('2d');
+    tempContext.scale(scale, scale);
     for (let i = 0; i < this.children.length; i = i + 1) {
       this.children[i].render(tempContext);
     }
 
     // Copy to main canvas
     context.globalAlpha = this.opacity;
+    context.save();
+    context.resetTransform();
     context.drawImage(tempCanvas, 0, 0);
+    context.restore();
     context.globalAlpha = 1;
   }
 

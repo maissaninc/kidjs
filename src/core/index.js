@@ -313,7 +313,7 @@ async function compile(code) {
         }
 
         // Look for calls to display() at right hand side of variable declaration
-        if (node.body[i].type == 'VariableDeclaration' &&
+        /*if (node.body[i].type == 'VariableDeclaration' &&
           typeof node.body[i].declarations != 'undefined' &&
           node.body[i].declarations.length > 0 &&
           typeof node.body[i].declarations[0].init !== 'undefined' &&
@@ -332,10 +332,10 @@ async function compile(code) {
             type: 'Literal',
             value: true
           };
-        }
+        }*/
 
         // Look for calls to display() at right hand side of assignment
-        if (node.body[i].type == 'ExpressionStatement' &&
+        /*if (node.body[i].type == 'ExpressionStatement' &&
           typeof node.body[i].expression.right  !== 'undefined' &&
           typeof node.body[i].expression.right.callee  !== 'undefined' &&
           node.body[i].expression.right.callee.name == 'display' &&
@@ -351,7 +351,7 @@ async function compile(code) {
             type: 'Literal',
             value: true
           };
-        }
+        }*/
 
         // Convert all functions to async
         if (node.body[i].type == 'FunctionDeclaration') {

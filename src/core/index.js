@@ -312,6 +312,43 @@ async function compile(code) {
           };
         }
 
+        // Look for calls to display() at right hand side of variable declaration
+        if (node.body[i].type == 'VariableDeclaration' &&
+          typeof node.body[i].declarations[0].init.callee !== 'undefined' &&
+          node.body[i].declarations[0].init.callee.name == 'display' &&
+          node.body[i].declarations[0].init.arguments.length == 3 &&
+          node.body[i].declarations[0].init.arguments[2].type != 'Literal'
+        ) {
+          let expression = astring.generate(node.body[i].declarations[0].init.arguments[2]);
+          node.body[i].declarations[0].init.arguments[2] = {
+            type: 'Literal',
+            value: expression
+          };
+          node.body[i].declarations[0].init.arguments[3] = {
+            type: 'Literal',
+            value: true
+          };
+        }
+
+        // Look for calls to display() at right hand side of assignment
+        if (node.body[i].type == 'ExpressionStatement' &&
+          typeof node.body[i].expression.right  !== 'undefined' &&
+          typeof node.body[i].expression.right.callee  !== 'undefined' &&
+          node.body[i].expression.right.callee.name == 'display' &&
+          node.body[i].expression.right.arguments.length == 3 &&
+          node.body[i].expression.right.arguments[2].type != 'Literal'
+        ) {
+          let expression = astring.generate(node.body[i].expression.right.arguments[2]);
+          node.body[i].expression.right.arguments[2] = {
+            type: 'Literal',
+            value: expression
+          };
+          node.body[i].expression.right.arguments[3] = {
+            type: 'Literal',
+            value: true
+          };
+        }
+
         // Convert all functions to async
         if (node.body[i].type == 'FunctionDeclaration') {
           if (node.body[i].async == false) {
@@ -668,6 +705,7 @@ export async function run(code) {
   window.stage.run();
   log('Compilation started');
   let processed = await compile(code);
+  console.log(processed);
   log('Compilation complete');
   await getPermissions();
   window._kidjs_.setGlobals();

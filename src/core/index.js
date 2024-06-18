@@ -314,13 +314,15 @@ async function compile(code) {
 
         // Look for calls to display() at right hand side of variable declaration
         if (node.body[i].type == 'VariableDeclaration' &&
-          typeof node.body[i].declarations.length > 0 &&
+          typeof node.body[i].declarations != 'undefined' &&
+          node.body[i].declarations.length > 0 &&
           typeof node.body[i].declarations[0].init !== 'undefined' &&
           typeof node.body[i].declarations[0].init.callee !== 'undefined' &&
           node.body[i].declarations[0].init.callee.name == 'display' &&
           node.body[i].declarations[0].init.arguments.length == 3 &&
           node.body[i].declarations[0].init.arguments[2].type != 'Literal'
         ) {
+          console.log(node.body[i]);
           let expression = astring.generate(node.body[i].declarations[0].init.arguments[2]);
           node.body[i].declarations[0].init.arguments[2] = {
             type: 'Literal',
@@ -707,7 +709,6 @@ export async function run(code) {
   window.stage.run();
   log('Compilation started');
   let processed = await compile(code);
-  console.log(processed);
   log('Compilation complete');
   await getPermissions();
   window._kidjs_.setGlobals();

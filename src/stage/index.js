@@ -276,14 +276,22 @@ export default class Stage {
       }
 
       // Update physics simulation
+      this._leftWall.locked = false;
       this._leftWall.ghost = !window.walls;
       this._leftWall.collides = window.walls;
+      this._leftWall.locked = true;
+      this._rightWall.locked = false;
       this._rightWall.ghost = !window.walls;
       this._rightWall.collides = window.walls;
+      this._rightWall.locked = true;
+      this._ceiling.locked = false;
       this._ceiling.ghost = !window.ceiling;
       this._ceiling.collides = window.ceiling;
+      this._ceiling.locked = true;
+      this._floor.locked = false;
       this._floor.ghost = !window.floor;
       this._floor.collides = window.floor;
+      this._floor.locked = true;
       this.engine.gravity.y = window.gravity;
       Matter.Engine.update(this.engine);
 

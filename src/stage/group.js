@@ -65,7 +65,7 @@ export default class Group extends Actor {
     }
 
     // Draw children on temporary canvas
-    let scale = context.canvas.width / window.innerWidth;
+    let scale = context.canvas.width / window.width;
     let tempCanvas = document.createElement('canvas');
     tempCanvas.width = context.canvas.width;
     tempCanvas.height = context.canvas.height;

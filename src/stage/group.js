@@ -22,6 +22,13 @@ export default class Group extends Actor {
    * Initialize physics body.
    */
   init() {
+    this.updateBody();
+  }
+
+  /**
+   * Update physics body.
+   */
+  updateBody() {
     let bodies = [];
     for (let i = 0; i < this.children.length; i = i + 1) {
       if (this.children[i].body) {
@@ -103,11 +110,48 @@ export default class Group extends Actor {
   }
 
   /**
+   * Add child to group.
+   */
+  addChild(actor) {
+    actor.parent = this;
+    this.children.push(actor);
+    window.stage.removeChild(actor);
+  }
+
+  /**
+   * Alias for add child.
+   */
+  add(actor) {
+    this.addChild(actor);
+  }
+
+  /**
+   * Remove child from group.
+   */
+  removeChild(actor) {
+    let index = this.children.indexOf(actor);
+    if (index > -1) {
+      actor.parent = null;
+      this.children.splice(index, 1);
+      this.updateBody();
+      window.stage.addChild(actor);
+    }
+  }
+
+  /**
    * Remove group.
    */
-  remove() {
+  remove(actor = false) {
+
+    // Remove child from group
+    if (actor) {
+      return this.removeChild(actor);
+    }
+
+    // Remove entire group from stage
     window.stage.removeChild(this);
     this.children = [];
+    this.updateBody();
   }
 
   /**
@@ -147,11 +191,12 @@ export function group(...actors) {
   let group = new Group();
   group.children = actors;
 
-  // Remove children from stage
+  // Set parent and remove from stage
   for (let i = 0; i < actors.length; i = i + 1) {
+    actors[i].parent = group;
     window.stage.removeChild(actors[i]);
   }
-
+  
   // Initialize group and add to stage
   group.init();
   window.stage.addChild(group);

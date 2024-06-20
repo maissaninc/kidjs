@@ -60,6 +60,9 @@ export default class Actor {
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
       }
+      if (this.parent) {
+        this.parent.updateBody();
+      }
     }
   }
 
@@ -75,6 +78,9 @@ export default class Actor {
       this.position.y = value;
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
+      }
+      if (this.parent) {
+        this.parent.updateBody();
       }
     }
   }

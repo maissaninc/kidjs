@@ -95,14 +95,12 @@ export default class Line extends Shape {
         context.lineTo(this.x + this.v.x, this.y + this.v.y);
     }
 
-    // Reset line
-    context.setLineDash([]);
-
     this.postrender(context);
   }
 
   postrender(context) {
     this.style.stroke(context, this.stroke, this.lineWidth);
+    context.setLineDash([]);
   }
 
   wiggle() {

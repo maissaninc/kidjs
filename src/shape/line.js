@@ -10,6 +10,8 @@ export default class Line extends Shape {
     }
     this.v = new Vector(x2 - x1, y2 - y1);
     this.u = this.v.normalize();
+    this.dashed = false;
+    this.cap = false;
   }
 
   get x1() {
@@ -51,6 +53,23 @@ export default class Line extends Shape {
   render(context) {
     this.prerender(context);
 
+    // Dashed line
+    if (this.dashed) {
+      context.setLineDash([5, 5]);
+    }
+
+    // Line cap
+    switch (this.cap) {
+      case 'round': 
+        context.lineCap = 'round';
+        break;
+      case 'square':
+        context.lineCap = 'square';
+        break;
+      default: 
+        context.lineCap = 'butt';
+    }
+
     switch (this.state) {
       case 'wiggle':
         context.moveTo(this.x, this.y);
@@ -75,6 +94,10 @@ export default class Line extends Shape {
         context.moveTo(this.x, this.y);
         context.lineTo(this.x + this.v.x, this.y + this.v.y);
     }
+
+    // Reset line
+    context.setLineDash([]);
+
     this.postrender(context);
   }
 

@@ -25,7 +25,7 @@ export default class Stage {
 
     // Create canvas
     this.canvas = document.createElement('canvas');
-    this.context = this.canvas.getContext('2d', {alpha: false});
+    this.context = this.canvas.getContext('2d');
     this.canvas.style.display = 'block';
     this.canvas.style.position = 'fixed';
     this.canvas.style.top = '0px';

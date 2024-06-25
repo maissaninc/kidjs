@@ -101,11 +101,6 @@ export function init() {
       for (let i = 0; i < window._kidjs_.hooks.setGlobals.length; i = i + 1) {
         window._kidjs_.hooks.setGlobals[0]();
       }
-
-      // Reset freeze detection when returning from background
-      document.addEventListener('visibilitychange', function() {
-        window._kidjs_.stats.lastFrame = Date.now();
-      });
     },
 
     onframe: function() {
@@ -215,6 +210,11 @@ export function init() {
 
   // Initialize sockets
   initSockets();
+
+  // Reset freeze detection when returning from background
+  document.addEventListener('visibilitychange', function() {
+    window._kidjs_.stats.lastFrame = Date.now();
+  });
 
   window._kidjs_.setGlobals();
 }

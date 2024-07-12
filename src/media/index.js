@@ -7,11 +7,16 @@ export default class Recording {
    */
   constructor() {
     this.stream = window.stage.canvas.captureStream(60);
-    this.recorder = new MediaRecorder(stream);
+    this.recorder = new MediaRecorder(this.stream, {
+      audioBitsPerSecond: 128000,
+      videoBitsPerSecond: 2500000,
+      mimeType: 'video/webm'
+    });
+    console.log(this.recorder.mimeType);
     this.chunks = [];
     this.recorder.ondataavailable = function(e) {
-      chunks.push(e.data);
-    };
+      this.chunks.push(e.data);
+    }.bind(this);
   }
 
   /**
@@ -33,9 +38,9 @@ export default class Recording {
    *
    * @param {string} filename - Downloaded filename
    */
-  download(filename = 'capture.mp4') {
+  download(filename = 'capture.webm') {
     if (this.chunks.length > 0) {
-      let blob = new Blob(this.chunks, { 'type' : 'video/mp4' }); 
+      let blob = new Blob(this.chunks, { 'type' : 'video/webm' }); 
       let videoURL = URL.createObjectURL(blob);
       let a = document.createElement("a");
       document.body.appendChild(a);

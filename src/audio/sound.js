@@ -32,3 +32,7 @@ export function sound(url, autoplay) {
   let sound = new Sound(url, autoplay);
   return sound;
 }
+
+export function tada() {
+  sound(window._kidjs_.scriptPath + '/assets/tada.mp3', true);
+}

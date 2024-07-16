@@ -22,6 +22,7 @@ import { semicircle } from '../shape/semicircle';
 import { triangle } from '../shape/triangle';
 import { image } from '../sprite';
 import { star } from '../shape/star';
+import { tada } from '../audio/sound';
 import { display, write, writeln } from '../text';
 import { group } from '../stage/group';
 import { random } from './math';
@@ -52,6 +53,8 @@ export function init() {
       grid: false,
       pixelSize: 1
     },
+
+    scriptPath: scriptPath,
 
     stats: {
       lastFrame: Date.now(),
@@ -88,6 +91,7 @@ export function init() {
       window.speak = speak;
       window.square = square;
       window.star = star;
+      window.tada = tada;
       window.triangle = triangle;
       window.wait = wait;
       window.write = write;

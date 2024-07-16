@@ -1,5 +1,6 @@
 const path = require('path');
 const BomPlugin = require('webpack-utf8-bom');
+const CopyPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
@@ -14,7 +15,12 @@ module.exports = {
     minimizer: [new TerserPlugin()],
   },
   plugins: [
-    new BomPlugin(true)
+    new BomPlugin(true),
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/assets', to: 'assets' }
+      ]
+    })
   ],
   module: {
     rules: [

@@ -135,6 +135,12 @@ export class NeuralNetwork {
       };
       this._trainingData.push(data);
     }
+
+    // Hook for visualization
+    if (typeof window._kidjs_.nnVisualizeData === 'function') {
+      window._kidjs_.nnVisualizeData(this, input, output, 'train');
+    }
+
   }
 
   /**
@@ -165,7 +171,14 @@ export class NeuralNetwork {
       result[i] = result[i] * this._outputSize[i] + this._outputMinimums[i];
     }
 
-    return this._parseResult(result);
+    let output = this._parseResult(result);
+
+    // Hook for visualization
+    if (typeof window._kidjs_.nnVisualizeData === 'function') {
+      window._kidjs_.nnVisualizeData(this, input, output, 'run');
+    }
+
+    return output;
   }
 }
 

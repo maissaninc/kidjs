@@ -136,11 +136,18 @@ export class NeuralNetwork {
       this._trainingData.push(data);
     }
 
-    // Hook for visualization
-    if (typeof window._kidjs_.nnVisualizeData === 'function') {
-      if (window._kidjs_.nnVisualizeData(this, input, output, 'train')) {
-        this.run(input);
+    // Hooks for visualization
+    if (typeof window._kidjs_.nnVisualizeEnabled === 'function') {
+
+      // If visualization is enabled, train network as we go
+      if (window._kidjs_.nnVisualizeEnabled()) {
+        let data = this._normalizeData(this._trainingData);
+        this.nn.train(data);
+        this._needsTraining = false;
       }
+    }
+    if (typeof window._kidjs_.nnVisualizeData === 'function') {
+      window._kidjs_.nnVisualizeData(this, input, output, 'train');
     }
 
   }
@@ -165,8 +172,8 @@ export class NeuralNetwork {
     }
 
     // Run input through network
-    input = this._normalizeInput(this._parseInput(input));
-    let result = this.nn.run(input);
+    let normalizedInput = this._normalizeInput(this._parseInput(input));
+    let result = this.nn.run(normalizedInput);
 
     // "Reverse" normalized output
     for (let i in result) {

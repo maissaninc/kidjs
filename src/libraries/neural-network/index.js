@@ -179,7 +179,6 @@ export class NeuralNetwork {
     for (let i in result) {
       result[i] = result[i] * this._outputSize[i] + this._outputMinimums[i];
     }
-
     let output = this._parseResult(result);
 
     // Hook for visualization

@@ -138,7 +138,9 @@ export class NeuralNetwork {
 
     // Hook for visualization
     if (typeof window._kidjs_.nnVisualizeData === 'function') {
-      window._kidjs_.nnVisualizeData(this, input, output, 'train');
+      if (window._kidjs_.nnVisualizeData(this, input, output, 'train')) {
+        this.run(input);
+      }
     }
 
   }
@@ -150,7 +152,7 @@ export class NeuralNetwork {
    */
   run(input) {
 
-    // If not training data, return random value
+    // If no training data, return random value
     if (this._trainingData.length == 0) {
       return Math.random();
     }

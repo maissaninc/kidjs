@@ -14,6 +14,14 @@ export default class Curve extends Shape {
     }
   }
 
+  get color() {
+    return this.stroke;
+  }
+
+  set color(value) {
+    this.stroke = value;
+  }
+
   drawSpline(context) {
     let points = [...this.points];
     points.unshift(points[0]);

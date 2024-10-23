@@ -263,7 +263,8 @@ export default class Stage {
         this.context.fillStyle = window._kidjs_.settings.backgroundColor;
         this.context.fillRect(0, 0, this.width, this.height);
       } else {
-        this.context.clearRect(0, 0, this.width, this.height);
+        this.context.fillStyle = 'white';
+        this.context.fillRect(0, 0, this.width, this.height);
       }
 
       // Detect change in friction

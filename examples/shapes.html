@@ -33,7 +33,14 @@
 
       pie(500, 200, 50, 0, 300).spin()
 
-      polygon(570, 200, 600, 190, 610, 230).spin()
+      let p = polygon(570, 200, 600, 190, 610, 230).spin()
+      p.color = 'red'
+
+      let l = line(75, 275, 125, 325)
+      l.color = 'red'
+
+      let c = curve(175, 275, 200, 275, 200, 325, 225, 325)
+      c.color = 'blue'
 
     </script>
   </body>

@@ -135,6 +135,21 @@ export class NeuralNetwork {
       };
       this._trainingData.push(data);
     }
+
+    // Hooks for visualization
+    if (typeof window._kidjs_.nnVisualizeEnabled === 'function') {
+
+      // If visualization is enabled, train network as we go
+      if (window._kidjs_.nnVisualizeEnabled()) {
+        let data = this._normalizeData(this._trainingData);
+        this.nn.train(data);
+        this._needsTraining = false;
+      }
+    }
+    if (typeof window._kidjs_.nnVisualizeData === 'function') {
+      window._kidjs_.nnVisualizeData(this, input, output, 'train');
+    }
+
   }
 
   /**
@@ -144,7 +159,7 @@ export class NeuralNetwork {
    */
   run(input) {
 
-    // If not training data, return random value
+    // If no training data, return random value
     if (this._trainingData.length == 0) {
       return Math.random();
     }
@@ -157,15 +172,21 @@ export class NeuralNetwork {
     }
 
     // Run input through network
-    input = this._normalizeInput(this._parseInput(input));
-    let result = this.nn.run(input);
+    let normalizedInput = this._normalizeInput(this._parseInput(input));
+    let result = this.nn.run(normalizedInput);
 
     // "Reverse" normalized output
     for (let i in result) {
       result[i] = result[i] * this._outputSize[i] + this._outputMinimums[i];
     }
+    let output = this._parseResult(result);
 
-    return this._parseResult(result);
+    // Hook for visualization
+    if (typeof window._kidjs_.nnVisualizeData === 'function') {
+      window._kidjs_.nnVisualizeData(this, input, output, 'run');
+    }
+
+    return output;
   }
 }
 

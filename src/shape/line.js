@@ -50,6 +50,14 @@ export default class Line extends Shape {
     this.v.y = value - this.y;
   }
 
+  get color() {
+    return this.stroke;
+  }
+
+  set color(value) {
+    this.stroke = value;
+  }
+
   render(context) {
     this.prerender(context);
 

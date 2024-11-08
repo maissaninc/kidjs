@@ -32,12 +32,12 @@ export function getPermissions() {
       label.style.borderRadius = '100px';
       label.style.color = '#fff';
       label.style.fontFamily = '"Public Sans", Helvetica, sans-serif';
-      label.style.fontSize = '30px';
+      label.style.fontSize = '24px';
       label.style.fontWeight = 'bold';
-      label.style.paddingLeft = '15px';
-      label.style.paddingRight = '15px';
-      label.style.paddingTop = '10px';
-      label.style.paddingBottom = '10px';
+      label.style.paddingLeft = '25px';
+      label.style.paddingRight = '25px';
+      label.style.paddingTop = '15px';
+      label.style.paddingBottom = '15px';
       clickToStart.appendChild(label);
 
       clickToStart.addEventListener('click', async () => {

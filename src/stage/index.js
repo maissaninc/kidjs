@@ -200,9 +200,11 @@ export default class Stage {
     log('Stage reset');
 
     // Lock screen orientation
-    if (screen.orientation) {
+    if (screen.orientation && screen.orientation.lock) {
       if (['portrait', 'landscape'].includes(window._kidjs_.settings.orientation)) {
-        screen.orientation.lock(window._kidjs_.settings.orientation);
+        screen.orientation.lock(window._kidjs_.settings.orientation).catch(function(error) {
+          console.warn(error);
+        });
       } else {
         screen.orientation.unlock();
       }

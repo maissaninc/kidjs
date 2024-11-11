@@ -27,6 +27,7 @@ import { init, run, stop, setAssetUrlFilter } from './core';
 import initEvents from './events';
 import Stage from './stage';
 import Grid from './stage/grid';
+import OrientationOverlay from './stage/orientation-overlay';
 
 // Initialize framework
 init();
@@ -42,6 +43,9 @@ window.addEventListener('DOMContentLoaded', function() {
   // Create grid
   window.grid = new Grid();
   document.body.appendChild(grid.canvas);
+
+  // Orientation overlay
+  new OrientationOverlay();
 
   // Resize canvas
   window.addEventListener('resize', function() {

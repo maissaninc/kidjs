@@ -199,6 +199,16 @@ export default class Stage {
   reset() {
     log('Stage reset');
 
+    // Lock screen orientation
+    if (screen.orientation) {
+      if (['portrait', 'landscape'].includes(window._kidjs_.settings.orientation)) {
+        screen.orientation.lock(window._kidjs_.settings.orientation);
+      } else {
+        screen.orientation.unlock();
+      }
+    }
+
+
     // Reset fill and stroke
     window.fill = 'theme';
     window.stroke = false;

@@ -22,11 +22,18 @@ export default class Actor {
     this._angularVelocity = 0;
     this.spinnable = true;
     this._bounciness = 0.8;
+    this._direction = 0;
     this._ghost = false;
     this._collides = true;
 
     // External properties
     this.locked = false;
+
+    // Detect change in velocity
+    this._acceleration = new Vector(0, 0);
+    this._acceleration.onchange = () => {
+      this.anchored = false;
+    }
 
     // Detect change in velocity
     this.velocity = new Vector(0, 0);
@@ -89,6 +96,22 @@ export default class Actor {
     if (!this.locked) {
       this.cancelAnimations('y');
       this._sety(value);
+    }
+  }
+
+  get acceleration() {
+    return this._acceleration;
+  }
+
+  set acceleration(value) {
+    console.log('Set');
+    if (value instanceof Vector) {
+      this._acceleration.x = value.x;
+      this._acceleration.y = value.y;
+    } else {
+      console.log('Dir' + this.direction);
+      this._acceleration.x = Math.cos(degreesToRadians(this.direction)) * value;
+      this._acceleration.y = Math.sin(degreesToRadians(this.direction)) * value;
     }
   }
 
@@ -174,6 +197,7 @@ export default class Actor {
 
   set direction(value) {
     if (!this.locked) {
+      this._direction = value;
       if (this.body) {
         Matter.Body.setVelocity(this.body, new Vector(
           Math.cos(degreesToRadians(value)) * this.speed,
@@ -184,10 +208,16 @@ export default class Actor {
   }
 
   get direction() {
-    if (this.body) {
+
+    // If body is moving, calculate direction
+    if (this.body && (this.body.velocity.x > 0 || this.body.velocity.y > 0)) {
       let a = Math.atan2(this.body.velocity.y, this.body.velocity.x)
       if (a < 0) a = a + Math.PI * 2;
       return radiansToDegrees(a);
+
+    // Otherwise return latest direction
+    } else {
+      return this._direction;
     }
   }
 
@@ -273,6 +303,14 @@ export default class Actor {
   update() {
     this.frame++;
 
+    // Apply acceleration
+    if (this.body) {
+      Matter.Body.setVelocity(this.body, new Vector(
+        this.body.velocity.x + this._acceleration.x,
+        this.body.velocity.y + this._acceleration.y
+      ));
+    }
+
     // Apply angular velocity
     if (!this.spinnable) {
       this.angularVelocity = 0;
@@ -286,6 +324,11 @@ export default class Actor {
     if (this.body) {
       this.velocity._x = this.body.velocity.x;
       this.velocity._y = this.body.velocity.y;
+    }
+
+    // Remember last direction
+    if (this.body) {
+      this._direction = this.direction;
     }
 
     // Update animations

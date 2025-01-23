@@ -46,6 +46,9 @@ function onDeviceOrientation(e) {
     let event = new CustomEvent('tiltdown')
     window.stage.dispatchEvent(event);
   }
+
+  // Trigger deviceorientation event on stage
+  window.stage.dispatchEvent(e);
 }
 
 // Trigger "tilt" event each frame

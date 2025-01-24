@@ -1,3 +1,5 @@
+import Vector from '../core/vector';
+
 const threshold = 10;
 
 function getHorizontalTilt(e) {

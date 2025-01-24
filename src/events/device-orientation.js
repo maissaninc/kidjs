@@ -22,6 +22,7 @@ function onDeviceOrientation(e) {
   window.orientationGamma = e.gamma;
   window.tiltX = e.tiltX = getHorizontalTilt(e);
   window.tiltY = e.tiltY = getVerticalTilt(e);
+  window.tilt = new Vector(window.tiltX, window.tiltY);
 
   // Trigger "tiltleft" event
   if (window.tiltX < -threshold) {

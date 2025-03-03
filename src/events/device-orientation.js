@@ -3,7 +3,7 @@ import Vector from '../core/vector';
 const threshold = 10;
 
 function getHorizontalTilt(e) {
-  if (window.matchMedia('(orientation: portrait)').matches) {
+  if (screen.orientation.type.includes('portrait')) {
     return e.gamma;
   } else {
     return -e.beta;
@@ -11,7 +11,7 @@ function getHorizontalTilt(e) {
 }
 
 function getVerticalTilt(e) {
-  if (window.matchMedia('(orientation: portrait)').matches) {
+  if (screen.orientation.type.includes('portrait')) {
     return e.beta;
   } else {
     return e.gamma;

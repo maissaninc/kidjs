@@ -29,7 +29,7 @@ export default class Actor {
     // External properties
     this.locked = false;
 
-    // Detect change in velocity
+    // Detect change in acceleration
     this._acceleration = new Vector(0, 0);
     this._acceleration.onchange = () => {
       this.anchored = false;

@@ -12,9 +12,9 @@ export default class Recording {
       videoBitsPerSecond: 2500000,
       mimeType: 'video/webm'
     });
-    console.log(this.recorder.mimeType);
     this.chunks = [];
     this.recorder.ondataavailable = function(e) {
+      console.log('Chunk');
       this.chunks.push(e.data);
     }.bind(this);
   }

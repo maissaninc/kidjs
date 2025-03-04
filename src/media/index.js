@@ -14,7 +14,6 @@ export default class Recording {
     });
     this.chunks = [];
     this.recorder.ondataavailable = function(e) {
-      console.log('Chunk');
       this.chunks.push(e.data);
     }.bind(this);
   }

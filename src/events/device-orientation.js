@@ -3,7 +3,6 @@ import Vector from '../core/vector';
 const threshold = 10;
 
 function getHorizontalTilt(e) {
-  console.log(screen.orientation.type);
   if (screen.orientation.type.includes('portrait')) {
     return e.gamma;
   } else {

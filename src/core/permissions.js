@@ -1,5 +1,3 @@
-import imageSrc from './assets/tap.png';
-
 let permissionsRequred = [];
 
 export function requirePermission(permission) {
@@ -28,18 +26,19 @@ export function getPermissions() {
       clickToStart.style.zIndex = 100;
       clickToStart.style.cursor = 'pointer';
 
-      let label = document.createElement('span');
+      let label = document.createElement('div');
       label.innerHTML = ('ontouchstart' in window) ? 'Tap to start' : 'Click to start';
-      label.style.fontFamily = '"Libre Franklin", Helvetica, sans-serif';
-      label.style.fontSize = '40px';
+      label.style.backgroundColor = '#000';
+      label.style.borderRadius = '100px';
+      label.style.color = '#fff';
+      label.style.fontFamily = '"Public Sans", Helvetica, sans-serif';
+      label.style.fontSize = '24px';
       label.style.fontWeight = 'bold';
+      label.style.paddingLeft = '25px';
+      label.style.paddingRight = '25px';
+      label.style.paddingTop = '15px';
+      label.style.paddingBottom = '15px';
       clickToStart.appendChild(label);
-
-      let image = document.createElement('img');
-      image.src = imageSrc;
-      image.style.width = '50px';
-      image.style.marginLeft = '20px';
-      clickToStart.appendChild(image);
 
       clickToStart.addEventListener('click', async () => {
         for (let i = 0; i < permissionsRequred.length; i = i + 1) {

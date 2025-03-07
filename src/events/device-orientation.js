@@ -1,7 +1,9 @@
+import Vector from '../core/vector';
+
 const threshold = 10;
 
 function getHorizontalTilt(e) {
-  if (window.matchMedia('(orientation: portrait)').matches) {
+  if (screen.orientation.type.includes('portrait')) {
     return e.gamma;
   } else {
     return -e.beta;
@@ -9,7 +11,7 @@ function getHorizontalTilt(e) {
 }
 
 function getVerticalTilt(e) {
-  if (window.matchMedia('(orientation: portrait)').matches) {
+  if (screen.orientation.type.includes('portrait')) {
     return e.beta;
   } else {
     return e.gamma;
@@ -22,6 +24,7 @@ function onDeviceOrientation(e) {
   window.orientationGamma = e.gamma;
   window.tiltX = e.tiltX = getHorizontalTilt(e);
   window.tiltY = e.tiltY = getVerticalTilt(e);
+  window.tilt = new Vector(window.tiltX, window.tiltY);
 
   // Trigger "tiltleft" event
   if (window.tiltX < -threshold) {
@@ -46,6 +49,9 @@ function onDeviceOrientation(e) {
     let event = new CustomEvent('tiltdown')
     window.stage.dispatchEvent(event);
   }
+
+  // Trigger deviceorientation event on stage
+  window.stage.dispatchEvent(e);
 }
 
 // Trigger "tilt" event each frame

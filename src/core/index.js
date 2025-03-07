@@ -51,7 +51,8 @@ export function init() {
       slowMotion: false,
       slowMotionDelay: 1,
       grid: false,
-      pixelSize: 1
+      pixelSize: 1,
+      orientation: 'auto'
     },
 
     scriptPath: scriptPath,

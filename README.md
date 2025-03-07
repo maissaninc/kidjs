@@ -25,7 +25,7 @@ Use the following HTML template to get started. Any code written inside of
 </html>
 ```
 
-See the [documentation](https://kidjs.org) for a comprehensive list of available
+See the [documentation](https://kidjs.io) for a comprehensive list of available
 functions, properties and events. Or, ask your question on our
 [Discord server](https://discord.gg/qQeKuqyWbt).
 

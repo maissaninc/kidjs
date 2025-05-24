@@ -3,9 +3,6 @@ import Vector from '../core/vector';
 const threshold = 10;
 
 function getHorizontalTilt(e) {
-  console.log(screen.orientation.type);
-  console.log(e.beta);
-  console.log(e.gamma);
   switch (screen.orientation.type) {
     case 'landscape-primary':
     case 'landscape':
@@ -25,9 +22,9 @@ function getVerticalTilt(e) {
   switch (screen.orientation.type) {
     case 'landscape-primary':
     case 'landscape':
-      return e.gamma;
-    case 'landscape-secondary':
       return -e.gamma;
+    case 'landscape-secondary':
+      return e.gamma;
     case 'portrait-secondary':
       return -e.beta;
     case 'portrait-primary':

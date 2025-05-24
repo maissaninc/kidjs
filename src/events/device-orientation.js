@@ -3,18 +3,34 @@ import Vector from '../core/vector';
 const threshold = 10;
 
 function getHorizontalTilt(e) {
-  if (screen.orientation.type.includes('portrait')) {
-    return e.gamma;
-  } else {
-    return -e.beta;
+  switch (screen.orientation.type) {
+    case 'landscape-primary':
+    case 'landscape':
+      return e.beta;
+    case 'landscape-secondary':
+      return -e.beta;
+    case 'portrait-secondary':
+      return -e.gamma;
+    case 'portrait-primary':
+    case 'portrait':
+    default:
+      return e.gamma;
   }
 }
 
 function getVerticalTilt(e) {
-  if (screen.orientation.type.includes('portrait')) {
-    return e.beta;
-  } else {
-    return e.gamma;
+  switch (screen.orientation.type) {
+    case 'landscape-primary':
+    case 'landscape':
+      return -e.gamma;
+    case 'landscape-secondary':
+      return e.gamma;
+    case 'portrait-secondary':
+      return -e.beta;
+    case 'portrait-primary':
+    case 'portrait':
+    default:
+      return e.beta;
   }
 }
 

@@ -66,7 +66,19 @@ window.addEventListener('DOMContentLoaded', function() {
   // Execute script blocks
   let scripts = document.querySelectorAll('script[type="kidjs"]');
   for (let script of scripts) {
-    run(script.innerHTML);
+
+    // Load external script
+    if (script.src) {
+      fetch(script.src).then(function(response) {
+        return response.text();
+      }).then(function(text) {
+        run(text);
+      });
+
+    // Run internal script
+    } else {
+      run(script.innerHTML);
+    }
   }
 });
 

@@ -106,7 +106,6 @@ export default class OrientationOverlay {
      */
     onOrientationChanged() {
         this.hide();
-        console.log(screen.orientation.type);
         if (window._kidjs_.settings.orientation == 'portrait' && (
             screen.orientation.type == 'landscape' ||
             screen.orientation.type == 'landscape-primary' ||

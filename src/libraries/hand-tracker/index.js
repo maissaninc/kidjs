@@ -1,6 +1,5 @@
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
-import Palm from './palm';
-import Phalange from './phalange';
+import * as THREE from 'three';
 
 export class HandTracker {
 
@@ -11,6 +10,9 @@ export class HandTracker {
    */
   constructor() {
     this.active = false;
+    this.canvas = null;
+    this.visible = false;
+    this.landmarks = [];
   }
 
   /**
@@ -32,8 +34,33 @@ export class HandTracker {
     });
     this.videoElement = document.createElement('video');
     this.videoElement.setAttribute('autoplay', '');
+
+    // Create canvas to render hand
+    this.canvas = document.createElement('canvas');
+    document.body.appendChild(this.canvas);
+
+    // Create Three.js scene
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera.position.z = 5;
+    this.scene.add(this.camera);
+
+    // Create Three.js renderer
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
+
+    // Create hand mesh
+    for (let i = 0; i <= 20; i = i + 1) {
+      this.landmarks.push(new THREE.Mesh(
+        new THREE.SphereGeometry(0.01, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+      ));
+      this.scene.add(this.landmarks[i]);
+    }
   }
 
+  /**
+   * Start hand tracking.
+   */
   async start() {
     await this.init();
 
@@ -46,50 +73,47 @@ export class HandTracker {
         this.onAnimationFrame();
       });
     });
-
-    this.palm = new Palm();
-    this.phalanges = [];
-    for (let i = 0; i < 20; i = i + 1) {
-      this.phalanges.push(new Phalange());
-    }
   }
 
+  /**
+   * Stop hand tracking.
+   */
   stop() {
     this.active = false;
   }
 
+  /**
+   * Update hand position.
+   */
   onAnimationFrame() {
     let results = this.handLandmarker.detectForVideo(
       this.videoElement, performance.now()
     );
     
+    // Show in view
     if (results.landmarks.length > 0) {
-      this.palm.show(
-        window.stage.canvas.width / 2 - results.landmarks[0][0].x * window.stage.canvas.width / 2,
-        results.landmarks[0][0].y * window.stage.canvas.height / 2,
-        window.stage.canvas.width / 2 - results.landmarks[0][1].x * window.stage.canvas.width / 2,
-        results.landmarks[0][1].y * window.stage.canvas.height / 2,
-        window.stage.canvas.width / 2 - results.landmarks[0][5].x * window.stage.canvas.width / 2,
-        results.landmarks[0][5].y * window.stage.canvas.height / 2,
-        window.stage.canvas.width / 2 - results.landmarks[0][9].x * window.stage.canvas.width / 2,
-        results.landmarks[0][9].y * window.stage.canvas.height / 2,
-        window.stage.canvas.width / 2 - results.landmarks[0][13].x * window.stage.canvas.width / 2,
-        results.landmarks[0][13].y * window.stage.canvas.height / 2,
-        window.stage.canvas.width / 2 - results.landmarks[0][17].x * window.stage.canvas.width / 2,
-        results.landmarks[0][17].y * window.stage.canvas.height / 2
-      );
-      for (let i = 0; i < this.phalanges.length; i = i + 1) {
-        let x1 = window.stage.canvas.width / 2 - results.landmarks[0][(i % 4 == 0) ? 0 : i].x * window.stage.canvas.width / 2;
-        let y1 = results.landmarks[0][(i % 4 == 0) ? 0 : i].y * window.stage.canvas.height / 2;
-        let x2 = window.stage.canvas.width / 2 - results.landmarks[0][i + 1].x * window.stage.canvas.width / 2;
-        let y2 = results.landmarks[0][i + 1].y * window.stage.canvas.height / 2;
-        this.phalanges[i].show(x1, y1, x2, y2);
+      this.visible = true;
+
+      // Update hand position
+      for (let i = 0; i <= 20; i = i + 1) {
+        this.landmarks[i].position.set(
+          results.landmarks[0][i].x,
+          results.landmarks[0][i].y,
+          results.landmarks[0][i].z
+        );
       }
+    
+    // Hide out of view
     } else {
-      this.palm.hide();
-      for (let i = 0; i < this.phalanges.length; i = i + 1) {
-        this.phalanges[i].hide();
-      }
+      this.visible = false;
+    }
+
+    // Render scene
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    if (this.visible) {
+      this.renderer.render(this.scene, this.camera);
     }
 
     if (this.active) {

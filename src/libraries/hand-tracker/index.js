@@ -37,22 +37,28 @@ export class HandTracker {
 
     // Create canvas to render hand
     this.canvas = document.createElement('canvas');
+    this.canvas.style.position = 'absolute';
+    this.canvas.style.top = 0;
+    this.canvas.style.left = 0;
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = '100%';
+    this.canvas.style.zIndex = 1000;
     document.body.appendChild(this.canvas);
 
     // Create Three.js scene
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.z = 5;
+    this.camera.position.z = 1;
     this.scene.add(this.camera);
 
     // Create Three.js renderer
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true });
 
     // Create hand mesh
     for (let i = 0; i <= 20; i = i + 1) {
       this.landmarks.push(new THREE.Mesh(
         new THREE.SphereGeometry(0.01, 32, 32),
-        new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        new THREE.MeshBasicMaterial({ color: 0x000000 })
       ));
       this.scene.add(this.landmarks[i]);
     }
@@ -93,12 +99,11 @@ export class HandTracker {
     // Show in view
     if (results.landmarks.length > 0) {
       this.visible = true;
-
-      // Update hand position
+      
       for (let i = 0; i <= 20; i = i + 1) {
         this.landmarks[i].position.set(
-          results.landmarks[0][i].x,
-          results.landmarks[0][i].y,
+          -results.landmarks[0][i].x + 0.5,
+          -results.landmarks[0][i].y + 0.5,
           results.landmarks[0][i].z
         );
       }

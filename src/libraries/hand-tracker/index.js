@@ -1,5 +1,6 @@
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 import * as THREE from 'three';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export class HandTracker {
 
@@ -13,6 +14,8 @@ export class HandTracker {
     this.canvas = null;
     this.visible = false;
     this.landmarks = [];
+    this.leftHand = null;
+    this.rightHand = null;
   }
 
   /**
@@ -48,7 +51,7 @@ export class HandTracker {
     // Create Three.js scene
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.z = 1;
+    this.camera.position.z = 10;
     this.scene.add(this.camera);
 
     // Create Three.js renderer
@@ -62,6 +65,30 @@ export class HandTracker {
       ));
       this.scene.add(this.landmarks[i]);
     }
+
+    // Load hand model
+    const loader = new FBXLoader();
+    loader.load(window._kidjs_.scriptPath + '/assets/models/left.fbx', (object) => {
+      this.leftHand = object; 
+      console.log(this.leftHand);
+      this.scene.add(this.leftHand);
+
+      for (let finger = 0; finger < 5; finger = finger + 1) {
+        let bone = this.leftHand.children[0].children[finger];
+        let depth = 4;
+        while (depth > 0) {
+          console.log(bone.isBone);
+          console.log(bone);
+          bone = bone.children[0];
+          depth = depth - 1;
+        }
+      }
+
+    });
+    /*loader.load(window._kidjs_.scriptPath + '/assets/models/right.fbx', (object) => {
+      this.rightHand = object;
+      this.scene.add(this.rightHand);
+    });*/
   }
 
   /**
@@ -89,6 +116,20 @@ export class HandTracker {
   }
 
   /**
+   * Translate landmark to Three.js coordinates.
+   * 
+   * @param {Object} - Landmark 
+   * @returns {Object} - Coordinates in 3D scene
+   */
+  translateLandmark(landmark) {
+    return [
+      -landmark.x + 0.5,
+      -landmark.y + 0.5,
+      landmark.z
+    ];
+  }
+
+  /**
    * Update hand position.
    */
   onAnimationFrame() {
@@ -101,12 +142,28 @@ export class HandTracker {
       this.visible = true;
       
       for (let i = 0; i <= 20; i = i + 1) {
-        this.landmarks[i].position.set(
-          -results.landmarks[0][i].x + 0.5,
-          -results.landmarks[0][i].y + 0.5,
-          results.landmarks[0][i].z
-        );
+        this.landmarks[i].position.set(...this.translateLandmark(results.landmarks[0][i]));
       }
+
+      this.leftHand.rotation.x = -Math.PI / 2;
+
+      // Position left hand
+      /*if (this.leftHand) {
+        this.leftHand.children[0].position.set(...this.translateLandmark(results.landmarks[0][0]));     
+        let landmarkIndex = 1;
+        for (let finger = 0; finger < 5; finger = finger + 1) {
+          let bone = this.leftHand.children[0].children[finger];
+          let depth = 4;
+          while (depth > 0) {
+            console.log(bone.isBone);
+            //bone.position.set(...this.translateLandmark(results.landmarks[0][landmarkIndex]));
+            console.log(bone);
+            bone = bone.children[0];
+            landmarkIndex = landmarkIndex + 1;
+            depth = depth - 1;
+          }
+        }
+      }*/
     
     // Hide out of view
     } else {

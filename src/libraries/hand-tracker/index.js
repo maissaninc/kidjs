@@ -15,7 +15,9 @@ export class HandTracker {
     this.visible = false;
     this.landmarks = [];
     this.leftHand = null;
+    this.leftWrist = null;
     this.rightHand = null;
+    this.rightWrist = null;
   }
 
   /**
@@ -57,33 +59,26 @@ export class HandTracker {
     // Create Three.js renderer
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true });
 
-    // Create hand mesh
-    for (let i = 0; i <= 20; i = i + 1) {
-      this.landmarks.push(new THREE.Mesh(
-        new THREE.SphereGeometry(0.01, 32, 32),
-        new THREE.MeshBasicMaterial({ color: 0x000000 })
-      ));
-      this.scene.add(this.landmarks[i]);
-    }
 
     // Load hand model
     const loader = new FBXLoader();
-    loader.load(window._kidjs_.scriptPath + '/assets/models/left.fbx', (object) => {
+    loader.load(window._kidjs_.scriptPath + '/assets/models/right.fbx', (object) => {
       this.leftHand = object; 
-      console.log(this.leftHand);
-      this.scene.add(this.leftHand);
-
-      for (let finger = 0; finger < 5; finger = finger + 1) {
-        let bone = this.leftHand.children[0].children[finger];
-        let depth = 4;
-        while (depth > 0) {
-          console.log(bone.isBone);
-          console.log(bone);
-          bone = bone.children[0];
-          depth = depth - 1;
+      for (let i = 0; i < this.leftHand.children.length; i = i + 1) {
+        if (this.leftHand.children[i].name == 'Wrist') {
+          this.leftWrist = this.leftHand.children[i];
         }
       }
+      this.scene.add(this.leftHand);
 
+      // Create hand mesh
+      for (let i = 0; i <= 20; i = i + 1) {
+        this.landmarks.push(new THREE.Mesh(
+          new THREE.SphereGeometry(0.25, 32, 32),
+          new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        ));
+        this.scene.add(this.landmarks[i]);
+      }
     });
     /*loader.load(window._kidjs_.scriptPath + '/assets/models/right.fbx', (object) => {
       this.rightHand = object;
@@ -119,13 +114,14 @@ export class HandTracker {
    * Translate landmark to Three.js coordinates.
    * 
    * @param {Object} - Landmark 
+   * @param {Number} - Scale factor
    * @returns {Object} - Coordinates in 3D scene
    */
-  translateLandmark(landmark) {
+  translateLandmark(landmark, scale=10) {
     return [
-      -landmark.x + 0.5,
-      -landmark.y + 0.5,
-      landmark.z
+      (-landmark.x + 0.5) * scale,
+      (-landmark.y + 0.5) * scale,
+      -landmark.z * scale
     ];
   }
 
@@ -141,29 +137,27 @@ export class HandTracker {
     if (results.landmarks.length > 0) {
       this.visible = true;
       
-      for (let i = 0; i <= 20; i = i + 1) {
-        this.landmarks[i].position.set(...this.translateLandmark(results.landmarks[0][i]));
-      }
-
-      this.leftHand.rotation.x = -Math.PI / 2;
-
       // Position left hand
-      /*if (this.leftHand) {
-        this.leftHand.children[0].position.set(...this.translateLandmark(results.landmarks[0][0]));     
+      if (this.leftWrist) {
+
+        for (let i = 0; i <= 20; i = i + 1) {
+          this.landmarks[i].position.set(...this.translateLandmark(results.landmarks[0][i]));
+        }
+  
+
+        this.leftWrist.position.set(...this.translateLandmark(results.landmarks[0][0]));     
         let landmarkIndex = 1;
         for (let finger = 0; finger < 5; finger = finger + 1) {
-          let bone = this.leftHand.children[0].children[finger];
+          let bone = this.leftWrist.children[finger];
           let depth = 4;
           while (depth > 0) {
-            console.log(bone.isBone);
-            //bone.position.set(...this.translateLandmark(results.landmarks[0][landmarkIndex]));
-            console.log(bone);
+            bone.position.set(...this.translateLandmark(results.landmarks[0][landmarkIndex]));
             bone = bone.children[0];
             landmarkIndex = landmarkIndex + 1;
             depth = depth - 1;
           }
         }
-      }*/
+      }
     
     // Hide out of view
     } else {

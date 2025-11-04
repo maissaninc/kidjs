@@ -52,23 +52,18 @@ export class HandTracker {
 
     // Create Three.js scene
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.z = 10;
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 2000);
+    this.camera.position.z = 1000;
     this.scene.add(this.camera);
 
     // Create Three.js renderer
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true });
 
-
     // Load hand model
     const loader = new FBXLoader();
-    loader.load(window._kidjs_.scriptPath + '/assets/models/right.fbx', (object) => {
+    loader.load(window._kidjs_.scriptPath + '/assets/models/left.fbx', (object) => {
       this.leftHand = object; 
-      for (let i = 0; i < this.leftHand.children.length; i = i + 1) {
-        if (this.leftHand.children[i].name == 'Wrist') {
-          this.leftWrist = this.leftHand.children[i];
-        }
-      }
+      this.leftWrist = this.leftHand.getObjectByName('Wrist');
       this.scene.add(this.leftHand);
 
       // Create hand mesh
@@ -117,7 +112,7 @@ export class HandTracker {
    * @param {Number} - Scale factor
    * @returns {Object} - Coordinates in 3D scene
    */
-  translateLandmark(landmark, scale=10) {
+  translateLandmark(landmark, scale=1) {
     return [
       (-landmark.x + 0.5) * scale,
       (-landmark.y + 0.5) * scale,
@@ -141,7 +136,7 @@ export class HandTracker {
       if (this.leftWrist) {
 
         for (let i = 0; i <= 20; i = i + 1) {
-          this.landmarks[i].position.set(...this.translateLandmark(results.landmarks[0][i]));
+          this.landmarks[i].position.set(...this.translateLandmark(results.landmarks[0][i], 10));
         }
   
 

@@ -1,7 +1,10 @@
+import initDeviceOrientationEvents from '../events/device-orientation';
+
 let permissionsRequred = [];
 
 export function requirePermission(permission) {
   if (permission == 'deviceorientation' && typeof DeviceOrientationEvent.requestPermission != 'function') {
+    initDeviceOrientationEvents();
     return;
   }
   permissionsRequred.push(permission);
@@ -44,6 +47,7 @@ export function getPermissions() {
         for (let i = 0; i < permissionsRequred.length; i = i + 1) {
           if (permissionsRequred[i] == 'deviceorientation') {
             await DeviceOrientationEvent.requestPermission();
+            initDeviceOrientationEvents();
           }
         }
         document.body.removeChild(clickToStart);

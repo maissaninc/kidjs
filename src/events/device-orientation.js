@@ -35,6 +35,7 @@ function getVerticalTilt(e) {
 }
 
 function onDeviceOrientation(e) {
+  console.log('onDeviceOrientation', e);
   window.orientationAlpha = e.alpha;
   window.orientationBeta = e.beta;
   window.orientationGamma = e.gamma;
@@ -77,6 +78,7 @@ function onAnimationFrame() {
 }
 
 export default function() {
+  console.log('Add events');
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', onDeviceOrientation);
     window.addEventListener('animationframe', onAnimationFrame);

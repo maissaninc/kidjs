@@ -12,7 +12,108 @@
     </script>
     <script type="kidjs">
 
-        display(width/2, height/2, tiltX);
+      let marble = circle(64, 64, 50)
+      marble.anchored = false
+
+
+      function movin() {
+        console.log('movin', tiltX, tiltY, tilt);
+        marble.velocity.x = 0 //parseFloat(tiltX)
+        marble.velocity.y = 0 //tiltY
+        console.log('marble.velocity', marble.velocity);
+        if (marble.velocity.x > 20) marble.velocity.x = 20
+        if (marble.velocity.x < -20) marble.velocity.x = -20
+        if (marble.velocity.y > 20) marble.velocity.y = 20
+        if (marble.velocity.y < -20) marble.velocity.y = -20
+      }
+
+     on('deviceorientation', movin)
+
+     gravity = false
+
+
+      // Create grid of squares
+      let grid = []
+      let section = 1
+      for (let x = 0; x < 8; x = x + 1) {
+        grid[x] = []
+        for (let y = 0; y < 6; y = y + 1) {
+          grid[x][y] = section
+          section = section + 1
+        }
+      }
+
+      // Create set of walls
+      let walls = []
+      for (let x = 0; x < 8; x = x + 1) {
+        for (let y = 0; y < 6; y = y + 1) {
+          if (x < 7) {
+            walls.push({
+              ax: x,
+              ay: y,
+              bx: x + 1,
+              by: y,
+              orientation: 'vertical'
+            });
+          }
+          if (y < 5) {
+            walls.push({
+              ax: x,
+              ay: y,
+              bx: x,
+              by: y + 1,
+              orientation: 'horizontal'
+            });
+          }
+        }
+      }
+
+      // Build maze
+      let maze = []
+      while (walls.length > 0) {
+
+        // Pick a wall at random
+        let i = random(0, walls.length - 1)
+        let wall = walls[i]
+
+        // Remove the wall from the list
+        walls.splice(i, 1)
+
+        // Check section on either side of the wall
+        let a = grid[wall.ax][wall.ay]
+        let b = grid[wall.bx][wall.by]
+
+        // If different sections, combine them
+        if (a !== b) {
+          for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 6; y++) {
+              if (grid[x][y] == b) {
+                grid[x][y] = a
+              }
+            }
+          }
+
+        // Otherwise include the wall in the maze
+        } else {
+          maze.push(wall)
+        }
+      }
+
+      // Draw walls
+      let squareWidth = width / 8
+      let squareHeight = height / 6
+      for (let i = 0; i  < maze.length; i = i + 1) {
+        let wall = maze[i]
+        if (wall.orientation == 'vertical') {
+          let x = wall.bx * squareWidth
+          let y = wall.ay * squareHeight + (squareHeight / 2)
+          rect(x, y, 20, squareHeight + 20)
+        } else {
+          let x = wall.ax * squareWidth + (squareWidth / 2)
+          let y = wall.by * squareHeight
+          rect(x, y, squareWidth + 20, 20)
+        }
+      }
         
     </script>
   </body>

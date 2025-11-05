@@ -7,7 +7,7 @@ let listeners = [];
 export default function() {
   window.tiltX = 0;
   window.tiltY = 0;
-  
+
   initKeyboardEvents();
   initMouseEvents();
 

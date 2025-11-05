@@ -35,12 +35,13 @@ function getVerticalTilt(e) {
 }
 
 function onDeviceOrientation(e) {
-  console.log('onDeviceOrientation', e);
-  window.orientationAlpha = e.alpha;
-  window.orientationBeta = e.beta;
-  window.orientationGamma = e.gamma;
-  window.tiltX = e.tiltX = getHorizontalTilt(e);
-  window.tiltY = e.tiltY = getVerticalTilt(e);
+  if (e.alpha !== null) {
+    window.orientationAlpha = e.alpha;
+    window.orientationBeta = e.beta;
+    window.orientationGamma = e.gamma;
+    window.tiltX = e.tiltX = getHorizontalTilt(e);
+    window.tiltY = e.tiltY = getVerticalTilt(e);
+  }
   window.tilt = new Vector(window.tiltX, window.tiltY);
 
   // Trigger "tiltleft" event
@@ -78,7 +79,6 @@ function onAnimationFrame() {
 }
 
 export default function() {
-  console.log('Add events');
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', onDeviceOrientation);
     window.addEventListener('animationframe', onAnimationFrame);

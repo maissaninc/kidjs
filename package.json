@@ -37,7 +37,9 @@
   },
   "overrides": {
     "brain.js": {
-      "gl": "^8.1.6"
+      "gpu.js": {
+        "gl": "^8.1.6"
+      }
     }
   },
   "scripts": {

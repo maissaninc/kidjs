@@ -35,6 +35,7 @@ function getVerticalTilt(e) {
 }
 
 function onDeviceOrientation(e) {
+  receivedOrientationEvent = true;
   if (e.alpha !== null) {
     window.orientationAlpha = e.alpha;
     window.orientationBeta = e.beta;
@@ -72,15 +73,25 @@ function onDeviceOrientation(e) {
   window.stage.dispatchEvent(e);
 }
 
-// Trigger "tilt" event each frame
-function onAnimationFrame() {
-  let event = new CustomEvent('tilt');
-  window.stage.dispatchEvent(event);
-}
-
 export default function() {
-  if (window.DeviceOrientationEvent) {
+
+  // Trigger "tilt" event each frame
+  window.addEventListener('animationframe', () => {
+    let event = new CustomEvent('tilt');
+    window.stage.dispatchEvent(event);
+  });
+
+  // Receive device orientation from parent window
+  if (window._kidjs_.settings.getDeviceOrientationFromParent) {
+    window.addEventListener('message', (event) => {
+      if (event.data.type == 'deviceorientation') {
+        onDeviceOrientation(event.data);
+      }
+    });
+  }
+
+  // Receive device orientation the normal way
+  else if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', onDeviceOrientation);
-    window.addEventListener('animationframe', onAnimationFrame);
   }
 }

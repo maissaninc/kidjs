@@ -46,7 +46,9 @@ export function getPermissions() {
         for (let i = 0; i < permissionsRequired.length; i = i + 1) {
           if (permissionsRequired[i] == 'deviceorientation') {
             if (window._kidjs_.settings.getDeviceOrientationFromParent) {
-              window.parent.postMessage('request-deviceorientation-permission', '*')
+              window.parent.postMessage({
+                event: 'request-deviceorientation-permission'
+              }, '*')
             } else {
               await DeviceOrientationEvent.requestPermission();
             }

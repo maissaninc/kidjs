@@ -241,7 +241,8 @@ async function compile(code) {
     ast = acorn.parse(code, {
       locations: true,
       onComment: comments,
-      sourceType: 'module'
+      sourceType: 'module',
+      ecmaVersion: 2020
     });
   } catch(e) {
     window._kidjs_.error(e);

@@ -35,7 +35,6 @@ function getVerticalTilt(e) {
 }
 
 function onDeviceOrientation(e) {
-  receivedOrientationEvent = true;
   if (e.alpha !== null) {
     window.orientationAlpha = e.alpha;
     window.orientationBeta = e.beta;

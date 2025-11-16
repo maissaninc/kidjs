@@ -295,10 +295,6 @@ export default class Actor {
   }
 
   get velocity() {
-    if (this.body) {
-      this._velocity.x = this.body.velocity.x;
-      this._velocity.y = this.body.velocity.y;
-    }
     return this._velocity;
   }
 

@@ -16,14 +16,14 @@
   "main": "dist/kid.js",
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.21",
-    "acorn": "^8.15.0",
-    "acorn-walk": "^8.3.4",
+    "acorn": "^8.18.0",
+    "acorn-walk": "^8.3.5",
     "astravel": "^0.6.1",
-    "astring": "^1.4.3",
+    "astring": "^1.9.0",
     "brain.js": "^2.0.0-beta.24",
-    "matter-js": "^0.19.0",
+    "matter-js": "^0.20.0",
     "seedrandom": "^3.0.5",
-    "three": "^0.181.0"
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "vite": "^8.2.1"

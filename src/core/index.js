@@ -332,7 +332,6 @@ async function compile(code) {
           node.body[i].declarations[0].init.arguments.length == 3 &&
           node.body[i].declarations[0].init.arguments[2].type != 'Literal'
         ) {
-          console.log(node.body[i]);
           let expression = astring.generate(node.body[i].declarations[0].init.arguments[2]);
           node.body[i].declarations[0].init.arguments[2] = {
             type: 'Literal',

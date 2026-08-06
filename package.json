@@ -1,6 +1,7 @@
 {
   "name": "@maissaninc/kidjs",
-  "version": "0.2.23",
+  "version": "0.2.24",
+  "type": "module",
   "homepage": "https://kidjs.org",
   "license": "MIT",
   "author": {
@@ -25,15 +26,7 @@
     "three": "^0.181.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-transform-async-to-generator": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
-    "copy-webpack-plugin": "^13.0.1",
-    "terser-webpack-plugin": "^5.2.4",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.25.0",
-    "webpack-cli": "^6.0.1",
-    "webpack-utf8-bom": "^1.3.0"
+    "vite": "^8.2.1"
   },
   "overrides": {
     "brain.js": {
@@ -43,20 +36,8 @@
     }
   },
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
-    "dev": "webpack --config webpack.dev.js",
+    "build": "vite build",
+    "dev": "vite build --mode development",
     "prepare": "npm run build"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }

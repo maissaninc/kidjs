@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
+      emptyOutDir: !isProd,
       lib: {
         entry: 'src/index.js',
         name: 'kidjs',

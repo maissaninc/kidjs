@@ -36,8 +36,9 @@
     }
   },
   "scripts": {
-    "build": "vite build --mode development && vite build --mode production",
-    "dev": "vite build --mode development",
+    "build": "vite build --mode development && vite build --mode production && npm run build:libraries",
+    "build:libraries": "KIDJS_LIBRARY=hand-tracker vite build --mode development && KIDJS_LIBRARY=neural-network vite build --mode development",
+    "dev": "vite build --mode development && npm run build:libraries",
     "prepare": "npm run build"
   }
 }

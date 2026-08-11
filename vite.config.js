@@ -14,8 +14,62 @@ function escapeNonAscii(code) {
   })
 }
 
+const escapeNonAsciiPlugin = {
+  name: 'escape-non-ascii',
+  writeBundle(options, bundle) {
+    const outDir = options.dir ?? resolve('dist')
+    for (const [fileName, chunk] of Object.entries(bundle)) {
+      if (chunk.type !== 'chunk') continue
+      const filePath = resolve(outDir, fileName)
+      const code = readFileSync(filePath, 'utf8')
+      writeFileSync(filePath, escapeNonAscii(code))
+    }
+  }
+}
+
+const copyAssetsPlugin = {
+  name: 'copy-assets',
+  closeBundle() {
+    cpSync(resolve('src/assets'), resolve('dist/assets'), { recursive: true })
+  }
+}
+
+const libraries = {
+  'hand-tracker': {
+    entry: 'src/libraries/hand-tracker/index.js',
+    name: 'HandTracker',
+  },
+  'neural-network': {
+    entry: 'src/libraries/neural-network/index.js',
+    name: 'NeuralNetwork',
+  },
+}
+
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production'
+  const libraryName = process.env.KIDJS_LIBRARY
+  const library = libraryName ? libraries[libraryName] : null
+
+  if (libraryName && !library) {
+    throw new Error(`Unknown KIDJS_LIBRARY "${libraryName}". Expected one of: ${Object.keys(libraries).join(', ')}`)
+  }
+
+  if (library) {
+    return {
+      build: {
+        emptyOutDir: false,
+        lib: {
+          entry: library.entry,
+          name: library.name,
+          formats: ['iife'],
+          fileName: () => `${libraryName}.js`,
+        },
+        minify: true,
+        sourcemap: true
+      },
+      plugins: [escapeNonAsciiPlugin]
+    }
+  }
 
   return {
     build: {
@@ -28,25 +82,6 @@ export default defineConfig(({ mode }) => {
       minify: isProd,
       sourcemap: !isProd
     },
-    plugins: [
-      {
-        name: 'escape-non-ascii',
-        writeBundle(options, bundle) {
-          const outDir = options.dir ?? resolve('dist')
-          for (const [fileName, chunk] of Object.entries(bundle)) {
-            if (chunk.type !== 'chunk') continue
-            const filePath = resolve(outDir, fileName)
-            const code = readFileSync(filePath, 'utf8')
-            writeFileSync(filePath, escapeNonAscii(code))
-          }
-        }
-      },
-      {
-        name: 'copy-assets',
-        closeBundle() {
-          cpSync(resolve('src/assets'), resolve('dist/assets'), { recursive: true })
-        }
-      }
-    ]
-  };
+    plugins: [escapeNonAsciiPlugin, copyAssetsPlugin]
+  }
 })

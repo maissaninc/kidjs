@@ -156,16 +156,21 @@ export function init() {
     error: function(e, runtime) {
       let lineNumber = -1;
       let match = e.stack.match(/(\d+):(\d+)/);
+      let type = 'error';
       if (match) {
         if (runtime) {
+          type = 'runtime';
           lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
         } else {
+          if (e.message.includes('SyntaxError')) {
+            type = 'syntax';
+          }
           lineNumber = parseInt(match[1]);
         }
       }
       console.error('Error: ' + e.message + ' at line ' + lineNumber);
       console.error(e.stack);
-      new KidjsError(e.message, lineNumber);
+      new KidjsError(e.message, type, lineNumber);
     },
 
     libraries: [],

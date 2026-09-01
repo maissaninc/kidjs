@@ -54,15 +54,15 @@ export default class Actor {
   }
 
   get x() {
-    return this.body ? this.body.position.x : this.position.x;
+    return this.body && !isNaN(this.body.position.x) ? this.body.position.x : this.position.x;
   }
 
   get y() {
-    return this.body ? this.body.position.y : this.position.y;
+    return this.body && !isNaN(this.body.position.y) ? this.body.position.y : this.position.y;
   }
   
   _setx(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.position.x = value;
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
@@ -74,14 +74,14 @@ export default class Actor {
   }
 
   set x(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.cancelAnimations('x');
       this._setx(value);
     }
   }
 
   _sety(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.position.y = value;
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
@@ -93,7 +93,7 @@ export default class Actor {
   }
 
   set y(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.cancelAnimations('y');
       this._sety(value);
     }

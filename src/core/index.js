@@ -25,7 +25,7 @@ import { star } from '../shape/star';
 import { tada } from '../audio/sound';
 import { display, write, writeln } from '../text';
 import { group } from '../stage/group';
-import { random } from './math';
+import { random, sin, cos, tan, asin, acos, atan } from './math';
 import { replacePercentUnits } from './units';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
@@ -63,8 +63,12 @@ export function init() {
     },
 
     setGlobals: function() {
+      window.acos = acos;
+      window.asin = asin;
+      window.atan = atan;
       window.beep = beep;
       window.circle = circle;
+      window.cos = cos;
       window.curve = curve;
       window.display = display;
       window.frequency = frequency;
@@ -87,12 +91,14 @@ export function init() {
       window.rect = rect;
       window.rectangle = rect;
       window.semicircle = semicircle;
+      window.sin = sin;
       window.song = song;
       window.sound = sound;
       window.speak = speak;
       window.square = square;
       window.star = star;
       window.tada = tada;
+      window.tan = tan;
       window.triangle = triangle;
       window.wait = wait;
       window.write = write;

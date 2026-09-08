@@ -36,11 +36,11 @@ export default class Actor {
     }
 
     // Detect change in velocity
-    this.velocity = new Vector(0, 0);
-    this.velocity.onchange = () => {
+    this._velocity = new Vector(0, 0);
+    this._velocity.onchange = () => {
       this.anchored = false;
       if (this.body) {
-        Matter.Body.setVelocity(this.body, this.velocity);
+        Matter.Body.setVelocity(this.body, this._velocity);
       }
     }
 
@@ -54,15 +54,15 @@ export default class Actor {
   }
 
   get x() {
-    return this.body ? this.body.position.x : this.position.x;
+    return this.body && !isNaN(this.body.position.x) ? this.body.position.x : this.position.x;
   }
 
   get y() {
-    return this.body ? this.body.position.y : this.position.y;
+    return this.body && !isNaN(this.body.position.y) ? this.body.position.y : this.position.y;
   }
   
   _setx(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.position.x = value;
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
@@ -74,14 +74,14 @@ export default class Actor {
   }
 
   set x(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.cancelAnimations('x');
       this._setx(value);
     }
   }
 
   _sety(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.position.y = value;
       if (this.body) {
         Matter.Body.setPosition(this.body, this.position);
@@ -93,7 +93,7 @@ export default class Actor {
   }
 
   set y(value) {
-    if (!this.locked) {
+    if (!this.locked && !isNaN(value)) {
       this.cancelAnimations('y');
       this._sety(value);
     }
@@ -104,12 +104,10 @@ export default class Actor {
   }
 
   set acceleration(value) {
-    console.log('Set');
     if (value instanceof Vector) {
       this._acceleration.x = value.x;
       this._acceleration.y = value.y;
     } else {
-      console.log('Dir' + this.direction);
       this._acceleration.x = Math.cos(degreesToRadians(this.direction)) * value;
       this._acceleration.y = Math.sin(degreesToRadians(this.direction)) * value;
     }
@@ -294,6 +292,20 @@ export default class Actor {
       return v.length;
     }
     return 0;
+  }
+
+  get velocity() {
+    return this._velocity;
+  }
+
+  set velocity(value) {
+    if (value instanceof Vector) {
+      this._velocity.x = value.x;
+      this._velocity.y = value.y;
+    } else {
+      this._velocity.x = 0;
+      this._velocity.y = 0;
+    }
   }
 
   /**

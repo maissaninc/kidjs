@@ -1,16 +1,18 @@
-let permissionsRequred = [];
+import initDeviceOrientationEvents from '../events/device-orientation';
+
+let permissionsRequired = [];
 
 export function requirePermission(permission) {
   if (permission == 'deviceorientation' && typeof DeviceOrientationEvent.requestPermission != 'function') {
     return;
   }
-  permissionsRequred.push(permission);
+  permissionsRequired.push(permission);
 }
 
 export function getPermissions() {
-  if (permissionsRequred.length > 0) {
+  if (permissionsRequired.length > 0) {
 
-    // Display "click to start" overlay
+    // Display "click to start" button
     return new Promise((resolve, reject) => {
 
       let clickToStart = document.createElement('div');
@@ -41,9 +43,15 @@ export function getPermissions() {
       clickToStart.appendChild(label);
 
       clickToStart.addEventListener('click', async () => {
-        for (let i = 0; i < permissionsRequred.length; i = i + 1) {
-          if (permissionsRequred[i] == 'deviceorientation') {
-            await DeviceOrientationEvent.requestPermission();
+        for (let i = 0; i < permissionsRequired.length; i = i + 1) {
+          if (permissionsRequired[i] == 'deviceorientation') {
+            if (window._kidjs_.settings.getDeviceOrientationFromParent) {
+              window.parent.postMessage({
+                event: 'request-deviceorientation-permission'
+              }, '*')
+            } else {
+              await DeviceOrientationEvent.requestPermission();
+            }
           }
         }
         document.body.removeChild(clickToStart);

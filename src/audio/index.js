@@ -1,26 +1,89 @@
-let context = new AudioContext();
+let context;
 
-export function frequency(frequency, duration = 0.25) {
+function getContext() {
+  if (!context) {
+    context = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (context.state === 'suspended') {
+    context.resume();
+  }
+  return context;
+}
+
+/**
+ * Play a specific frequency for a given duration.
+ * 
+ * @param {number} frequency - Frequency in Hz
+ * @param {number} duration - Duration in seconds
+ */
+export async function frequency(frequency, duration = 1) {
+  let context = getContext();
+
   return new Promise((resolve) => {
+    let start = context.currentTime;
+    duration = Math.max(duration, 0.05);
 
-    // Play frequency
-    let oscillator = context.createOscillator();
-    let gain = context.createGain();
-    oscillator.type = 'triangle';
-    oscillator.frequency.value = frequency;
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start();
+    // Soft attack and release to prevent click
+    let attack = Math.min(0.012, duration * 0.15);
+    let release = Math.min(0.14, duration * 0.3);
+    let peak = 0.2;
 
-    // Stop
-    setTimeout(function() {
-      gain.gain.exponentialRampToValueAtTime(0.0000001, context.currentTime + 0.04);
-      resolve();
-    }, duration * 1000);
+    let filter = context.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.Q.value = 0.9;
+    // Bright at the start (like a hammer hitting a string), then mellow.
+    filter.frequency.setValueAtTime(Math.min(frequency * 8, 4200), start);
+    filter.frequency.exponentialRampToValueAtTime(
+      Math.max(frequency * 2.2, 180),
+      start + duration
+    );
 
+    let amp = context.createGain();
+    amp.gain.setValueAtTime(0.0001, start);
+    amp.gain.exponentialRampToValueAtTime(peak, start + attack);
+    amp.gain.exponentialRampToValueAtTime(peak * 0.55, start + duration - release);
+    amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+    filter.connect(amp);
+    amp.connect(context.destination);
+
+    let pending = 3;
+
+    function startOscillator(type, freq, volume, detune = 0) {
+      let oscillator = context.createOscillator();
+      let gain = context.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(freq, start);
+      oscillator.detune.setValueAtTime(detune, start);
+      gain.gain.value = volume;
+      oscillator.connect(gain);
+      gain.connect(filter);
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.02);
+      oscillator.onended = () => {
+        oscillator.disconnect();
+        gain.disconnect();
+        pending -= 1;
+        if (pending === 0) {
+          filter.disconnect();
+          amp.disconnect();
+          resolve();
+        }
+      };
+    }
+
+    startOscillator('sine', frequency, 0.7);
+    startOscillator('triangle', frequency, 0.25, 4);
+    startOscillator('sine', frequency * 2, 0.1);
   });
 }
 
+/**
+ * Play a specific note for a given duration.
+ * 
+ * @param {string} note - Note name (e.g. 'c4')
+ * @param {number} beats - Duration in beats
+ */
 export async function note(note, beats = 1) {
   let frequencies = {
     'c0': 16.35,
@@ -155,22 +218,95 @@ export async function note(note, beats = 1) {
   };
 
   note = note.toLowerCase();
-  let duration = window.tempo / 60 * beats;
+  let tempo = window.tempo || 60;
+  let duration = (60 / tempo) * beats;
   if (typeof frequencies[note] !== 'undefined') {
     await frequency(frequencies[note], duration);
   }
 }
 
+/**
+ * Play a multiple notes in sequence.
+ * 
+ * @param  {...any} notes - Notes to play
+ */
 export async function song(...notes) {
-  for (let item of notes) {
-    if (typeof item === 'string') {
-      await note(item, 1);
-    } else if (typeof item[1] === 'number') {
-      await note(item[0], item[1]);
+  for (let i = 0; i < notes.length; i++) {
+    if (i < notes.length - 1) {
+      if (typeof notes[i] === 'string' && typeof notes[i + 1] === 'number') {
+        await note(notes[i], notes[i + 1]);
+        i++;
+      } else if (typeof notes[i] === 'string') {
+        await note(notes[i], 1);
+      } else if (typeof notes[i] === 'array' && notes[i].length === 2) {
+        await note(notes[i][0], notes[i][1]);
+      }
+    } else {
+      await note(notes[i], 1);
     }
   }
 }
 
-export function beep() {
-  frequency(1000, 0.25);
+/**
+ * Make a beep sound.
+ */
+export async function beep() {
+  let context = getContext();
+
+  return new Promise((resolve) => {
+    let start = context.currentTime;
+
+    function chirp(freqStart, freqEnd, when, length, volume, done) {
+      let osc = context.createOscillator();
+      let sparkle = context.createOscillator();
+      let filter = context.createBiquadFilter();
+      let amp = context.createGain();
+      let sparkleGain = context.createGain();
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freqStart, when);
+      osc.frequency.exponentialRampToValueAtTime(freqEnd, when + length);
+
+      sparkle.type = 'sine';
+      sparkle.frequency.setValueAtTime(freqStart * 2, when);
+      sparkle.frequency.exponentialRampToValueAtTime(freqEnd * 2, when + length);
+      sparkleGain.gain.value = 0.35;
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(4200, when);
+      filter.frequency.exponentialRampToValueAtTime(2200, when + length);
+      filter.Q.value = 1.2;
+
+      amp.gain.setValueAtTime(0.0001, when);
+      amp.gain.exponentialRampToValueAtTime(volume, when + 0.004);
+      amp.gain.setValueAtTime(volume, when + length * 0.45);
+      amp.gain.exponentialRampToValueAtTime(0.0001, when + length);
+
+      osc.connect(filter);
+      sparkle.connect(sparkleGain);
+      sparkleGain.connect(filter);
+      filter.connect(amp);
+      amp.connect(context.destination);
+
+      osc.start(when);
+      sparkle.start(when);
+      osc.stop(when + length + 0.02);
+      sparkle.stop(when + length + 0.02);
+
+      osc.onended = () => {
+        osc.disconnect();
+        sparkle.disconnect();
+        sparkleGain.disconnect();
+        filter.disconnect();
+        amp.disconnect();
+        if (done) {
+          resolve();
+        }
+      };
+    }
+
+    // Bloop-bleep!
+    chirp(660, 880, start, 0.07, 0.22, false);
+    chirp(880, 1320, start + 0.075, 0.12, 0.26, true);
+  });
 }

@@ -2,14 +2,18 @@ import initKeyboardEvents from './keyboard';
 import initMouseEvents from './mouse';
 import initDeviceOrientationEvents from './device-orientation';
 
+
 let parentAddEventListener;
 let listeners = [];
 
 export default function() {
+  window.tiltX = 0;
+  window.tiltY = 0;
+
   initKeyboardEvents();
   initMouseEvents();
   initDeviceOrientationEvents();
-
+  
   // Intercept adding event listeners
   parentAddEventListener = window.addEventListener;
   window.addEventListener = function(type, listener, capture) {

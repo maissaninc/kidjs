@@ -25,7 +25,7 @@ import { star } from '../shape/star';
 import { tada } from '../audio/sound';
 import { display, write, writeln } from '../text';
 import { group } from '../stage/group';
-import { random } from './math';
+import { random, sin, cos, tan, asin, acos, atan } from './math';
 import { replacePercentUnits } from './units';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
@@ -63,8 +63,12 @@ export function init() {
     },
 
     setGlobals: function() {
+      window.acos = acos;
+      window.asin = asin;
+      window.atan = atan;
       window.beep = beep;
       window.circle = circle;
+      window.cos = cos;
       window.curve = curve;
       window.display = display;
       window.frequency = frequency;
@@ -87,12 +91,14 @@ export function init() {
       window.rect = rect;
       window.rectangle = rect;
       window.semicircle = semicircle;
+      window.sin = sin;
       window.song = song;
       window.sound = sound;
       window.speak = speak;
       window.square = square;
       window.star = star;
       window.tada = tada;
+      window.tan = tan;
       window.triangle = triangle;
       window.wait = wait;
       window.write = write;
@@ -156,16 +162,21 @@ export function init() {
     error: function(e, runtime) {
       let lineNumber = -1;
       let match = e.stack.match(/(\d+):(\d+)/);
+      let type = 'error';
       if (match) {
         if (runtime) {
+          type = 'runtime';
           lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
         } else {
+          if (e.message.includes('SyntaxError')) {
+            type = 'syntax';
+          }
           lineNumber = parseInt(match[1]);
         }
       }
       console.error('Error: ' + e.message + ' at line ' + lineNumber);
       console.error(e.stack);
-      new KidjsError(e.message, lineNumber);
+      new KidjsError(e.message, type, lineNumber);
     },
 
     libraries: [],
@@ -241,7 +252,8 @@ async function compile(code) {
     ast = acorn.parse(code, {
       locations: true,
       onComment: comments,
-      sourceType: 'module'
+      sourceType: 'module',
+      ecmaVersion: 2020
     });
   } catch(e) {
     window._kidjs_.error(e);
@@ -331,7 +343,6 @@ async function compile(code) {
           node.body[i].declarations[0].init.arguments.length == 3 &&
           node.body[i].declarations[0].init.arguments[2].type != 'Literal'
         ) {
-          console.log(node.body[i]);
           let expression = astring.generate(node.body[i].declarations[0].init.arguments[2]);
           node.body[i].declarations[0].init.arguments[2] = {
             type: 'Literal',

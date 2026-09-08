@@ -306,8 +306,8 @@ export default class Stage {
       this._floor.collides = window.floor;
       this._floor.locked = true;
       this.engine.gravity.y = window.gravity;
-      Matter.Engine.update(this.engine);
-
+      Matter.Engine.update(this.engine, 1000 / 60);
+      
       // Render actors
       for (let actor of this.actors) {
 

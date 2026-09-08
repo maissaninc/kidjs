@@ -22,6 +22,67 @@ export function random(a, b) {
 }
 
 /**
+ * Sine function
+ * 
+ * @param {Number} angle - Angle in degrees
+ * @return {Number} Sine of the angle
+ */
+export function sin(angle) {
+  return Math.sin(degreesToRadians(angle));
+}
+
+/**
+ * Cosine function
+ * 
+ * @param {Number} angle - Angle in degrees
+ * @return {Number} Cosine of the angle
+ */
+export function cos(angle) {
+  return Math.cos(degreesToRadians(angle));
+}
+
+/**
+ * Tangent function
+ * 
+ * @param {Number} angle - Angle in degrees
+ * @return {Number} Tangent of the angle
+ */
+export function tan(angle) {
+  return Math.tan(degreesToRadians(angle));
+}
+
+/**
+ * Arc sine function
+ * 
+ * @param {Number} value - Value
+ * @return {Number} Angle in radians
+ */
+export function asin(value) {
+  return radiansToDegrees(Math.asin(value));
+}
+
+/**
+ * Arc cosine function
+ * 
+ * @param {Number} value - Value
+ * @return {Number} Angle in radians
+ */
+export function acos(value) {
+  return radiansToDegrees(Math.acos(value));
+}
+
+/**
+ * Arc tangent function
+ * 
+ * @param {Number} value - Slope
+ * @return {Number} Angle in degrees
+ */
+export function atan(value) {
+  if (Number.isNaN(value)) return 0;
+  return radiansToDegrees(Math.atan(value));
+}
+
+/**
  * Convert degrees to radians
  *
  * @param {Number} deg - Angle in degrees

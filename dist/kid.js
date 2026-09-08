@@ -7083,7 +7083,7 @@
 		return context;
 	}
 	/**
-	* Play a specific frequency for a given duration
+	* Play a specific frequency for a given duration.
 	* 
 	* @param {number} frequency - Frequency in Hz
 	* @param {number} duration - Duration in seconds
@@ -7137,7 +7137,7 @@
 		});
 	}
 	/**
-	* Play a specific note for a given duration
+	* Play a specific note for a given duration.
 	* 
 	* @param {string} note - Note name (e.g. 'c4')
 	* @param {number} beats - Duration in beats
@@ -7270,7 +7270,7 @@
 		if (typeof frequencies[note] !== "undefined") await frequency(frequencies[note], duration);
 	}
 	/**
-	* Play a number of notes in a sequence
+	* Play a multiple notes in sequence.
 	* 
 	* @param  {...any} notes - Notes to play
 	*/
@@ -7284,7 +7284,7 @@
 		} else await note(notes[i], 1);
 	}
 	/**
-	* Make a beep sound
+	* Make a beep sound.
 	*/
 	async function beep() {
 		let context = getContext();

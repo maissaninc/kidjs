@@ -173,4 +173,6 @@ export class HandTracker {
   }
 }
 
-window.HandTracker = new HandTracker();
+window._kidjs_.hooks.setGlobals.push(function() {
+  window.HandTracker = new HandTracker();
+});

@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Audio</title>
+    <script src="../dist/kid.js"></script>
+  </head>
+  <body>
+    <script type="kidjs">
+
+        let a = circle(100, 100, 50)
+        a.on('click', function() {
+            beep()
+        })
+
+        let b = circle(200, 100, 50)
+        b.on('click', function() {
+            note('c4')
+        })
+
+        let c = circle(300, 100, 50)
+        c.on('click', function() {
+            song('c4', 0.5, 'd4', 1, 'e4', 0.5, 'f4', 1, 'g4', 0.5, 'a4', 1, 'b4', 0.5, 'c5', 1)
+        })
+
+        let d = circle(400, 100, 50)
+        d.on('click', function() {
+            tada()
+        })
+
+    </script>
+  </body>
+</html>

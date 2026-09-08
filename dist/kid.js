@@ -7076,22 +7076,72 @@
 	}
 	//#endregion
 	//#region src/audio/index.js
-	var context = new AudioContext();
-	function frequency(frequency, duration = .25) {
+	var context;
+	function getContext() {
+		if (!context) context = new (window.AudioContext || window.webkitAudioContext)();
+		if (context.state === "suspended") context.resume();
+		return context;
+	}
+	/**
+	* Play a specific frequency for a given duration
+	* 
+	* @param {number} frequency - Frequency in Hz
+	* @param {number} duration - Duration in seconds
+	*/
+	async function frequency(frequency, duration = 1) {
+		let context = getContext();
 		return new Promise((resolve) => {
-			let oscillator = context.createOscillator();
-			let gain = context.createGain();
-			oscillator.type = "triangle";
-			oscillator.frequency.value = frequency;
-			oscillator.connect(gain);
-			gain.connect(context.destination);
-			oscillator.start();
-			setTimeout(function() {
-				gain.gain.exponentialRampToValueAtTime(1e-7, context.currentTime + .04);
-				resolve();
-			}, duration * 1e3);
+			let start = context.currentTime;
+			duration = Math.max(duration, .05);
+			let attack = Math.min(.012, duration * .15);
+			let release = Math.min(.14, duration * .3);
+			let peak = .2;
+			let filter = context.createBiquadFilter();
+			filter.type = "lowpass";
+			filter.Q.value = .9;
+			filter.frequency.setValueAtTime(Math.min(frequency * 8, 4200), start);
+			filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2.2, 180), start + duration);
+			let amp = context.createGain();
+			amp.gain.setValueAtTime(1e-4, start);
+			amp.gain.exponentialRampToValueAtTime(peak, start + attack);
+			amp.gain.exponentialRampToValueAtTime(peak * .55, start + duration - release);
+			amp.gain.exponentialRampToValueAtTime(1e-4, start + duration);
+			filter.connect(amp);
+			amp.connect(context.destination);
+			let pending = 3;
+			function startOscillator(type, freq, volume, detune = 0) {
+				let oscillator = context.createOscillator();
+				let gain = context.createGain();
+				oscillator.type = type;
+				oscillator.frequency.setValueAtTime(freq, start);
+				oscillator.detune.setValueAtTime(detune, start);
+				gain.gain.value = volume;
+				oscillator.connect(gain);
+				gain.connect(filter);
+				oscillator.start(start);
+				oscillator.stop(start + duration + .02);
+				oscillator.onended = () => {
+					oscillator.disconnect();
+					gain.disconnect();
+					pending -= 1;
+					if (pending === 0) {
+						filter.disconnect();
+						amp.disconnect();
+						resolve();
+					}
+				};
+			}
+			startOscillator("sine", frequency, .7);
+			startOscillator("triangle", frequency, .25, 4);
+			startOscillator("sine", frequency * 2, .1);
 		});
 	}
+	/**
+	* Play a specific note for a given duration
+	* 
+	* @param {string} note - Note name (e.g. 'c4')
+	* @param {number} beats - Duration in beats
+	*/
 	async function note(note, beats = 1) {
 		let frequencies = {
 			"c0": 16.35,
@@ -7216,15 +7266,72 @@
 			"b8": 7902.13
 		};
 		note = note.toLowerCase();
-		let duration = window.tempo / 60 * beats;
+		let duration = 60 / (window.tempo || 60) * beats;
 		if (typeof frequencies[note] !== "undefined") await frequency(frequencies[note], duration);
 	}
+	/**
+	* Play a number of notes in a sequence
+	* 
+	* @param  {...any} notes - Notes to play
+	*/
 	async function song(...notes) {
-		for (let item of notes) if (typeof item === "string") await note(item, 1);
-		else if (typeof item[1] === "number") await note(item[0], item[1]);
+		for (let i = 0; i < notes.length; i++) if (i < notes.length - 1) {
+			if (typeof notes[i] === "string" && typeof notes[i + 1] === "number") {
+				await note(notes[i], notes[i + 1]);
+				i++;
+			} else if (typeof notes[i] === "string") await note(notes[i], 1);
+			else if (typeof notes[i] === "array" && notes[i].length === 2) await note(notes[i][0], notes[i][1]);
+		} else await note(notes[i], 1);
 	}
-	function beep() {
-		frequency(1e3, .25);
+	/**
+	* Make a beep sound
+	*/
+	async function beep() {
+		let context = getContext();
+		return new Promise((resolve) => {
+			let start = context.currentTime;
+			function chirp(freqStart, freqEnd, when, length, volume, done) {
+				let osc = context.createOscillator();
+				let sparkle = context.createOscillator();
+				let filter = context.createBiquadFilter();
+				let amp = context.createGain();
+				let sparkleGain = context.createGain();
+				osc.type = "square";
+				osc.frequency.setValueAtTime(freqStart, when);
+				osc.frequency.exponentialRampToValueAtTime(freqEnd, when + length);
+				sparkle.type = "sine";
+				sparkle.frequency.setValueAtTime(freqStart * 2, when);
+				sparkle.frequency.exponentialRampToValueAtTime(freqEnd * 2, when + length);
+				sparkleGain.gain.value = .35;
+				filter.type = "lowpass";
+				filter.frequency.setValueAtTime(4200, when);
+				filter.frequency.exponentialRampToValueAtTime(2200, when + length);
+				filter.Q.value = 1.2;
+				amp.gain.setValueAtTime(1e-4, when);
+				amp.gain.exponentialRampToValueAtTime(volume, when + .004);
+				amp.gain.setValueAtTime(volume, when + length * .45);
+				amp.gain.exponentialRampToValueAtTime(1e-4, when + length);
+				osc.connect(filter);
+				sparkle.connect(sparkleGain);
+				sparkleGain.connect(filter);
+				filter.connect(amp);
+				amp.connect(context.destination);
+				osc.start(when);
+				sparkle.start(when);
+				osc.stop(when + length + .02);
+				sparkle.stop(when + length + .02);
+				osc.onended = () => {
+					osc.disconnect();
+					sparkle.disconnect();
+					sparkleGain.disconnect();
+					filter.disconnect();
+					amp.disconnect();
+					if (done) resolve();
+				};
+			}
+			chirp(660, 880, start, .07, .22, false);
+			chirp(880, 1320, start + .075, .12, .26, true);
+		});
 	}
 	//#endregion
 	//#region src/audio/sound.js
@@ -7695,6 +7802,61 @@
 		if (typeof a == "undefined" && typeof b == "undefined") return Math.random();
 		if (typeof b == "undefined") return Math.round(Math.random() * a);
 		return Math.round(Math.random() * (b - a) + a);
+	}
+	/**
+	* Sine function
+	* 
+	* @param {Number} angle - Angle in degrees
+	* @return {Number} Sine of the angle
+	*/
+	function sin(angle) {
+		return Math.sin(degreesToRadians(angle));
+	}
+	/**
+	* Cosine function
+	* 
+	* @param {Number} angle - Angle in degrees
+	* @return {Number} Cosine of the angle
+	*/
+	function cos(angle) {
+		return Math.cos(degreesToRadians(angle));
+	}
+	/**
+	* Tangent function
+	* 
+	* @param {Number} angle - Angle in degrees
+	* @return {Number} Tangent of the angle
+	*/
+	function tan(angle) {
+		return Math.tan(degreesToRadians(angle));
+	}
+	/**
+	* Arc sine function
+	* 
+	* @param {Number} value - Value
+	* @return {Number} Angle in radians
+	*/
+	function asin(value) {
+		return radiansToDegrees(Math.asin(value));
+	}
+	/**
+	* Arc cosine function
+	* 
+	* @param {Number} value - Value
+	* @return {Number} Angle in radians
+	*/
+	function acos(value) {
+		return radiansToDegrees(Math.acos(value));
+	}
+	/**
+	* Arc tangent function
+	* 
+	* @param {Number} value - Slope
+	* @return {Number} Angle in degrees
+	*/
+	function atan(value) {
+		if (Number.isNaN(value)) return 0;
+		return radiansToDegrees(Math.atan(value));
 	}
 	/**
 	* Convert degrees to radians
@@ -18489,11 +18651,12 @@
 	//#endregion
 	//#region src/core/error.js
 	var KidjsError$1 = class extends Error {
-		constructor(message, line = 0, column = 0) {
+		constructor(message, type, line = 0, column = 0) {
 			super(message);
 			this.name = "Kidjs";
 			window.dispatchEvent(new CustomEvent("KID.error", { detail: {
 				message,
+				type,
 				line,
 				column
 			} }));
@@ -18526,8 +18689,12 @@
 				fps: 0
 			},
 			setGlobals: function() {
+				window.acos = acos;
+				window.asin = asin;
+				window.atan = atan;
 				window.beep = beep;
 				window.circle = circle;
+				window.cos = cos;
 				window.curve = curve;
 				window.display = display;
 				window.frequency = frequency;
@@ -18550,12 +18717,14 @@
 				window.rect = rect$1;
 				window.rectangle = rect$1;
 				window.semicircle = semicircle;
+				window.sin = sin;
 				window.song = song;
 				window.sound = sound;
 				window.speak = speak;
 				window.square = square;
 				window.star = star;
 				window.tada = tada;
+				window.tan = tan;
 				window.triangle = triangle;
 				window.wait = wait;
 				window.write = write;
@@ -18592,13 +18761,19 @@
 			error: function(e, runtime) {
 				let lineNumber = -1;
 				let match = e.stack.match(/(\d+):(\d+)/);
+				let type = "error";
 				if (match) {
-					if (runtime) lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
-					else lineNumber = parseInt(match[1]);
+					if (runtime) {
+						type = "runtime";
+						lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
+					} else {
+						if (e.message.includes("SyntaxError")) type = "syntax";
+						lineNumber = parseInt(match[1]);
+					}
 				}
 				console.error("Error: " + e.message + " at line " + lineNumber);
 				console.error(e.stack);
-				new KidjsError$1(e.message, lineNumber);
+				new KidjsError$1(e.message, type, lineNumber);
 			},
 			libraries: [],
 			import: async function(library) {

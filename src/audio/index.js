@@ -11,7 +11,7 @@ function getContext() {
 }
 
 /**
- * Play a specific frequency for a given duration
+ * Play a specific frequency for a given duration.
  * 
  * @param {number} frequency - Frequency in Hz
  * @param {number} duration - Duration in seconds
@@ -79,7 +79,7 @@ export async function frequency(frequency, duration = 1) {
 }
 
 /**
- * Play a specific note for a given duration
+ * Play a specific note for a given duration.
  * 
  * @param {string} note - Note name (e.g. 'c4')
  * @param {number} beats - Duration in beats
@@ -226,7 +226,7 @@ export async function note(note, beats = 1) {
 }
 
 /**
- * Play a number of notes in a sequence
+ * Play a multiple notes in sequence.
  * 
  * @param  {...any} notes - Notes to play
  */
@@ -248,7 +248,7 @@ export async function song(...notes) {
 }
 
 /**
- * Make a beep sound
+ * Make a beep sound.
  */
 export async function beep() {
   let context = getContext();

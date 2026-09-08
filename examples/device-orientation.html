@@ -15,7 +15,6 @@
       let marble = circle(64, 64, 50)
       marble.anchored = false
 
-
       function movin() {
         console.log('movin', tiltX, tiltY, tilt);
         marble.velocity.x = 0 //parseFloat(tiltX)
@@ -30,7 +29,6 @@
      on('deviceorientation', movin)
 
      gravity = false
-
 
       // Create grid of squares
       let grid = []

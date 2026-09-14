@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Grid</title>
+    <script src="../dist/kid.js"></script>
+  </head>
+  <body>
+    <script>
+
+        debug = true;
+        KID.settings.pixelSize = 20;
+        KID.settings.grid = true;
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'g') {
+                if (KID.settings.grid) {
+                    console.log('grid off')
+                    KID.settings.pixelSize = 1;
+                    KID.settings.grid = false;
+                } else {
+                    console.log('grid on')
+                    KID.settings.pixelSize = 20;
+                    KID.settings.grid = true;
+                }
+            }
+        });
+
+    </script>
+    <script type="kidjs">
+
+      let a = circle(10, 10, 10)
+      a.anchored = false
+
+    </script>
+  </body>
+</html>

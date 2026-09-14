@@ -31,6 +31,7 @@ import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
 import { prompt, closeAllPrompts } from '../input/prompt';
 import { KidjsError } from './error';
+import { Settings } from './settings';
 
 let triggers = [];
 let parentSetTimeout;
@@ -46,14 +47,7 @@ let scriptPath = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
 
 export function init() {
   window._kidjs_ = {
-    settings: {
-      backgroundColor: null,
-      slowMotion: false,
-      slowMotionDelay: 1,
-      grid: false,
-      pixelSize: 1,
-      orientation: 'auto'
-    },
+    settings: new Settings(),
 
     scriptPath: scriptPath,
 

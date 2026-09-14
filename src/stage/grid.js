@@ -14,9 +14,8 @@ export default class Grid {
     this.canvas.style.position = 'fixed';
     this.canvas.style.top = 0;
     this.canvas.style.left = 0;
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
     this.canvas.style.display = 'block';
+    this.canvas.style.imageRendering = 'pixelated';
   }
 
   /**
@@ -24,13 +23,13 @@ export default class Grid {
    *
    * @param {CanvasRenderingContext2D} context - Rendering context
    */
-  render() {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+  render(width = window.innerWidth, height = window.innerHeight) {
+    this.canvas.width = width;
+    this.canvas.height = height;
     let size = window._kidjs_.settings.pixelSize;
     if (window._kidjs_.settings.grid && size >= 5) {
-      for (let x = 0; x < this.canvas.width; x = x + size) {
-        for (let y = 0; y < this.canvas.height; y = y + size) {
+      for (let x = 0; x < this.canvas.width + size; x = x + size) {
+        for (let y = 0; y < this.canvas.height + size; y = y + size) {
           this.context.fillStyle = this.color;
           this.context.fillRect(x + size, y, 1, size);
           this.context.fillRect(x, y + size, size, 1);

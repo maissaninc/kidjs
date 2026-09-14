@@ -18663,6 +18663,54 @@
 		}
 	};
 	//#endregion
+	//#region src/core/settings.js
+	var Settings = class {
+		_backgroundColor = null;
+		_slowMotion = false;
+		_slowMotionDelay = 1;
+		_grid = false;
+		_pixelSize = 1;
+		_orientation = "auto";
+		set backgroundColor(value) {
+			this._backgroundColor = value;
+		}
+		get backgroundColor() {
+			return this._backgroundColor;
+		}
+		set slowMotion(value) {
+			this._slowMotion = value;
+		}
+		get slowMotion() {
+			return this._slowMotion;
+		}
+		set slowMotionDelay(value) {
+			this._slowMotionDelay = value;
+		}
+		get slowMotionDelay() {
+			return this._slowMotionDelay;
+		}
+		set grid(value) {
+			this._grid = value;
+			if (window.grid) window.stage.resize();
+		}
+		get grid() {
+			return this._grid;
+		}
+		set pixelSize(value) {
+			this._pixelSize = value;
+			if (window.stage) window.stage.resize();
+		}
+		get pixelSize() {
+			return this._pixelSize;
+		}
+		set orientation(value) {
+			this._orientation = value;
+		}
+		get orientation() {
+			return this._orientation;
+		}
+	};
+	//#endregion
 	//#region src/core/index.js
 	var triggers = [];
 	var parentSetTimeout;
@@ -18675,14 +18723,7 @@
 	var scriptPath = scriptSrc.substring(0, scriptSrc.lastIndexOf("/"));
 	function init() {
 		window._kidjs_ = {
-			settings: {
-				backgroundColor: null,
-				slowMotion: false,
-				slowMotionDelay: 1,
-				grid: false,
-				pixelSize: 1,
-				orientation: "auto"
-			},
+			settings: new Settings(),
 			scriptPath,
 			stats: {
 				lastFrame: Date.now(),
@@ -19193,7 +19234,8 @@
 			this.canvas.style.left = "0px";
 			this.canvas.style.width = "100%";
 			this.canvas.style.height = "100%";
-			this.canvas.style.objectFit = "contain";
+			this.canvas.style.objectFit = "cover";
+			this.canvas.style.objectPosition = "top left";
 			if (!window._kidjs_.defaultStyle) window._kidjs_.defaultStyle = new Style(this.context);
 			this.actors = [];
 			this.eventListeners = {};
@@ -19210,51 +19252,56 @@
 		resize(width, height) {
 			if (!parseInt(width)) width = window.innerWidth;
 			if (!parseInt(height)) height = window.innerHeight;
-			if (this.width != parseInt(width) || this.height != parseInt(height)) {
-				this.width = parseInt(width);
-				this.height = parseInt(height);
-				log(`Stage resized (${width} x ${height})`);
-				if (window._kidjs_.settings.pixelSize > 1) {
-					let scale = 1 / window._kidjs_.settings.pixelSize;
-					this.canvas.width = Math.floor(this.width * scale);
-					this.canvas.height = Math.floor(this.height * scale);
-					this.canvas.style.imageRendering = "pixelated";
-				} else {
-					let scale = window.devicePixelRatio;
-					this.canvas.width = Math.floor(this.width * scale);
-					this.canvas.height = Math.floor(this.height * scale);
-					this.context.scale(scale, scale);
-				}
-				window.width = this.width;
-				window.height = this.height;
-				if (this._leftWall) {
-					this._leftWall.locked = false;
-					this._leftWall.x = -500;
-					this._leftWall.y = this.height / 2;
-					this._leftWall.height = this.height + WALL_DEPTH * 2;
-					this._leftWall.updateBody();
-					this._leftWall.locked = true;
-					this._rightWall.locked = false;
-					this._rightWall.x = this.width + WALL_DEPTH / 2;
-					this._rightWall.y = this.height / 2;
-					this._rightWall.height = this.height + WALL_DEPTH * 2;
-					this._rightWall.updateBody();
-					this._rightWall.locked = true;
-					this._ceiling.locked = false;
-					this._ceiling.x = this.width / 2;
-					this._ceiling.y = -500;
-					this._ceiling.width = this.width + WALL_DEPTH * 2;
-					this._ceiling.updateBody();
-					this._ceiling.locked = true;
-					this._floor.locked = false;
-					this._floor.x = this.width / 2;
-					this._floor.y = this.height + WALL_DEPTH / 2;
-					this._floor.width = this.width + WALL_DEPTH * 2;
-					this._floor.updateBody();
-					this._floor.locked = true;
-				}
-				if (window.grid) window.grid.render();
+			let scale = window.devicePixelRatio;
+			this.width = parseInt(width);
+			this.height = parseInt(height);
+			if (window._kidjs_.settings.pixelSize > 1) {
+				scale = 1;
+				this.width = Math.round(parseInt(width) / window._kidjs_.settings.pixelSize);
+				this.height = Math.round(parseInt(height) / window._kidjs_.settings.pixelSize);
+				this.canvas.style.imageRendering = "pixelated";
 			}
+			log(`Stage resized (${this.width} x ${this.height} @ ${scale}x)`);
+			let viewportWidth = this.width * window._kidjs_.settings.pixelSize;
+			let viewportHeight = this.height * window._kidjs_.settings.pixelSize;
+			window.width = this.width;
+			window.height = this.height;
+			this.canvas.width = Math.floor(this.width * scale);
+			this.canvas.height = Math.floor(this.height * scale);
+			this.canvas.style.width = viewportWidth + "px";
+			this.canvas.style.height = viewportHeight + "px";
+			this.context.scale(scale, scale);
+			if (this._leftWall) this._positionWalls();
+			if (window.grid) window.grid.render(viewportWidth, viewportHeight);
+		}
+		/**
+		* Position walls.
+		*/
+		_positionWalls() {
+			this._leftWall.locked = false;
+			this._leftWall.x = -500;
+			this._leftWall.y = this.height / 2;
+			this._leftWall.height = this.height + WALL_DEPTH * 2;
+			this._leftWall.updateBody();
+			this._leftWall.locked = true;
+			this._rightWall.locked = false;
+			this._rightWall.x = this.width + WALL_DEPTH / 2;
+			this._rightWall.y = this.height / 2;
+			this._rightWall.height = this.height + WALL_DEPTH * 2;
+			this._rightWall.updateBody();
+			this._rightWall.locked = true;
+			this._ceiling.locked = false;
+			this._ceiling.x = this.width / 2;
+			this._ceiling.y = -500;
+			this._ceiling.width = this.width + WALL_DEPTH * 2;
+			this._ceiling.updateBody();
+			this._ceiling.locked = true;
+			this._floor.locked = false;
+			this._floor.x = this.width / 2;
+			this._floor.y = this.height + WALL_DEPTH / 2;
+			this._floor.width = this.width + WALL_DEPTH * 2;
+			this._floor.updateBody();
+			this._floor.locked = true;
 		}
 		/**
 		* Add an actor to the stage.
@@ -19309,7 +19356,6 @@
 			this._floor.invisible = true;
 			this._floor.locked = true;
 			this._floor.type = "wall";
-			this.resize(window._kidjs_.settings.width, window._kidjs_.settings.height);
 			resetCursor();
 		}
 		/**
@@ -19530,20 +19576,19 @@
 			this.canvas.style.position = "fixed";
 			this.canvas.style.top = 0;
 			this.canvas.style.left = 0;
-			this.canvas.style.width = "100%";
-			this.canvas.style.height = "100%";
 			this.canvas.style.display = "block";
+			this.canvas.style.imageRendering = "pixelated";
 		}
 		/**
 		* Render grid.
 		*
 		* @param {CanvasRenderingContext2D} context - Rendering context
 		*/
-		render() {
-			this.canvas.width = window.innerWidth;
-			this.canvas.height = window.innerHeight;
+		render(width = window.innerWidth, height = window.innerHeight) {
+			this.canvas.width = width;
+			this.canvas.height = height;
 			let size = window._kidjs_.settings.pixelSize;
-			if (window._kidjs_.settings.grid && size >= 5) for (let x = 0; x < this.canvas.width; x = x + size) for (let y = 0; y < this.canvas.height; y = y + size) {
+			if (window._kidjs_.settings.grid && size >= 5) for (let x = 0; x < this.canvas.width + size; x = x + size) for (let y = 0; y < this.canvas.height + size; y = y + size) {
 				this.context.fillStyle = this.color;
 				this.context.fillRect(x + size, y, 1, size);
 				this.context.fillRect(x, y + size, size, 1);
@@ -19684,12 +19729,12 @@
 	*/
 	init();
 	window.addEventListener("DOMContentLoaded", function() {
+		window.grid = new Grid();
 		window.stage = new Stage(window.KID.settings.width, window.KID.settings.height);
 		document.body.style.margin = 0;
 		document.body.style.padding = 0;
 		document.body.appendChild(stage.canvas);
-		window.grid = new Grid();
-		document.body.appendChild(grid.canvas);
+		document.body.appendChild(window.grid.canvas);
 		new OrientationOverlay();
 		window.addEventListener("resize", function() {
 			window.stage.resize(KID.settings.width, KID.settings.height);

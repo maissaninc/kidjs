@@ -35,14 +35,12 @@ init();
 window.addEventListener('DOMContentLoaded', function() {
 
   // Create canvas
+  window.grid = new Grid();
   window.stage = new Stage(window.KID.settings.width, window.KID.settings.height);
   document.body.style.margin = 0;
   document.body.style.padding = 0;
   document.body.appendChild(stage.canvas);
-
-  // Create grid
-  window.grid = new Grid();
-  document.body.appendChild(grid.canvas);
+  document.body.appendChild(window.grid.canvas);
 
   // Orientation overlay
   new OrientationOverlay();

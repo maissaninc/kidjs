@@ -32,8 +32,8 @@ export default class Stage {
     this.canvas.style.left = '0px';
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
-    this.canvas.style.objectFit = 'cover';
-    this.canvas.style.objectPosition = 'top left';
+    this.canvas.style.objectFit = 'contain';
+    this.canvas.style.objectPosition = 'center';
 
     // Create default style
     if (!window._kidjs_.defaultStyle) {

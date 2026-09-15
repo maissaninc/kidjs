@@ -19234,8 +19234,8 @@
 			this.canvas.style.left = "0px";
 			this.canvas.style.width = "100%";
 			this.canvas.style.height = "100%";
-			this.canvas.style.objectFit = "cover";
-			this.canvas.style.objectPosition = "top left";
+			this.canvas.style.objectFit = "contain";
+			this.canvas.style.objectPosition = "center";
 			if (!window._kidjs_.defaultStyle) window._kidjs_.defaultStyle = new Style(this.context);
 			this.actors = [];
 			this.eventListeners = {};

@@ -17147,65 +17147,6 @@
 		return shape;
 	}
 	//#endregion
-	//#region src/media/index.js
-	var Recording = class {
-		/**
-		* Create a new video recording.
-		*
-		* @constructor
-		*/
-		constructor() {
-			this.stream = window.stage.canvas.captureStream(60);
-			this.recorder = new MediaRecorder(this.stream, {
-				audioBitsPerSecond: 128e3,
-				videoBitsPerSecond: 25e5,
-				mimeType: "video/webm"
-			});
-			this.chunks = [];
-			this.recorder.ondataavailable = function(e) {
-				this.chunks.push(e.data);
-			}.bind(this);
-		}
-		/**
-		* Start recording video.
-		*/
-		start() {
-			this.recorder.start();
-		}
-		/**
-		* Stop recording video.
-		*/
-		stop() {
-			this.recorder.stop();
-		}
-		/**
-		* Download recorded video.
-		*
-		* @param {string} filename - Downloaded filename
-		*/
-		download(filename = "capture.webm") {
-			if (this.chunks.length > 0) {
-				let blob = new Blob(this.chunks, { "type": "video/webm" });
-				let videoURL = URL.createObjectURL(blob);
-				let a = document.createElement("a");
-				document.body.appendChild(a);
-				a.href = videoURL;
-				a.download = filename;
-				a.click();
-			}
-		}
-	};
-	/**
-	* Create and start a new recording.
-	*
-	* @return {Recording} Video recording
-	*/
-	function record() {
-		let recording = new Recording();
-		recording.start();
-		return recording;
-	}
-	//#endregion
 	//#region src/shape/rect.js
 	var Rect = class Rect extends Polygon {
 		constructor(x, y, width, height) {
@@ -17263,7 +17204,17 @@
 		window.stage.addChild(shape);
 		return shape;
 	}
-	function pixel(x, y, color = "black") {
+	//#endregion
+	//#region src/pixel/index.js
+	/**
+	* Place a pixel at the given coordinates.
+	* 
+	* @param {int} x - X coordinate
+	* @param {int} y - Y coordinate
+	* @param {string} color - Color of the pixel
+	* @returns {Rect} Pixel
+	*/
+	function putPixel(x, y, color = "black") {
 		if (x == null || y == null) return;
 		x = parseLength(x, "x") + .5;
 		y = parseLength(y, "y") + .5;
@@ -17273,6 +17224,79 @@
 		shape.init();
 		window.stage.addChild(shape);
 		return shape;
+	}
+	/**
+	* Get the value of a pixel at the given coordinates.
+	* 
+	* @param {int} x - X coordinate
+	* @param {int} y - Y coordinate
+	* @returns {string} Value of the pixel
+	*/
+	function getPixel(x, y) {
+		if (x == null || y == null) return null;
+		x = parseLength(x, "x") + .5;
+		y = parseLength(y, "y") + .5;
+		for (let i = 0; i < window.stage.actors.length; i++) if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) return window.stage.actors[i].color;
+		return false;
+	}
+	//#endregion
+	//#region src/media/index.js
+	var Recording = class {
+		/**
+		* Create a new video recording.
+		*
+		* @constructor
+		*/
+		constructor() {
+			this.stream = window.stage.canvas.captureStream(60);
+			this.recorder = new MediaRecorder(this.stream, {
+				audioBitsPerSecond: 128e3,
+				videoBitsPerSecond: 25e5,
+				mimeType: "video/webm"
+			});
+			this.chunks = [];
+			this.recorder.ondataavailable = function(e) {
+				this.chunks.push(e.data);
+			}.bind(this);
+		}
+		/**
+		* Start recording video.
+		*/
+		start() {
+			this.recorder.start();
+		}
+		/**
+		* Stop recording video.
+		*/
+		stop() {
+			this.recorder.stop();
+		}
+		/**
+		* Download recorded video.
+		*
+		* @param {string} filename - Downloaded filename
+		*/
+		download(filename = "capture.webm") {
+			if (this.chunks.length > 0) {
+				let blob = new Blob(this.chunks, { "type": "video/webm" });
+				let videoURL = URL.createObjectURL(blob);
+				let a = document.createElement("a");
+				document.body.appendChild(a);
+				a.href = videoURL;
+				a.download = filename;
+				a.click();
+			}
+		}
+	};
+	/**
+	* Create and start a new recording.
+	*
+	* @return {Recording} Video recording
+	*/
+	function record() {
+		let recording = new Recording();
+		recording.start();
+		return recording;
 	}
 	//#endregion
 	//#region src/shape/regular.js
@@ -18762,7 +18786,9 @@
 				window.path = path;
 				window.pentagon = pentagon;
 				window.pie = pie;
-				window.pixel = pixel;
+				window.pixel = putPixel;
+				window.putPixel = putPixel;
+				window.getPixel = getPixel;
 				window.polygon = polygon;
 				window.prompt = prompt;
 				window.random = random;

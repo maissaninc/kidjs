@@ -80,27 +80,3 @@ export function square(x, y, size) {
   window.stage.addChild(shape);
   return shape;
 }
-
-export function pixel(x, y, color = 'black') {
-  if (x == null || y == null) {
-    return;
-  }
-
-  // Shift x and y to the center of the pixel
-  x = parseLength(x, 'x') + 0.5;
-  y = parseLength(y, 'y') + 0.5;
-
-  // If there is another pixel at the same location, replace it
-  for (let i = 0; i < window.stage.actors.length; i++) {
-    if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) {
-      window.stage.actors[i].remove();
-    }
-  }
-
-  // Create a new pixel
-  const shape = new Rect(x, y, 1, 1);
-  shape.color = color;
-  shape.init();
-  window.stage.addChild(shape);
-  return shape;
-}

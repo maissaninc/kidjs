@@ -80,3 +80,19 @@ export function square(x, y, size) {
   window.stage.addChild(shape);
   return shape;
 }
+
+export function pixel(x, y, color = 'black') {
+  if (x == null || y == null) {
+    return;
+  }
+  const shape = new Rect(
+    parseLength(x, 'x') + 0.5,
+    parseLength(y, 'y') + 0.5,
+    1,
+    1
+  );
+  shape.color = color;
+  shape.init();
+  window.stage.addChild(shape);
+  return shape;
+}

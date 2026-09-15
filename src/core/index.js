@@ -16,7 +16,7 @@ import { path } from '../shape/path';
 import { pie } from '../shape/pie';
 import { polygon } from '../shape/polygon';
 import { record } from '../media';
-import { rect, square } from '../shape/rect';
+import { rect, square, pixel } from '../shape/rect';
 import { pentagon, hexagon, heptagon, octagon } from '../shape/regular';
 import { semicircle } from '../shape/semicircle';
 import { triangle } from '../shape/triangle';
@@ -78,6 +78,7 @@ export function init() {
       window.path = path;
       window.pentagon = pentagon;
       window.pie = pie;
+      window.pixel = pixel;
       window.polygon = polygon;
       window.prompt = prompt;
       window.random = random;

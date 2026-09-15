@@ -17216,9 +17216,9 @@
 	*/
 	function putPixel(x, y, color = "black") {
 		if (x == null || y == null) return;
+		clearPixel(x, y);
 		x = parseLength(x, "x") + .5;
 		y = parseLength(y, "y") + .5;
-		for (let i = 0; i < window.stage.actors.length; i++) if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) window.stage.actors[i].remove();
 		const shape = new Rect(x, y, 1, 1);
 		shape.color = color;
 		shape.init();
@@ -17238,6 +17238,18 @@
 		y = parseLength(y, "y") + .5;
 		for (let i = 0; i < window.stage.actors.length; i++) if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) return window.stage.actors[i].color;
 		return false;
+	}
+	/**
+	* Clear the pixel at the given coordinates.
+	* 
+	* @param {int} x - X coordinate
+	* @param {int} y - Y coordinate
+	*/
+	function clearPixel(x, y) {
+		if (x == null || y == null) return;
+		x = parseLength(x, "x") + .5;
+		y = parseLength(y, "y") + .5;
+		for (let i = 0; i < window.stage.actors.length; i++) if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) window.stage.actors[i].remove();
 	}
 	//#endregion
 	//#region src/media/index.js
@@ -18789,6 +18801,7 @@
 				window.pixel = putPixel;
 				window.putPixel = putPixel;
 				window.getPixel = getPixel;
+				window.clearPixel = clearPixel;
 				window.polygon = polygon;
 				window.prompt = prompt;
 				window.random = random;

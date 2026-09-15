@@ -14,7 +14,7 @@ import { line } from '../shape/line';
 import { oval } from '../shape/oval';
 import { path } from '../shape/path';
 import { pie } from '../shape/pie';
-import { putPixel, getPixel } from '../pixel';
+import { putPixel, getPixel, clearPixel } from '../pixel';
 import { polygon } from '../shape/polygon';
 import { record } from '../media';
 import { rect, square } from '../shape/rect';
@@ -82,6 +82,7 @@ export function init() {
       window.pixel = putPixel;
       window.putPixel = putPixel;
       window.getPixel = getPixel;
+      window.clearPixel = clearPixel;
       window.polygon = polygon;
       window.prompt = prompt;
       window.random = random;

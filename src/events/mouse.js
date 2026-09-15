@@ -79,8 +79,8 @@ function onMouseUp(e) {
 
 function onMouseMove(e) {
   let position = window.stage.toStageCoordinates(e.pageX, e.pageY);
-  window.mouseX = position.x;
-  window.mouseY = position.y;
+  window.mouseX = Math.floor(position.x);
+  window.mouseY = Math.floor(position.y);
 
   let mouseMoveEvent = new MouseEvent('mousemove', e);
   window.stage.dispatchEvent(mouseMoveEvent);

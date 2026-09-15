@@ -91,9 +91,9 @@ export function pixel(x, y, color = 'black') {
   y = parseLength(y, 'y') + 0.5;
 
   // If there is another pixel at the same location, replace it
-  for (let i = 0; i < window.stage.children.length; i++) {
-    if (window.stage.children[i] instanceof Rect && window.stage.children[i].x === x && window.stage.children[i].y === y) {
-      window.stage.children[i].remove();
+  for (let i = 0; i < window.stage.actors.length; i++) {
+    if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) {
+      window.stage.actors[i].remove();
     }
   }
 

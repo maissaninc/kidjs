@@ -17267,7 +17267,7 @@
 		if (x == null || y == null) return;
 		x = parseLength(x, "x") + .5;
 		y = parseLength(y, "y") + .5;
-		for (let i = 0; i < window.stage.children.length; i++) if (window.stage.children[i] instanceof Rect && window.stage.children[i].x === x && window.stage.children[i].y === y) window.stage.children[i].remove();
+		for (let i = 0; i < window.stage.actors.length; i++) if (window.stage.actors[i] instanceof Rect && window.stage.actors[i].x === x && window.stage.actors[i].y === y) window.stage.actors[i].remove();
 		const shape = new Rect(x, y, 1, 1);
 		shape.color = color;
 		shape.init();

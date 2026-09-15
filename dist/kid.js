@@ -19577,6 +19577,8 @@
 			this.canvas.style.top = 0;
 			this.canvas.style.left = 0;
 			this.canvas.style.display = "block";
+			this.canvas.style.objectFit = "contain";
+			this.canvas.style.objectPosition = "center";
 			this.canvas.style.imageRendering = "pixelated";
 		}
 		/**

@@ -28,6 +28,7 @@ import { display, write, writeln } from '../text';
 import { group } from '../stage/group';
 import { random, sin, cos, tan, asin, acos, atan } from './math';
 import { replacePercentUnits } from './units';
+import normalizeCase from './normalize-case';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
 import { prompt, closeAllPrompts } from '../input/prompt';
@@ -259,6 +260,11 @@ async function compile(code) {
     return '';
   }
   attachComments(ast, comments);
+
+  // Lowercase identifiers, restoring mixed-case APIs
+  if (window._kidjs_.settings.caseInsensitive) {
+    normalizeCase(ast);
+  }
 
   // Keep track of functions converted to async
   let convertedFunctions = [];

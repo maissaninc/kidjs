@@ -1,6 +1,7 @@
 export class Settings {
 
     _backgroundColor = null;
+    _caseInsensitive = false;
     _slowMotion = false;
     _slowMotionDelay = 1;
     _grid = false;
@@ -13,6 +14,14 @@ export class Settings {
 
    get backgroundColor() {
     return this._backgroundColor;
+   }
+
+   set caseInsensitive(value) {
+    this._caseInsensitive = value;
+   }
+
+   get caseInsensitive() {
+    return this._caseInsensitive;
    }
 
    set slowMotion(value) {

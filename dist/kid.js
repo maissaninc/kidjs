@@ -18559,6 +18559,102 @@
 		return group;
 	}
 	//#endregion
+	//#region src/core/normalize-case.js
+	var dictionary = [
+		"addChild",
+		"addEventListener",
+		"angularVelocity",
+		"appendChild",
+		"Array",
+		"bezierCurveTo",
+		"cancelAnimationFrame",
+		"clearInterval",
+		"clearPixel",
+		"clearRect",
+		"clearTimeout",
+		"Date",
+		"decodeURI",
+		"decodeURIComponent",
+		"drawImage",
+		"encodeURI",
+		"encodeURIComponent",
+		"fadeIn",
+		"fadeOut",
+		"fillCircle",
+		"fillRect",
+		"fillStyle",
+		"fontColor",
+		"fontSize",
+		"fontWeight",
+		"getPixel",
+		"indexOf",
+		"Infinity",
+		"innerHeight",
+		"innerWidth",
+		"isFinite",
+		"isNaN",
+		"JSON",
+		"lineStyle",
+		"lineTo",
+		"lineWidth",
+		"Math",
+		"mouseButton",
+		"mouseX",
+		"mouseY",
+		"moveTo",
+		"NaN",
+		"Number",
+		"Object",
+		"parseFloat",
+		"parseInt",
+		"PI",
+		"putPixel",
+		"removeChild",
+		"removeEventListener",
+		"requestAnimationFrame",
+		"setInterval",
+		"setTimeout",
+		"shadowBlur",
+		"shadowColor",
+		"shadowOffsetX",
+		"shadowOffsetY",
+		"String",
+		"strokeStyle",
+		"textAlign",
+		"textBaseline",
+		"tiltX",
+		"tiltY",
+		"toLowerCase",
+		"toString",
+		"toUpperCase"
+	];
+	var restored = {};
+	for (let i = 0; i < dictionary.length; i++) restored[dictionary[i].toLowerCase()] = dictionary[i];
+	/**
+	* Lowercase a name, then restore known mixed-case APIs.
+	*
+	* @param {String} name - Identifier name
+	* @return {String} Normalized name
+	*/
+	function normalizeName(name) {
+		let lower = name.toLowerCase();
+		if (restored[lower]) return restored[lower];
+		return lower;
+	}
+	/**
+	* Convert identifier names to lowercase, restoring mixed-case APIs.
+	* String literals, comments, and regexes are left unchanged.
+	*
+	* @param {Object} ast - Parsed AST
+	*/
+	function normalizeCase(ast) {
+		full(ast, function(node) {
+			if (node.type == "Identifier") node.name = normalizeName(node.name);
+			if (node.type == "MemberExpression" && !node.computed && node.property.type == "Identifier") node.property.name = normalizeName(node.property.name);
+			if ((node.type == "Property" || node.type == "MethodDefinition" || node.type == "PropertyDefinition") && !node.computed && node.key && node.key.type == "Identifier") node.key.name = normalizeName(node.key.name);
+		});
+	}
+	//#endregion
 	//#region src/core/permissions.js
 	var permissionsRequired = [];
 	function requirePermission(permission) {
@@ -18713,6 +18809,7 @@
 	//#region src/core/settings.js
 	var Settings = class {
 		_backgroundColor = null;
+		_caseInsensitive = false;
 		_slowMotion = false;
 		_slowMotionDelay = 1;
 		_grid = false;
@@ -18723,6 +18820,12 @@
 		}
 		get backgroundColor() {
 			return this._backgroundColor;
+		}
+		set caseInsensitive(value) {
+			this._caseInsensitive = value;
+		}
+		get caseInsensitive() {
+			return this._caseInsensitive;
 		}
 		set slowMotion(value) {
 			this._slowMotion = value;
@@ -18924,6 +19027,7 @@
 			return "";
 		}
 		attachComments(ast, comments);
+		if (window._kidjs_.settings.caseInsensitive) normalizeCase(ast);
 		let convertedFunctions = [];
 		let libraries = [];
 		full(ast, function(node) {

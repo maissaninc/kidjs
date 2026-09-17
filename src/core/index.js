@@ -175,7 +175,6 @@ export function init() {
         }
       }
       console.error('Error: ' + e.message + ' at line ' + lineNumber);
-      console.error(e.stack);
       new KidjsError(e.message, type, lineNumber);
     },
 

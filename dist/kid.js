@@ -18967,7 +18967,6 @@
 					}
 				}
 				console.error("Error: " + e.message + " at line " + lineNumber);
-				console.error(e.stack);
 				new KidjsError$1(e.message, type, lineNumber);
 			},
 			libraries: [],

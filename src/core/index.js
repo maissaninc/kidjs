@@ -163,14 +163,15 @@ export function init() {
       let lineNumber = -1;
       let match = e.stack.match(/(\d+):(\d+)/);
       let type = 'error';
+      if (e.message.includes('SyntaxError')) {
+        type = 'syntax';
+        console.log(match);
+      }
       if (match) {
         if (runtime) {
           type = 'runtime';
           lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
         } else {
-          if (e.message.includes('SyntaxError')) {
-            type = 'syntax';
-          }
           lineNumber = parseInt(match[1]);
         }
       }

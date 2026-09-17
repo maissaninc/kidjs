@@ -163,9 +163,7 @@ export function init() {
       let lineNumber = -1;
       let match = e.stack.match(/(\d+):(\d+)/);
       let type = 'error';
-      console.log(e);
-      console.log(match);
-      if (e.message.includes('SyntaxError')) {
+      if (e instanceof SyntaxError) {
         type = 'syntax';
       }
       if (match) {

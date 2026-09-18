@@ -227,7 +227,11 @@ export function init() {
   window.setTimeout = function(callback, duration) {
     let timeout = parentSetTimeout(() => {
       window._kidjs_.stats.lastFrame = Date.now();
-      callback();
+      try {
+        callback();
+      } catch(e) {
+        window._kidjs_.error(e, true);
+      }
     }, duration);
     timeouts.push(timeout);
     return timeout;
@@ -236,7 +240,11 @@ export function init() {
   window.setInterval = function(callback, duration) {
     let interval = parentSetInterval(() => {
       window._kidjs_.stats.lastFrame = Date.now();
-      callback();
+      try {
+        callback();
+      } catch(e) {
+        window._kidjs_.error(e, true);
+      }
     }, duration);
     intervals.push(interval);
     return interval;
@@ -253,6 +261,12 @@ export function init() {
   window._kidjs_.setGlobals();
 }
 
+/**
+ * "Compile" Kid.js code into regular JavaScript code.
+ * 
+ * @param {String} code - Kid.js code to compile
+ * @returns {String} - Compiled JavaScript code
+ */
 async function compile(code) {
 
   // Replace percent units with string literals
@@ -482,7 +496,7 @@ async function compile(code) {
       try {
         return eval(key);
       } catch {
-        // Don't die on me
+        window._kidjs_.error(e, true);
       }
     };
     window._kidjs_.get = function(key) {

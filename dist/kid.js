@@ -19741,7 +19741,7 @@
 		*/
 		dispatchEvent(event, context = window) {
 			if (this.eventListeners[event.type] !== void 0) {
-				for (let listener of this.eventListeners[event.type]) if (typeof listener.handler == "function") {
+				for (let listener of this.eventListeners[event.type]) if (typeof listener.handler == "function") try {
 					switch (event.constructor.name) {
 						case "KeyboardEvent":
 							listener.handler.call(context, event.key);
@@ -19761,6 +19761,8 @@
 							return;
 						default: listener.handler.call(context);
 					}
+				} catch (e) {
+					window._kidjs_.error(e, true);
 				}
 			}
 		}

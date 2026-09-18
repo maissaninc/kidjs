@@ -2,6 +2,7 @@ import Animation from '../animation';
 import Vector from '../core/vector';
 import { degreesToRadians, radiansToDegrees }  from '../core/math';
 import Matter from 'matter-js';
+import { invokeEventHandler } from '../core/error';
 
 export default class Actor {
 
@@ -692,12 +693,15 @@ export default class Actor {
   dispatchEvent(event, context = this) {
     if (this.eventListeners[event.type] !== undefined) {
       for (let listener of this.eventListeners[event.type]) {
+        if (typeof listener.handler != 'function') {
+          continue;
+        }
         switch (event.type) {
           case 'collision':
-            listener.handler.call(context, event.detail);
+            invokeEventHandler(listener.handler, context, event.detail);
             break;
           default:
-            listener.handler.call(context);
+            invokeEventHandler(listener.handler, context);
         }
       }
     }

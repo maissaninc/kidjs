@@ -15902,8 +15902,52 @@
 		});
 	}));
 	//#endregion
-	//#region src/stage/actor.js
+	//#region src/core/error.js
 	var import_matter = /* @__PURE__ */ __toESM(require_matter(), 1);
+	var KidjsError$1 = class extends Error {
+		constructor(message, type, line = 0, column = 0) {
+			super(message);
+			this.name = "Kidjs";
+			window.dispatchEvent(new CustomEvent("KID.error", { detail: {
+				message,
+				type,
+				line,
+				column
+			} }));
+		}
+	};
+	/**
+	* Call an event handler and report both thrown errors and rejected
+	* promises. Named Kid.js functions are compiled as async, so errors
+	* inside them become promise rejections instead of throws.
+	*
+	* @param {function} handler
+	* @param {*} context
+	* @return {*}
+	*/
+	function invokeEventHandler(handler, context) {
+		let args = [];
+		for (let i = 2; i < arguments.length; i = i + 1) args.push(arguments[i]);
+		try {
+			return catchRejectedPromise(handler.apply(context, args));
+		} catch (e) {
+			window._kidjs_.error(e, true);
+		}
+	}
+	/**
+	* Report errors from a rejected promise returned by a user callback.
+	*
+	* @param {*} result
+	* @return {*}
+	*/
+	function catchRejectedPromise(result) {
+		if (result && typeof result.then == "function") result.catch(function(e) {
+			window._kidjs_.error(e, true);
+		});
+		return result;
+	}
+	//#endregion
+	//#region src/stage/actor.js
 	var Actor = class {
 		/**
 		* Create a new actor and add it to the stage.
@@ -16400,11 +16444,14 @@
 		* @param {Event} [event] - Event object.
 		*/
 		dispatchEvent(event, context = this) {
-			if (this.eventListeners[event.type] !== void 0) for (let listener of this.eventListeners[event.type]) switch (event.type) {
-				case "collision":
-					listener.handler.call(context, event.detail);
-					break;
-				default: listener.handler.call(context);
+			if (this.eventListeners[event.type] !== void 0) for (let listener of this.eventListeners[event.type]) {
+				if (typeof listener.handler != "function") continue;
+				switch (event.type) {
+					case "collision":
+						invokeEventHandler(listener.handler, context, event.detail);
+						break;
+					default: invokeEventHandler(listener.handler, context);
+				}
 			}
 		}
 		/**
@@ -18794,20 +18841,6 @@
 		for (let i = 0; i < els.length; i = i + 1) document.body.removeChild(els[i]);
 	}
 	//#endregion
-	//#region src/core/error.js
-	var KidjsError$1 = class extends Error {
-		constructor(message, type, line = 0, column = 0) {
-			super(message);
-			this.name = "Kidjs";
-			window.dispatchEvent(new CustomEvent("KID.error", { detail: {
-				message,
-				type,
-				line,
-				column
-			} }));
-		}
-	};
-	//#endregion
 	//#region src/core/settings.js
 	var Settings = class {
 		_backgroundColor = null;
@@ -19093,14 +19126,15 @@
 			hooks: { setGlobals: [] },
 			seed: Date.now(),
 			sourceMap: null,
-			sourceMapPrefixLines: 0
+			sourceMapPrefixLines: 0,
+			catchRejectedPromise
 		};
 		parentSetTimeout = window.setTimeout;
 		window.setTimeout = function(callback, duration) {
 			let timeout = parentSetTimeout(() => {
 				window._kidjs_.stats.lastFrame = Date.now();
 				try {
-					callback();
+					catchRejectedPromise(callback());
 				} catch (e) {
 					window._kidjs_.error(e, true);
 				}
@@ -19113,7 +19147,7 @@
 			let interval = parentSetInterval(() => {
 				window._kidjs_.stats.lastFrame = Date.now();
 				try {
-					callback();
+					catchRejectedPromise(callback());
 				} catch (e) {
 					window._kidjs_.error(e, true);
 				}
@@ -19242,8 +19276,8 @@
   try {
     window._kidjs_.eval = function(key) {
       try {
-        return eval(key);
-      } catch {
+        return window._kidjs_.catchRejectedPromise(eval(key));
+      } catch(e) {
         window._kidjs_.error(e, true);
       }
     };
@@ -19741,28 +19775,26 @@
 		*/
 		dispatchEvent(event, context = window) {
 			if (this.eventListeners[event.type] !== void 0) {
-				for (let listener of this.eventListeners[event.type]) if (typeof listener.handler == "function") try {
+				for (let listener of this.eventListeners[event.type]) if (typeof listener.handler == "function") {
 					switch (event.constructor.name) {
 						case "KeyboardEvent":
-							listener.handler.call(context, event.key);
+							invokeEventHandler(listener.handler, context, event.key);
 							return;
 						case "MouseEvent":
 						case "PointerEvent":
 							let position = this.toStageCoordinates(event.x, event.y);
-							listener.handler.call(context, position.x, position.y);
+							invokeEventHandler(listener.handler, context, position.x, position.y);
 							return;
 					}
 					switch (event.type) {
 						case "tilt":
-							listener.handler.call(context, window.tiltX, window.tiltY);
+							invokeEventHandler(listener.handler, context, window.tiltX, window.tiltY);
 							return;
 						case "message":
-							listener.handler.call(context, event.detail.message);
+							invokeEventHandler(listener.handler, context, event.detail.message);
 							return;
-						default: listener.handler.call(context);
+						default: invokeEventHandler(listener.handler, context);
 					}
-				} catch (e) {
-					window._kidjs_.error(e, true);
 				}
 			}
 		}

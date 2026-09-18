@@ -2,6 +2,7 @@ import Matter from 'matter-js';
 import Style from '../style';
 import { resetCursor } from '../text';
 import { log } from '../debug';
+import { invokeEventHandler } from '../core/error';
 
 const WALL_DEPTH = 1000;
 
@@ -410,33 +411,29 @@ export default class Stage {
     if (this.eventListeners[event.type] !== undefined) {
       for (let listener of this.eventListeners[event.type]) {
         if (typeof listener.handler == 'function') {
-          try {
 
-            // Switch on event object type
-            switch (event.constructor.name) {
-              case 'KeyboardEvent':
-                listener.handler.call(context, event.key);
-                return;
-              case 'MouseEvent':
-              case 'PointerEvent':
-                let position = this.toStageCoordinates(event.x, event.y);
-                listener.handler.call(context, position.x, position.y);
-                return;
-            }
+          // Switch on event object type
+          switch (event.constructor.name) {
+            case 'KeyboardEvent':
+              invokeEventHandler(listener.handler, context, event.key);
+              return;
+            case 'MouseEvent':
+            case 'PointerEvent':
+              let position = this.toStageCoordinates(event.x, event.y);
+              invokeEventHandler(listener.handler, context, position.x, position.y);
+              return;
+          }
 
-            // Switch on event type property
-            switch (event.type) {
-              case 'tilt': 
-                listener.handler.call(context, window.tiltX, window.tiltY);
-                return;
-              case 'message':
-                listener.handler.call(context, event.detail.message);
-                return;
-              default:
-                listener.handler.call(context);
-            }
-          } catch(e) {
-            window._kidjs_.error(e, true);
+          // Switch on event type property
+          switch (event.type) {
+            case 'tilt':
+              invokeEventHandler(listener.handler, context, window.tiltX, window.tiltY);
+              return;
+            case 'message':
+              invokeEventHandler(listener.handler, context, event.detail.message);
+              return;
+            default:
+              invokeEventHandler(listener.handler, context);
           }
         }
       } 

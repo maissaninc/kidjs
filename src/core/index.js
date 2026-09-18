@@ -32,7 +32,7 @@ import normalizeCase from './normalize-case';
 import { requirePermission, getPermissions } from './permissions';
 import { log } from '../debug';
 import { prompt, closeAllPrompts } from '../input/prompt';
-import { KidjsError } from './error';
+import { KidjsError, catchRejectedPromise } from './error';
 import { Settings } from './settings';
 import { SourceMap, parseEvalStackFrame } from './source-map';
 
@@ -219,7 +219,8 @@ export function init() {
 
     seed: Date.now(),
     sourceMap: null,
-    sourceMapPrefixLines: 0
+    sourceMapPrefixLines: 0,
+    catchRejectedPromise: catchRejectedPromise
   };
 
   // Intercept setTimeout and setInterval
@@ -228,7 +229,7 @@ export function init() {
     let timeout = parentSetTimeout(() => {
       window._kidjs_.stats.lastFrame = Date.now();
       try {
-        callback();
+        catchRejectedPromise(callback());
       } catch(e) {
         window._kidjs_.error(e, true);
       }
@@ -241,7 +242,7 @@ export function init() {
     let interval = parentSetInterval(() => {
       window._kidjs_.stats.lastFrame = Date.now();
       try {
-        callback();
+        catchRejectedPromise(callback());
       } catch(e) {
         window._kidjs_.error(e, true);
       }
@@ -494,8 +495,8 @@ async function compile(code) {
   try {
     window._kidjs_.eval = function(key) {
       try {
-        return eval(key);
-      } catch {
+        return window._kidjs_.catchRejectedPromise(eval(key));
+      } catch(e) {
         window._kidjs_.error(e, true);
       }
     };

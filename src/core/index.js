@@ -34,6 +34,7 @@ import { log } from '../debug';
 import { prompt, closeAllPrompts } from '../input/prompt';
 import { KidjsError } from './error';
 import { Settings } from './settings';
+import { SourceMap, parseEvalStackFrame } from './source-map';
 
 let triggers = [];
 let parentSetTimeout;
@@ -161,21 +162,36 @@ export function init() {
 
     error: function(e, runtime) {
       let lineNumber = -1;
-      let match = e.stack.match(/(\d+):(\d+)/);
+      let columnNumber = 0;
       let type = 'error';
-      if (e instanceof SyntaxError) {
+
+      if (runtime) {
+        type = 'runtime';
+        let frame = parseEvalStackFrame(e.stack);
+        let map = window._kidjs_.sourceMap;
+        let offset = window._kidjs_.sourceMapPrefixLines || 0;
+        if (frame && map && typeof map.originalPositionFor == 'function') {
+          let original = map.originalPositionFor(
+            frame.line - offset,
+            frame.column - 1
+          );
+          if (original) {
+            lineNumber = original.line;
+            columnNumber = original.column + 1;
+          }
+        }
+      } else if (e.loc) {
+        if (e instanceof SyntaxError) {
+          type = 'syntax';
+        }
+        lineNumber = e.loc.line;
+        columnNumber = e.loc.column + 1;
+      } else if (e instanceof SyntaxError) {
         type = 'syntax';
       }
-      if (match) {
-        if (runtime) {
-          type = 'runtime';
-          lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
-        } else {
-          lineNumber = parseInt(match[1]);
-        }
-      }
-      console.error('Error: ' + e.message + ' at line ' + lineNumber);
-      new KidjsError(e.message, type, lineNumber);
+
+      console.error('Error: ' + e.message + ' at line ' + lineNumber + ', column ' + columnNumber);
+      new KidjsError(e.message, type, lineNumber, columnNumber);
     },
 
     libraries: [],
@@ -202,7 +218,8 @@ export function init() {
     },
 
     seed: Date.now(),
-    sourceMap: []
+    sourceMap: null,
+    sourceMapPrefixLines: 0
   };
 
   // Intercept setTimeout and setInterval
@@ -240,9 +257,6 @@ async function compile(code) {
 
   // Replace percent units with string literals
   code = replacePercentUnits(code);
-
-  // Insert line markers
-  code = insertLineMarkers(code);
 
   // Parse code into source tree
   let comments = [];
@@ -393,10 +407,7 @@ async function compile(code) {
           node.body[i].expression.callee.type == 'Identifier' &&
           node.body[i].expression.callee.name == 'wait'
         ) {
-          node.body[i].expression = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node.body[i].expression)
-          };
+          node.body[i].expression = wrapAwait(node.body[i].expression);
         }
 
         // Add await if wait() at the end of a chain
@@ -405,10 +416,7 @@ async function compile(code) {
           node.body[i].expression.callee.type == 'MemberExpression' &&
           node.body[i].expression.callee.property.name == 'wait'
         ) {
-          node.body[i].expression = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node.body[i].expression)
-          };
+          node.body[i].expression = wrapAwait(node.body[i].expression);
         }
 
         // Add await to prompt() calls with return
@@ -418,10 +426,7 @@ async function compile(code) {
           node.body[i].declarations[0].init.type == 'CallExpression' &&
           node.body[i].declarations[0].init.callee.name == 'prompt'
         ) {
-          node.body[i].declarations[0].init = {
-            type: 'AwaitExpression',
-            argument: Object.assign({},  node.body[i].declarations[0].init)
-          };
+          node.body[i].declarations[0].init = wrapAwait(node.body[i].declarations[0].init);
         }        
 
         // Add await to prompt() calls without return
@@ -429,10 +434,7 @@ async function compile(code) {
           node.body[i].expression.type == 'CallExpression' &&
           node.body[i].expression.callee.name == 'prompt'
         ) {
-          node.body[i].expression = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node.body[i].expression)
-          };
+          node.body[i].expression = wrapAwait(node.body[i].expression);
         }
       }
     }
@@ -447,33 +449,21 @@ async function compile(code) {
         if (parent.type == 'CallExpression' && parent.arguments) {
           for (let i = 0; i < parent.arguments.length; i = i + 1) {
             if (parent.arguments[i] == node) {
-              parent.arguments[i] = {
-                type: 'AwaitExpression',
-                argument: Object.assign({}, node)
-              };
+              parent.arguments[i] = wrapAwait(node);
             }
           }
         }
 
         if (parent.type == 'ExpressionStatement' && parent.expression == node) {
-          parent.expression = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node)
-          };
+          parent.expression = wrapAwait(node);
         }
 
         if (parent.type == 'VariableDeclarator' && parent.init == node) {
-          parent.init = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node)
-          };
+          parent.init = wrapAwait(node);
         }
 
         if (parent.type == 'IfStatement' && parent.test == node) {
-          parent.test = {
-            type: 'AwaitExpression',
-            argument: Object.assign({}, node)
-          };
+          parent.test = wrapAwait(node);
         }
       }
     }
@@ -482,39 +472,42 @@ async function compile(code) {
   // Insert step statements
   insertStepStatements(ast);
 
-  // Generate updated source
-  let processed = astring.generate(ast, { comments: true });
+  // Generate updated source with original-location mappings
+  let sourceMap = new SourceMap();
+  let processed = astring.generate(ast, { comments: true, sourceMap: sourceMap });
 
-  // Generate source map
-  window._kidjs_.sourceMap = generateSourceMap(processed, 15);
+  let prefix = `(async function() {
+  try {
+    window._kidjs_.eval = function(key) {
+      try {
+        return eval(key);
+      } catch {
+        // Don't die on me
+      }
+    };
+    window._kidjs_.get = function(key) {
+      if (eval('typeof ' + key) !== 'undefined') {
+        return eval(key);
+      }
+    };
+`;
+  let suffix = `
+  } catch(e) {
+    window._kidjs_.error(e, true);
+  }
+  window._kidjs_.end();
+})();
+//# sourceURL=kidjs://index.js`;
+
+  window._kidjs_.sourceMap = sourceMap;
+  window._kidjs_.sourceMapPrefixLines = prefix.split('\n').length - 1;
 
   // Load libraries
   for (let i = 0; i < libraries.length; i = i + 1) {
     await window._kidjs_.import(libraries[i]);
   }
 
-  return `
-    (async function() {
-      try {
-        window._kidjs_.eval = function(key) {
-          try {
-            return eval(key);
-          } catch {
-            // Don't die on me
-          }
-        };
-        window._kidjs_.get = function(key) {
-          if (eval('typeof ' + key) !== 'undefined') {
-            return eval(key);
-          }
-        };
-        ${processed}
-      } catch(e) {
-        window._kidjs_.error(e, true);
-      }
-      window._kidjs_.end();
-    })();
-  `
+  return prefix + processed + suffix;
 }
 
 /**
@@ -585,6 +578,20 @@ function createInlineFunction(node) {
     },
     params: []
   }
+}
+
+/**
+ * Wrap an AST node in an AwaitExpression, preserving original location.
+ *
+ * @param {Object} node - AST node to await
+ * @return {Object} AwaitExpression node
+ */
+function wrapAwait(node) {
+  return {
+    type: 'AwaitExpression',
+    argument: Object.assign({}, node),
+    loc: node.loc
+  };
 }
 
 /**
@@ -662,40 +669,6 @@ function insertStepStatements(ast) {
       }
     }
   }
-}
-
-/**
- * Insert line markers as comments.
- *
- * @param {String} code - Source code
- * @return {String} Source code containling line markers
- */
-function insertLineMarkers(code) {
-  let lines = code.split(/\r?\n/);
-  for (let i = 0; i < lines.length; i = i + 1) {
-    lines[i] = lines[i] + '//__kidjs__beginline__' + i + '__endline__';
-  }
-  return lines.join('\n');
-}
-
-/**
- * Generate source map.
- *
- * @param {String} code - Source code with markers
- * @return {Array} Source map
- */
-function generateSourceMap(code, offset) {
-  let map = [];
-  let lines = code.split(/\r?\n/);
-  let lineNumber = 0;
-  for (let i = 0; i < lines.length; i = i + 1) {
-    let test = /__kidjs__beginline__(\d+)__endline__/.exec(lines[i]);
-    if (test) {
-      lineNumber = test[1];
-    }
-    map[i + offset] = lineNumber;
-  }
-  return map;
 }
 
 export function reset() {

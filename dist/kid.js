@@ -18863,6 +18863,105 @@
 		}
 	};
 	//#endregion
+	//#region src/core/source-map.js
+	/**
+	* Mapping collector compatible with astring's `sourceMap` option.
+	* Stores generated \u2192 original positions without VLQ encoding.
+	*/
+	var SourceMap = class {
+		constructor() {
+			this.file = "kidjs";
+			this._file = "kidjs";
+			this.mappings = [];
+		}
+		/**
+		* Record a mapping from astring. Values are copied because astring
+		* reuses the same `generated` state object across writes.
+		*
+		* @param {Object} mapping
+		*/
+		addMapping(mapping) {
+			if (!mapping || !mapping.original || !mapping.generated) return;
+			this.mappings.push({
+				generatedLine: mapping.generated.line,
+				generatedColumn: mapping.generated.column,
+				originalLine: mapping.original.line,
+				originalColumn: mapping.original.column
+			});
+		}
+		/**
+		* Find the original position for a generated line/column.
+		* Uses the last mapping at or before the query (source-map consumer rule).
+		* Lines are 1-based; columns are 0-based (ESTree).
+		*
+		* @param {Number} line - Generated line
+		* @param {Number} column - Generated column
+		* @return {?{line: Number, column: Number}}
+		*/
+		originalPositionFor(line, column) {
+			let mappings = this.mappings;
+			if (mappings.length === 0) return null;
+			let lo = 0;
+			let hi = mappings.length - 1;
+			let found = -1;
+			while (lo <= hi) {
+				let mid = lo + hi >> 1;
+				let mapping = mappings[mid];
+				if (mapping.generatedLine < line || mapping.generatedLine === line && mapping.generatedColumn <= column) {
+					found = mid;
+					lo = mid + 1;
+				} else hi = mid - 1;
+			}
+			if (found !== -1 && mappings[found].generatedLine !== line) {
+				let next = mappings[found + 1];
+				if (next && next.generatedLine === line) found = found + 1;
+			}
+			if (found === -1) {
+				if (mappings[0].generatedLine === line) found = 0;
+				else return null;
+			}
+			let mapping = mappings[found];
+			let originalColumn = mapping.originalColumn;
+			if (mapping.generatedLine === line && column >= mapping.generatedColumn) originalColumn = mapping.originalColumn + (column - mapping.generatedColumn);
+			return {
+				line: mapping.originalLine,
+				column: originalColumn
+			};
+		}
+	};
+	/**
+	* Extract the generated line/column of the eval'd user program from a stack.
+	* Stack coordinates are 1-based (V8 / SpiderMonkey).
+	*
+	* @param {String} stack
+	* @return {?{line: Number, column: Number}}
+	*/
+	function parseEvalStackFrame(stack) {
+		if (!stack) return null;
+		let lines = String(stack).split("\n");
+		for (let i = 0; i < lines.length; i = i + 1) {
+			let match = lines[i].match(/kidjs:\/\/index\.js:(\d+):(\d+)/);
+			if (match) return {
+				line: parseInt(match[1], 10),
+				column: parseInt(match[2], 10)
+			};
+		}
+		for (let i = 0; i < lines.length; i = i + 1) {
+			let line = lines[i];
+			let match = line.match(/<anonymous>:(\d+):(\d+)/);
+			if (match && /eval/i.test(line)) return {
+				line: parseInt(match[1], 10),
+				column: parseInt(match[2], 10)
+			};
+			match = line.match(/(?:debugger eval code|eval code):(\d+):(\d+)/);
+			if (match) return {
+				line: parseInt(match[1], 10),
+				column: parseInt(match[2], 10)
+			};
+		}
+		return null;
+	}
+	//#endregion
 	//#region src/core/index.js
 	var triggers = [];
 	var parentSetTimeout;
@@ -18957,17 +19056,27 @@
 			},
 			error: function(e, runtime) {
 				let lineNumber = -1;
-				let match = e.stack.match(/(\d+):(\d+)/);
+				let columnNumber = 0;
 				let type = "error";
-				if (e instanceof SyntaxError) type = "syntax";
-				if (match) {
-					if (runtime) {
-						type = "runtime";
-						lineNumber = parseInt(window._kidjs_.sourceMap[match[1]]) + 1;
-					} else lineNumber = parseInt(match[1]);
-				}
-				console.error("Error: " + e.message + " at line " + lineNumber);
-				new KidjsError$1(e.message, type, lineNumber);
+				if (runtime) {
+					type = "runtime";
+					let frame = parseEvalStackFrame(e.stack);
+					let map = window._kidjs_.sourceMap;
+					let offset = window._kidjs_.sourceMapPrefixLines || 0;
+					if (frame && map && typeof map.originalPositionFor == "function") {
+						let original = map.originalPositionFor(frame.line - offset, frame.column - 1);
+						if (original) {
+							lineNumber = original.line;
+							columnNumber = original.column + 1;
+						}
+					}
+				} else if (e.loc) {
+					if (e instanceof SyntaxError) type = "syntax";
+					lineNumber = e.loc.line;
+					columnNumber = e.loc.column + 1;
+				} else if (e instanceof SyntaxError) type = "syntax";
+				console.error("Error: " + e.message + " at line " + lineNumber + ", column " + columnNumber);
+				new KidjsError$1(e.message, type, lineNumber, columnNumber);
 			},
 			libraries: [],
 			import: async function(library) {
@@ -18983,7 +19092,8 @@
 			},
 			hooks: { setGlobals: [] },
 			seed: Date.now(),
-			sourceMap: []
+			sourceMap: null,
+			sourceMapPrefixLines: 0
 		};
 		parentSetTimeout = window.setTimeout;
 		window.setTimeout = function(callback, duration) {
@@ -19011,7 +19121,6 @@
 	}
 	async function compile(code) {
 		code = replacePercentUnits(code);
-		code = insertLineMarkers(code);
 		let comments = [];
 		let ast;
 		try {
@@ -19092,73 +19201,55 @@
 						if (node.body[i].id && node.body[i].id.name) convertedFunctions.push(node.body[i].id.name);
 					}
 				}
-				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.type == "Identifier" && node.body[i].expression.callee.name == "wait") node.body[i].expression = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node.body[i].expression)
-				};
-				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.type == "MemberExpression" && node.body[i].expression.callee.property.name == "wait") node.body[i].expression = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node.body[i].expression)
-				};
-				if (node.body[i].type == "VariableDeclaration" && node.body[i].declarations.length > 0 && node.body[i].declarations[0].init && node.body[i].declarations[0].init.type == "CallExpression" && node.body[i].declarations[0].init.callee.name == "prompt") node.body[i].declarations[0].init = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node.body[i].declarations[0].init)
-				};
-				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.name == "prompt") node.body[i].expression = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node.body[i].expression)
-				};
+				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.type == "Identifier" && node.body[i].expression.callee.name == "wait") node.body[i].expression = wrapAwait(node.body[i].expression);
+				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.type == "MemberExpression" && node.body[i].expression.callee.property.name == "wait") node.body[i].expression = wrapAwait(node.body[i].expression);
+				if (node.body[i].type == "VariableDeclaration" && node.body[i].declarations.length > 0 && node.body[i].declarations[0].init && node.body[i].declarations[0].init.type == "CallExpression" && node.body[i].declarations[0].init.callee.name == "prompt") node.body[i].declarations[0].init = wrapAwait(node.body[i].declarations[0].init);
+				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.name == "prompt") node.body[i].expression = wrapAwait(node.body[i].expression);
 			}
 		});
 		ancestor(ast, { CallExpression: function(node, ancestors) {
 			if (convertedFunctions.includes(node.callee.name)) {
 				let parent = ancestors[ancestors.length - 2];
 				if (parent.type == "CallExpression" && parent.arguments) {
-					for (let i = 0; i < parent.arguments.length; i = i + 1) if (parent.arguments[i] == node) parent.arguments[i] = {
-						type: "AwaitExpression",
-						argument: Object.assign({}, node)
-					};
+					for (let i = 0; i < parent.arguments.length; i = i + 1) if (parent.arguments[i] == node) parent.arguments[i] = wrapAwait(node);
 				}
-				if (parent.type == "ExpressionStatement" && parent.expression == node) parent.expression = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node)
-				};
-				if (parent.type == "VariableDeclarator" && parent.init == node) parent.init = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node)
-				};
-				if (parent.type == "IfStatement" && parent.test == node) parent.test = {
-					type: "AwaitExpression",
-					argument: Object.assign({}, node)
-				};
+				if (parent.type == "ExpressionStatement" && parent.expression == node) parent.expression = wrapAwait(node);
+				if (parent.type == "VariableDeclarator" && parent.init == node) parent.init = wrapAwait(node);
+				if (parent.type == "IfStatement" && parent.test == node) parent.test = wrapAwait(node);
 			}
 		} });
 		insertStepStatements(ast);
-		let processed = generate(ast, { comments: true });
-		window._kidjs_.sourceMap = generateSourceMap(processed, 15);
-		for (let i = 0; i < libraries.length; i = i + 1) await window._kidjs_.import(libraries[i]);
-		return `
-    (async function() {
+		let sourceMap = new SourceMap();
+		let processed = generate(ast, {
+			comments: true,
+			sourceMap
+		});
+		let prefix = `(async function() {
+  try {
+    window._kidjs_.eval = function(key) {
       try {
-        window._kidjs_.eval = function(key) {
-          try {
-            return eval(key);
-          } catch {
-            // Don't die on me
-          }
-        };
-        window._kidjs_.get = function(key) {
-          if (eval('typeof ' + key) !== 'undefined') {
-            return eval(key);
-          }
-        };
-        ${processed}
-      } catch(e) {
-        window._kidjs_.error(e, true);
+        return eval(key);
+      } catch {
+        // Don't die on me
       }
-      window._kidjs_.end();
-    })();
-  `;
+    };
+    window._kidjs_.get = function(key) {
+      if (eval('typeof ' + key) !== 'undefined') {
+        return eval(key);
+      }
+    };
+`;
+		let suffix = `
+  } catch(e) {
+    window._kidjs_.error(e, true);
+  }
+  window._kidjs_.end();
+})();
+//# sourceURL=kidjs://index.js`;
+		window._kidjs_.sourceMap = sourceMap;
+		window._kidjs_.sourceMapPrefixLines = prefix.split("\n").length - 1;
+		for (let i = 0; i < libraries.length; i = i + 1) await window._kidjs_.import(libraries[i]);
+		return prefix + processed + suffix;
 	}
 	/**
 	* Determine if AST node represents a call to on() method.
@@ -19213,6 +19304,19 @@
 				}]
 			},
 			params: []
+		};
+	}
+	/**
+	* Wrap an AST node in an AwaitExpression, preserving original location.
+	*
+	* @param {Object} node - AST node to await
+	* @return {Object} AwaitExpression node
+	*/
+	function wrapAwait(node) {
+		return {
+			type: "AwaitExpression",
+			argument: Object.assign({}, node),
+			loc: node.loc
 		};
 	}
 	/**
@@ -19282,34 +19386,6 @@
 				if (ast.body[i].alternate) insertStepStatements(ast.body[i].alternate);
 			}
 		}
-	}
-	/**
-	* Insert line markers as comments.
-	*
-	* @param {String} code - Source code
-	* @return {String} Source code containling line markers
-	*/
-	function insertLineMarkers(code) {
-		let lines = code.split(/\r?\n/);
-		for (let i = 0; i < lines.length; i = i + 1) lines[i] = lines[i] + "//__kidjs__beginline__" + i + "__endline__";
-		return lines.join("\n");
-	}
-	/**
-	* Generate source map.
-	*
-	* @param {String} code - Source code with markers
-	* @return {Array} Source map
-	*/
-	function generateSourceMap(code, offset) {
-		let map = [];
-		let lines = code.split(/\r?\n/);
-		let lineNumber = 0;
-		for (let i = 0; i < lines.length; i = i + 1) {
-			let test = /__kidjs__beginline__(\d+)__endline__/.exec(lines[i]);
-			if (test) lineNumber = test[1];
-			map[i + offset] = lineNumber;
-		}
-		return map;
 	}
 	function reset() {
 		log("Reset");

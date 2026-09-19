@@ -19512,8 +19512,6 @@
 			this.canvas.style.left = "0px";
 			this.canvas.style.width = "100%";
 			this.canvas.style.height = "100%";
-			this.canvas.style.objectFit = "contain";
-			this.canvas.style.objectPosition = "center";
 			if (!window._kidjs_.defaultStyle) window._kidjs_.defaultStyle = new Style(this.context);
 			this.actors = [];
 			this.eventListeners = {};
@@ -19527,9 +19525,16 @@
 		* @param {int} [width] - Optional stage width. Defaults to browser width.
 		* @param {int} [height] - Optional stage height. Defaults to browser height.
 		*/
-		resize(width, height) {
-			if (!parseInt(width)) width = window.innerWidth;
-			if (!parseInt(height)) height = window.innerHeight;
+		resize(width = "auto", height = "auto") {
+			if (width == "auto" && height == "auto") {
+				this.canvas.style.objectFit = "cover";
+				this.canvas.style.objectPosition = "top left";
+			} else {
+				this.canvas.style.objectFit = "contain";
+				this.canvas.style.objectPosition = "center";
+			}
+			if (width == "auto") width = window.innerWidth;
+			if (height == "auto") height = window.innerHeight;
 			let scale = window.devicePixelRatio;
 			this.width = parseInt(width);
 			this.height = parseInt(height);
@@ -19855,8 +19860,6 @@
 			this.canvas.style.top = 0;
 			this.canvas.style.left = 0;
 			this.canvas.style.display = "block";
-			this.canvas.style.objectFit = "contain";
-			this.canvas.style.objectPosition = "center";
 			this.canvas.style.imageRendering = "pixelated";
 		}
 		/**
@@ -19864,7 +19867,16 @@
 		*
 		* @param {CanvasRenderingContext2D} context - Rendering context
 		*/
-		render(width = window.innerWidth, height = window.innerHeight) {
+		render(width = "auto", height = "auto") {
+			if (width == "auto" && height == "auto") {
+				this.canvas.style.objectFit = "cover";
+				this.canvas.style.objectPosition = "top left";
+			} else {
+				this.canvas.style.objectFit = "contain";
+				this.canvas.style.objectPosition = "center";
+			}
+			if (width == "auto") width = window.innerWidth;
+			if (height == "auto") height = window.innerHeight;
 			this.canvas.width = width;
 			this.canvas.height = height;
 			let size = window._kidjs_.settings.pixelSize;

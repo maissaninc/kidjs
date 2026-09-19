@@ -33,8 +33,6 @@ export default class Stage {
     this.canvas.style.left = '0px';
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
-    this.canvas.style.objectFit = 'contain';
-    this.canvas.style.objectPosition = 'center';
 
     // Create default style
     if (!window._kidjs_.defaultStyle) {
@@ -56,11 +54,22 @@ export default class Stage {
    * @param {int} [width] - Optional stage width. Defaults to browser width.
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
-  resize(width, height) {
+  resize(width = 'auto', height = 'auto') {
 
-    // If no width or height default to window size
-    if (!parseInt(width)) width = window.innerWidth;
-    if (!parseInt(height)) height = window.innerHeight;
+    // If full size (ie. "auto")
+    if (width == 'auto' && height == 'auto') {
+      this.canvas.style.objectFit = 'cover';
+      this.canvas.style.objectPosition = 'top left';
+    } else {
+      this.canvas.style.objectFit = 'contain';
+      this.canvas.style.objectPosition = 'center';
+    }
+    if (width == 'auto') {
+      width = window.innerWidth;
+    }
+    if (height == 'auto') {
+      height = window.innerHeight;
+    }
 
     // Set width and height
     let scale = window.devicePixelRatio;

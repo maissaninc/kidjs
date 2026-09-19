@@ -15,8 +15,6 @@ export default class Grid {
     this.canvas.style.top = 0;
     this.canvas.style.left = 0;
     this.canvas.style.display = 'block';
-    this.canvas.style.objectFit = 'contain';
-    this.canvas.style.objectPosition = 'center';
     this.canvas.style.imageRendering = 'pixelated';
   }
 
@@ -25,9 +23,26 @@ export default class Grid {
    *
    * @param {CanvasRenderingContext2D} context - Rendering context
    */
-  render(width = window.innerWidth, height = window.innerHeight) {
+  render(width = 'auto', height = 'auto') {
+
+    // Resize canvas
+    if (width == 'auto' && height == 'auto') {
+      this.canvas.style.objectFit = 'cover';
+      this.canvas.style.objectPosition = 'top left';
+    } else {
+      this.canvas.style.objectFit = 'contain';
+      this.canvas.style.objectPosition = 'center';
+    }
+    if (width == 'auto') {
+      width = window.innerWidth;
+    }
+    if (height == 'auto') {
+      height = window.innerHeight;
+    }
     this.canvas.width = width;
     this.canvas.height = height;
+
+    // Redraw grid
     let size = window._kidjs_.settings.pixelSize;
     if (window._kidjs_.settings.grid && size >= 5) {
       for (let x = 0; x < this.canvas.width + size; x = x + size) {

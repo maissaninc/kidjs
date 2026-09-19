@@ -20,8 +20,8 @@ export default class Stage {
     this.frame = 0;
 
     // Ensure width and height are integers
-    if (!parseInt(width)) width = 'auto';
-    if (!parseInt(height)) height = 'auto';
+    if (!width || !parseInt(width)) width = 'auto';
+    if (!height || !parseInt(height)) height = 'auto';
 
     // Create Matter.js engine and listen for events
     this.engine = Matter.Engine.create();

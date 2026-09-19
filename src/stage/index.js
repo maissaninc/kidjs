@@ -15,7 +15,7 @@ export default class Stage {
    * @param {int} [width] - Optional stage width. Defaults to browser width.
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
-  constructor(width = window.innerWidth, height = window.innerHeight) {
+  constructor(width = "auto", height = "auto") {
     this.running = false;
     this.frame = 0;
 

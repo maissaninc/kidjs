@@ -15,9 +15,13 @@ export default class Stage {
    * @param {int} [width] - Optional stage width. Defaults to browser width.
    * @param {int} [height] - Optional stage height. Defaults to browser height.
    */
-  constructor(width = "auto", height = "auto") {
+  constructor(width = 'auto', height = 'auto') {
     this.running = false;
     this.frame = 0;
+
+    // Ensure width and height are integers
+    if (!parseInt(width)) width = 'auto';
+    if (!parseInt(height)) height = 'auto';
 
     // Create Matter.js engine and listen for events
     this.engine = Matter.Engine.create();

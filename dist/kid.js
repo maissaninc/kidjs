@@ -19501,6 +19501,8 @@
 		constructor(width = "auto", height = "auto") {
 			this.running = false;
 			this.frame = 0;
+			if (!parseInt(width)) width = "auto";
+			if (!parseInt(height)) height = "auto";
 			this.engine = import_matter.default.Engine.create();
 			import_matter.default.Events.on(this.engine, "collisionStart", (event) => this.onCollisionStart(event));
 			import_matter.default.Resolver._restingThresh = .001;

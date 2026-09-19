@@ -18850,6 +18850,8 @@
 		_grid = false;
 		_pixelSize = 1;
 		_orientation = "auto";
+		_width = "auto";
+		_height = "auto";
 		set backgroundColor(value) {
 			this._backgroundColor = value;
 		}
@@ -18893,6 +18895,20 @@
 		}
 		get orientation() {
 			return this._orientation;
+		}
+		set width(value) {
+			if (parseInt(value)) this._width = parseInt(value);
+			else this._width = "auto";
+		}
+		get width() {
+			return this._width;
+		}
+		set height(value) {
+			if (parseInt(value)) this._height = parseInt(value);
+			else this._height = "auto";
+		}
+		get height() {
+			return this._height;
 		}
 	};
 	//#endregion

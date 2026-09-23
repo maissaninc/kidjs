@@ -8,7 +8,7 @@ import seedrandom from 'seedrandom';
  * @param {String} code - Code to anonymize
  * @return {String} Anonymized code
  */
-export default function anonymize(code) {
+export function anonymize(code) {
 
   // Strings to replace
   let strings = [];

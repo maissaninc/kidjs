@@ -166,7 +166,6 @@ export function init() {
       let type = 'error';
 
       if (runtime) {
-        type = 'runtime';
         let frame = parseEvalStackFrame(e.stack);
         let map = window._kidjs_.sourceMap;
         let offset = window._kidjs_.sourceMapPrefixLines || 0;
@@ -181,17 +180,12 @@ export function init() {
           }
         }
       } else if (e.loc) {
-        if (e instanceof SyntaxError) {
-          type = 'syntax';
-        }
         lineNumber = e.loc.line;
         columnNumber = e.loc.column + 1;
-      } else if (e instanceof SyntaxError) {
-        type = 'syntax';
       }
 
       console.error('Error: ' + e.message + ' at line ' + lineNumber + ', column ' + columnNumber);
-      new KidjsError(e.message, type, lineNumber, columnNumber);
+      new KidjsError(e.message, typeof e, runtime, lineNumber, columnNumber);
     },
 
     libraries: [],

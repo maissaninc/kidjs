@@ -1,20 +1,21 @@
-import { anonymizeCode } from '../utils/anonymize';
+import { anonymize } from './anonymize';
 export class KidjsError extends Error {
 
-  constructor(message, type, line = 0, column = 0) {
+  constructor(message, type = 'KidjsError', runtime = true, line = 0, column = 0) {
     super(message);
     this.name = 'Kidjs';
 
     // Anonymize code
     let code = window._kidjs_.code;
     if (window._kidjs_.settings.anonymizeCodeForErrors) {
-      code = anonymizeCode(code);
+      code = anonymize(code);
     }
-    
+        
     window.dispatchEvent(new CustomEvent('KID.error', {
       detail: {
         message: message,
         type: type,
+        runtime: runtime,
         line: line,
         column: column,
         code: code

@@ -19178,10 +19178,7 @@
 					columnNumber = e.loc.column + 1;
 				}
 				console.error("Error: " + e.message + " at line " + lineNumber + ", column " + columnNumber);
-				let type = typeof e;
-				console.log("Type: " + type);
-				console.log(e);
-				new KidjsError$1(e.message, type, runtime, lineNumber, columnNumber);
+				new KidjsError$1(e.message, e.name || "UnknownError", runtime, lineNumber, columnNumber);
 			},
 			libraries: [],
 			import: async function(library) {

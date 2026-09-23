@@ -163,7 +163,6 @@ export function init() {
     error: function(e, runtime) {
       let lineNumber = -1;
       let columnNumber = 0;
-      let type = 'error';
 
       if (runtime) {
         let frame = parseEvalStackFrame(e.stack);
@@ -185,7 +184,10 @@ export function init() {
       }
 
       console.error('Error: ' + e.message + ' at line ' + lineNumber + ', column ' + columnNumber);
-      new KidjsError(e.message, typeof e, runtime, lineNumber, columnNumber);
+      let type = typeof e;
+      console.log('Type: ' + type);
+      console.log(e);
+      new KidjsError(e.message, type, runtime, lineNumber, columnNumber);
     },
 
     libraries: [],

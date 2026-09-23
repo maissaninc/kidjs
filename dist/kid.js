@@ -19162,7 +19162,6 @@
 			error: function(e, runtime) {
 				let lineNumber = -1;
 				let columnNumber = 0;
-				let type = "error";
 				if (runtime) {
 					let frame = parseEvalStackFrame(e.stack);
 					let map = window._kidjs_.sourceMap;
@@ -19179,7 +19178,10 @@
 					columnNumber = e.loc.column + 1;
 				}
 				console.error("Error: " + e.message + " at line " + lineNumber + ", column " + columnNumber);
-				new KidjsError$1(e.message, typeof e, runtime, lineNumber, columnNumber);
+				let type = typeof e;
+				console.log("Type: " + type);
+				console.log(e);
+				new KidjsError$1(e.message, type, runtime, lineNumber, columnNumber);
 			},
 			libraries: [],
 			import: async function(library) {

@@ -217,6 +217,7 @@ export function init() {
       setGlobals: []
     },
 
+    code: '',
     seed: Date.now(),
     sourceMap: null,
     sourceMapPrefixLines: 0,
@@ -720,6 +721,7 @@ export async function run(code) {
   reset();
   window.stage.run();
   log('Compilation started');
+  window._kidjs_.code = code;
   let processed = await compile(code);
   log('Compilation complete');
   await getPermissions();

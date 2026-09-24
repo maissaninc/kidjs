@@ -16819,7 +16819,7 @@
 			this.name = "Kidjs";
 			let code = window._kidjs_.code;
 			let dictionary = {};
-			if (window._kidjs_.settings.anonymizeCodeForErrors) code = anonymize(code, dictionary);
+			if (window._kidjs_.settings.includeAnonymizedCodeInErrors) code = anonymize(code, dictionary);
 			window.dispatchEvent(new CustomEvent("KID.error", { detail: {
 				message,
 				type,

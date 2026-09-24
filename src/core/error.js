@@ -8,7 +8,7 @@ export class KidjsError extends Error {
     // Anonymize code
     let code = window._kidjs_.code;
     let dictionary = {};
-    if (window._kidjs_.settings.anonymizeCodeForErrors) {
+    if (window._kidjs_.settings.includeAnonymizedCodeInErrors) {
       code = anonymize(code, dictionary);
     }
         

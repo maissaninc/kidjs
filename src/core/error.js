@@ -7,8 +7,9 @@ export class KidjsError extends Error {
 
     // Anonymize code
     let code = window._kidjs_.code;
+    let dictionary = {};
     if (window._kidjs_.settings.anonymizeCodeForErrors) {
-      code = anonymize(code);
+      code = anonymize(code, dictionary);
     }
         
     window.dispatchEvent(new CustomEvent('KID.error', {
@@ -18,7 +19,8 @@ export class KidjsError extends Error {
         runtime: runtime,
         line: line,
         column: column,
-        code: code
+        code: code,
+        dictionary: dictionary
       }
     }));
   }

@@ -1,58 +1,142 @@
-import * as acorn from 'acorn';
-import * as walk from 'acorn-walk';
 import seedrandom from 'seedrandom';
 
+// JavaScript reserved words, common builtins, and Kid.js APIs. Matching is
+// case-insensitive so these names stay readable in anonymized code.
+const reservedWords = [
+  'abstract', 'arguments', 'as', 'async', 'await', 'boolean', 'break', 'byte',
+  'case', 'catch', 'char', 'class', 'const', 'continue', 'debugger', 'default',
+  'delete', 'do', 'double', 'else', 'enum', 'eval', 'export', 'extends', 'false',
+  'final', 'finally', 'for', 'from', 'function', 'goto', 'if', 'implements',
+  'import', 'in', 'instanceof', 'int', 'interface', 'let', 'long', 'native',
+  'new', 'null', 'of', 'package', 'private', 'protected', 'public', 'return',
+  'short', 'static', 'super', 'switch', 'synchronized', 'this', 'throw',
+  'throws', 'transient', 'true', 'try', 'typeof', 'undefined', 'var', 'void',
+  'volatile', 'while', 'with', 'yield',
+
+  'Array', 'BigInt', 'Boolean', 'Date', 'Error', 'Function', 'Infinity', 'JSON',
+  'Map', 'Math', 'NaN', 'Number', 'Object', 'PI', 'Promise', 'Proxy', 'Reflect',
+  'RegExp', 'Set', 'String', 'Symbol', 'WeakMap', 'WeakSet',
+  'clearInterval', 'clearTimeout', 'console', 'decodeURI', 'decodeURIComponent',
+  'document', 'encodeURI', 'encodeURIComponent', 'isFinite', 'isNaN', 'log',
+  'parseFloat', 'parseInt', 'requestAnimationFrame', 'cancelAnimationFrame',
+  'setInterval', 'setTimeout', 'window',
+  'alert', 'confirm', 'prompt',
+  'toString', 'toLowerCase', 'toUpperCase', 'indexOf', 'length',
+  'innerHeight', 'innerWidth',
+  'addEventListener', 'removeEventListener', 'appendChild', 'removeChild',
+  'beginPath', 'closePath', 'clearRect', 'fillRect', 'fillStyle', 'strokeStyle',
+  'drawImage', 'lineTo', 'moveTo', 'bezierCurveTo',
+  'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY',
+
+  'acos', 'asin', 'atan', 'beep', 'circle', 'clear', 'clearPixel', 'cos',
+  'curve', 'display', 'frequency', 'getPixel', 'group', 'heptagon', 'hexagon',
+  'image', 'join', 'line', 'neuralNetwork', 'note', 'octagon', 'on', 'oval',
+  'path', 'pentagon', 'pie', 'pixel', 'polygon', 'putPixel', 'random', 'record',
+  'rect', 'rectangle', 'semicircle', 'send', 'sin', 'song', 'sound', 'speak',
+  'square', 'star', 'tada', 'tan', 'triangle', 'wait', 'write', 'writeln',
+  'HandTracker',
+
+  'stage', 'grid', 'debug', 'KID',
+  'fill', 'stroke', 'color', 'opacity', 'width', 'height', 'size',
+  'font', 'fontColor', 'fontSize', 'fontWeight', 'lineWidth', 'lineStyle',
+  'textAlign', 'textBaseline', 'text',
+  'mouseX', 'mouseY', 'mouseButton', 'tiltX', 'tiltY',
+  'x', 'y', 'angle', 'velocity', 'acceleration', 'angularVelocity', 'direction',
+  'anchored', 'locked', 'collides', 'ghost', 'bounciness',
+
+  'rotate', 'forward', 'backward', 'animate', 'move', 'shrink', 'grow', 'fade',
+  'fadeIn', 'fadeOut', 'push', 'spin', 'explode', 'stop', 'hide', 'show',
+  'remove', 'clone', 'copy', 'add', 'addChild', 'repeat', 'train', 'run',
+
+  'click', 'dblclick', 'doubleclick', 'mousedown', 'mouseup', 'mousemove',
+  'keydown', 'keyup', 'keypress', 'collision', 'frame', 'message'
+];
+
+const reserved = {};
+for (let i = 0; i < reservedWords.length; i = i + 1) {
+  reserved[reservedWords[i].toLowerCase()] = true;
+}
+
 /**
- * Anonymize the given code.
+ * Anonymize the given code without parsing it.
+ *
+ * Alphanumeric runs are kept together. Reserved JavaScript keywords and
+ * common Kid.js / JavaScript names are left unchanged; every other
+ * identifier-like segment is replaced with seeded random text of the same
+ * length. Purely numeric segments are left as-is.
  *
  * @param {String} code - Code to anonymize
- * @return {String} Anonymized code
+ * @return {{code: String, dictionary: Object}} Anonymized code and a map of
+ *   randomized text to the original segment, for unanonymize()
  */
-export function anonymize(code) {
-
-  // Strings to replace
-  let strings = [];
-
-  // Parse code into AST
-  let comments = [];
-  let ast;
-  try {
-    ast = acorn.parse(code, {
-      locations: true,
-      onComment: comments,
-      sourceType: 'module',
-      ecmaVersion: 2020
-    });
-  } catch(e) {
+export function anonymize(code, dictionary) {
+  if (!code) {
     return '';
   }
+  if (!dictionary) {
+    dictionary = {};
+  }
 
-  // Walk entire source tree
-  walk.full(ast, function(node) {
+  let forward = {};
+  let parts = code.split(/([A-Za-z0-9]+)/);
+  let result = '';
 
-    // If string literal, add to strings array
-    if (node.type == 'Literal' && typeof node.value == 'string') {
-      strings.push(node);
+  for (let i = 0; i < parts.length; i = i + 1) {
+    let part = parts[i];
+    if (shouldReplace(part)) {
+      if (!forward[part]) {
+        let replacement = uniqueRandom(part, dictionary);
+        forward[part] = replacement;
+        dictionary[replacement] = part;
+      }
+      result += forward[part];
+    } else {
+      result += part;
     }
-  });
-
-  // Replace string literals with seeded random strings of the same length
-  for (let i = strings.length - 1; i >= 0; i = i - 1) {
-    let node = strings[i];
-    let quote = code[node.start];
-    let innerLength = node.end - node.start - 2;
-    let replacement = quote + randomizeString(node.value, innerLength) + quote;
-    code = code.slice(0, node.start) + replacement + code.slice(node.end);
   }
 
-  // Replace comments with empty strings, keeping newlines so line numbers stay the same
-  for (let i = comments.length - 1; i >= 0; i = i - 1) {
-    let text = code.slice(comments[i].start, comments[i].end);
-    let replacement = text.replace(/[^\n]/g, '');
-    code = code.slice(0, comments[i].start) + replacement + code.slice(comments[i].end);
-  }
+  return result;
+}
 
-  return code;
+
+/**
+ * True when this alphanumeric run should be replaced with random text.
+ *
+ * @param {String} part - Segment from the split
+ * @return {Boolean}
+ */
+function shouldReplace(part) {
+  if (!/^[A-Za-z0-9]+$/.test(part)) {
+    return false;
+  }
+  if (!/[A-Za-z]/.test(part)) {
+    return false;
+  }
+  if (reserved[part.toLowerCase()]) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Build a unique random stand-in for value, avoiding reserved words and
+ * strings already used as replacements.
+ *
+ * @param {String} value - Original segment
+ * @param {Object} dictionary - Map of replacements already assigned
+ * @return {String} Seeded random string of the same length
+ */
+function uniqueRandom(value, dictionary) {
+  let firstIsLetter = /[A-Za-z]/.test(value.charAt(0));
+  let attempt = 0;
+  while (attempt < 1000) {
+    let candidate = randomizeString(value + ':' + attempt, value.length, firstIsLetter);
+    if (!reserved[candidate.toLowerCase()] && !dictionary[candidate]) {
+      return candidate;
+    }
+    attempt = attempt + 1;
+  }
+  return randomizeString(value, value.length, firstIsLetter);
 }
 
 /**
@@ -60,14 +144,17 @@ export function anonymize(code) {
  *
  * @param {String} value - Original string used as the RNG seed
  * @param {Number} length - Number of characters to generate
+ * @param {Boolean} firstIsLetter - Whether the first character must be a letter
  * @return {String} Seeded random string
  */
 function randomizeString(value, length) {
   let rng = seedrandom(value);
-  let alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let alphabet = letters + '0123456789';
   let result = '';
   for (let i = 0; i < length; i = i + 1) {
-    result += alphabet.charAt(Math.floor(rng() * alphabet.length));
+    let chars = (i == 0 && firstIsLetter) ? letters : alphabet;
+    result += chars.charAt(Math.floor(rng() * chars.length));
   }
   return result;
 }

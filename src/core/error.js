@@ -1,4 +1,3 @@
-import { anonymize } from './anonymize';
 export class KidjsError extends Error {
 
   constructor(message, type = 'KidjsError', runtime = true, line = 0, column = 0) {

@@ -16811,17 +16811,12 @@
 		constructor(message, type = "KidjsError", runtime = true, line = 0, column = 0) {
 			super(message);
 			this.name = "Kidjs";
-			let code = window._kidjs_.code;
-			let dictionary = {};
-			if (window._kidjs_.settings.includeAnonymizedCodeInErrors) code = anonymize(code, dictionary);
 			window.dispatchEvent(new CustomEvent("KID.error", { detail: {
 				message,
 				type,
 				runtime,
 				line,
-				column,
-				code,
-				dictionary
+				column
 			} }));
 		}
 	};
@@ -20408,6 +20403,7 @@
 	window.KID = {
 		run,
 		stop,
+		anonymize,
 		settings: window._kidjs_.settings,
 		setAssetUrlFilter
 	};

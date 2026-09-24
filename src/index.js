@@ -24,6 +24,7 @@
 
 
 import { init, run, stop, setAssetUrlFilter } from './core';
+import { anonymize } from './core/anonymize';
 import initEvents from './events';
 import Stage from './stage';
 import Grid from './stage/grid';
@@ -83,6 +84,7 @@ window.addEventListener('DOMContentLoaded', function() {
 window.KID = {
   run: run,
   stop: stop,
+  anonymize: anonymize,
   settings: window._kidjs_.settings,
   setAssetUrlFilter: setAssetUrlFilter,
 };

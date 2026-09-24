@@ -4,23 +4,13 @@ export class KidjsError extends Error {
   constructor(message, type = 'KidjsError', runtime = true, line = 0, column = 0) {
     super(message);
     this.name = 'Kidjs';
-
-    // Anonymize code
-    let code = window._kidjs_.code;
-    let dictionary = {};
-    if (window._kidjs_.settings.includeAnonymizedCodeInErrors) {
-      code = anonymize(code, dictionary);
-    }
-        
     window.dispatchEvent(new CustomEvent('KID.error', {
       detail: {
         message: message,
         type: type,
         runtime: runtime,
         line: line,
-        column: column,
-        code: code,
-        dictionary: dictionary
+        column: column
       }
     }));
   }

@@ -16783,32 +16783,26 @@
 	* @return {String} Seeded random string of the same length
 	*/
 	function uniqueRandom(value, dictionary) {
-		let firstIsLetter = /[A-Za-z]/.test(value.charAt(0));
 		let attempt = 0;
 		while (attempt < 1e3) {
-			let candidate = randomizeString(value + ":" + attempt, value.length, firstIsLetter);
+			let candidate = randomizeString(value + ":" + attempt, value.length);
 			if (!reserved[candidate.toLowerCase()] && !dictionary[candidate]) return candidate;
 			attempt = attempt + 1;
 		}
-		return randomizeString(value, value.length, firstIsLetter);
+		return randomizeString(value, value.length);
 	}
 	/**
 	* Build a random alphanumeric string of the given length, seeded by value.
 	*
 	* @param {String} value - Original string used as the RNG seed
 	* @param {Number} length - Number of characters to generate
-	* @param {Boolean} firstIsLetter - Whether the first character must be a letter
 	* @return {String} Seeded random string
 	*/
 	function randomizeString(value, length) {
 		let rng = (0, import_seedrandom.default)(value);
-		let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		let result = "";
-		for (let i = 0; i < length; i = i + 1) {
-			let chars = i == 0 && firstIsLetter ? letters : alphabet;
-			result += chars.charAt(Math.floor(rng() * chars.length));
-		}
+		for (let i = 0; i < length; i = i + 1) result += chars.charAt(Math.floor(rng() * 52));
 		return result;
 	}
 	//#endregion

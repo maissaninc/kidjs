@@ -23,16 +23,9 @@ export default class Grid {
    *
    * @param {CanvasRenderingContext2D} context - Rendering context
    */
-  render(width = 'auto', height = 'auto') {
+  render(width = 'auto', height = 'auto', objectFit = 'cover', objectPosition = 'top left') {
 
     // Resize canvas
-    if (width == 'auto' && height == 'auto') {
-      this.canvas.style.objectFit = 'cover';
-      this.canvas.style.objectPosition = 'top left';
-    } else {
-      this.canvas.style.objectFit = 'contain';
-      this.canvas.style.objectPosition = 'center';
-    }
     if (width == 'auto') {
       width = window.innerWidth;
     }
@@ -41,6 +34,8 @@ export default class Grid {
     }
     this.canvas.width = width;
     this.canvas.height = height;
+    this.canvas.style.objectFit = objectFit;
+    this.canvas.style.objectPosition = objectPosition;
 
     // Redraw grid
     let size = window._kidjs_.settings.pixelSize;

@@ -112,7 +112,7 @@ export default class Stage {
 
     // Redraw grid
     if (window.grid) {
-      window.grid.render(viewportWidth, viewportHeight);
+      window.grid.render(viewportWidth, viewportHeight, this.canvas.style.objectFit, this.canvas.style.objectPosition);
     }
   }
 

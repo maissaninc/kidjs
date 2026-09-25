@@ -19573,7 +19573,7 @@
 			this.canvas.style.height = viewportHeight + "px";
 			this.context.scale(scale, scale);
 			if (this._leftWall) this._positionWalls();
-			if (window.grid) window.grid.render(viewportWidth, viewportHeight);
+			if (window.grid) window.grid.render(viewportWidth, viewportHeight, this.canvas.style.objectFit, this.canvas.style.objectPosition);
 		}
 		/**
 		* Position walls.
@@ -19885,18 +19885,13 @@
 		*
 		* @param {CanvasRenderingContext2D} context - Rendering context
 		*/
-		render(width = "auto", height = "auto") {
-			if (width == "auto" && height == "auto") {
-				this.canvas.style.objectFit = "cover";
-				this.canvas.style.objectPosition = "top left";
-			} else {
-				this.canvas.style.objectFit = "contain";
-				this.canvas.style.objectPosition = "center";
-			}
+		render(width = "auto", height = "auto", objectFit = "cover", objectPosition = "top left") {
 			if (width == "auto") width = window.innerWidth;
 			if (height == "auto") height = window.innerHeight;
 			this.canvas.width = width;
 			this.canvas.height = height;
+			this.canvas.style.objectFit = objectFit;
+			this.canvas.style.objectPosition = objectPosition;
 			let size = window._kidjs_.settings.pixelSize;
 			if (window._kidjs_.settings.grid && size >= 5) for (let x = 0; x < this.canvas.width + size; x = x + size) for (let y = 0; y < this.canvas.height + size; y = y + size) {
 				this.context.fillStyle = this.color;

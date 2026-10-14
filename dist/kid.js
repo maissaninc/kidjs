@@ -15919,7 +15919,7 @@
 	};
 	/**
 	* Call an event handler and report both thrown errors and rejected
-	* promises. Named Kid.js functions are compiled as async, so errors
+	* promises. Kid.js functions are compiled as async, so errors
 	* inside them become promise rejections instead of throws.
 	*
 	* @param {function} handler
@@ -19203,6 +19203,14 @@
 		let libraries = [];
 		full(ast, function(node) {
 			checkForRequiredPermissions(node);
+			if ([
+				"FunctionDeclaration",
+				"FunctionExpression",
+				"ArrowFunctionExpression"
+			].includes(node.type) && !node.async) {
+				node.async = true;
+				if (node.id && node.id.name) convertedFunctions.push(node.id.name);
+			}
 			if (node.body) for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 				if (node.body[i].type == "ImportDeclaration") {
 					libraries.push(node.body[i].source.value);
@@ -19218,7 +19226,7 @@
 							"code": node.body[i].expression.arguments[1].name + "();",
 							"target": target
 						});
-						if (node.body[i].expression.arguments[1].type == "FunctionExpression") triggers.push({
+						if (["FunctionExpression", "ArrowFunctionExpression"].includes(node.body[i].expression.arguments[1].type)) triggers.push({
 							"condition": generate(node.body[i].expression.arguments[0]),
 							"code": "(" + generate(node.body[i].expression.arguments[1]) + ")();",
 							"target": target
@@ -19257,12 +19265,6 @@
 						type: "Literal",
 						value: true
 					};
-				}
-				if (node.body[i].type == "FunctionDeclaration") {
-					if (node.body[i].async == false) {
-						node.body[i].async = true;
-						if (node.body[i].id && node.body[i].id.name) convertedFunctions.push(node.body[i].id.name);
-					}
 				}
 				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.type == "Identifier" && node.body[i].expression.callee.name == "wait") node.body[i].expression = wrapAwait(node.body[i].expression);
 				if (node.body[i].type == "ExpressionStatement" && node.body[i].expression.type == "CallExpression" && node.body[i].expression.callee.type == "MemberExpression" && node.body[i].expression.callee.property.name == "wait") node.body[i].expression = wrapAwait(node.body[i].expression);
@@ -19359,14 +19361,16 @@
 	function createInlineFunction(node) {
 		return {
 			type: "ArrowFunctionExpression",
+			async: true,
+			expression: false,
+			params: [],
 			body: {
 				type: "BlockStatement",
 				body: [{
 					type: "ExpressionStatement",
 					expression: node
 				}]
-			},
-			params: []
+			}
 		};
 	}
 	/**

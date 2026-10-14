@@ -300,6 +300,17 @@ async function compile(code) {
     // Check for required permissions
     checkForRequiredPermissions(node);
 
+    // Convert all functions to async, including inline function
+    // expressions and arrows so await wait()/prompt() is valid
+    if (['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression'].includes(node.type) &&
+        !node.async
+    ) {
+      node.async = true;
+      if (node.id && node.id.name) {
+        convertedFunctions.push(node.id.name);
+      }
+    }
+
     if (node.body) {
       for (let i = node.body.length - 1; i >= 0; i = i - 1) {
 
@@ -332,7 +343,7 @@ async function compile(code) {
             }
 
             // Inline function passed as second parameter
-            if (node.body[i].expression.arguments[1].type == 'FunctionExpression') {
+            if (['FunctionExpression', 'ArrowFunctionExpression'].includes(node.body[i].expression.arguments[1].type)) {
               triggers.push({
                 'condition': astring.generate(node.body[i].expression.arguments[0]),
                 'code': '(' + astring.generate(node.body[i].expression.arguments[1]) + ')();',
@@ -398,16 +409,6 @@ async function compile(code) {
             type: 'Literal',
             value: true
           };
-        }
-
-        // Convert all functions to async
-        if (node.body[i].type == 'FunctionDeclaration') {
-          if (node.body[i].async == false) {
-            node.body[i].async = true;
-            if (node.body[i].id && node.body[i].id.name) {
-              convertedFunctions.push(node.body[i].id.name);
-            }
-          }
         }
 
         // Add await to wait() calls
@@ -578,14 +579,16 @@ function checkForRequiredPermissions(node) {
 function createInlineFunction(node) {
   return {
     type: 'ArrowFunctionExpression',
+    async: true,
+    expression: false,
+    params: [],
     body: {
       type: 'BlockStatement',
       body: [{
         type: 'ExpressionStatement',
         expression: node
       }]
-    },
-    params: []
+    }
   }
 }
 

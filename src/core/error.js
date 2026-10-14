@@ -17,7 +17,7 @@ export class KidjsError extends Error {
 
 /**
  * Call an event handler and report both thrown errors and rejected
- * promises. Named Kid.js functions are compiled as async, so errors
+ * promises. Kid.js functions are compiled as async, so errors
  * inside them become promise rejections instead of throws.
  *
  * @param {function} handler
